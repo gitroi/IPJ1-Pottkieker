@@ -23,9 +23,10 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
     * Titel und Beschreibung ergänzen -> Create
     * Die Pull Request kann von allen Mitarbeitern kommentiert werden
     * Collaborators können die Request zulassen, entweder auf Github oder unten in der Activity Bar "Create Merge Commit"
+4. Branch löschen
 
 <ins>Arbeiten ("unsicher"):</ins>
-    Einfach im main-Branch arbeiten und darin "Commit & Sync" 
+* Einfach im main-Branch arbeiten und darin "Commit & Sync" 
 
 
 **Das Repository ist wie folgt aufgebaut:**
