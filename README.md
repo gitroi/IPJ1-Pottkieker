@@ -7,8 +7,8 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 **Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
 
 Initial: 
-1. Beim ersten Mal in VS-Code in der Activity Bar zur "Source Control" navigieren
-2. 
+1. In VS-Code auf die "Welcome"-Page (erreichbar durch Strg + Shift + P -> "welcome" eingeben)
+2. "Clone Git Repository" -> URL dieses Repositories einfügen und lokalen Speicherort wählen
 
 Das Repository ist wie folgt aufgebaut:
 
