@@ -4,21 +4,21 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 ## Dateistruktur
 
-###**Das Repository ist wie folgt aufgebaut:**
+###Das Repository ist wie folgt aufgebaut:
 
-### Code
+#### Code
 
 Hier liegen alle Python-/Jupyter-Quelldateien.
 
-### Daten
+#### Daten
 
 Hier liegen alle Daten die zur Auswertung eingelesen werden wie CSV-Dateien.
 
-### Quellen
+#### Quellen
 
 Hier liegen Quellen, die bei der Erstellung der Software genutzt wurden.
 
-### Sonstiges
+#### Sonstiges
 
 Hier liegen alle Dateien die nicht den anderen Kategorien zugeordnet werden können (Bei Bedarf einen neuen Ordner erstellen, falls sinnvoll)
 
