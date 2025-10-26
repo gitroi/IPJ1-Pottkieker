@@ -10,7 +10,7 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 1. In VS-Code auf die "Welcome"-Page (erreichbar durch Strg + Shift + P -> "welcome" eingeben)
 2. "Clone Git Repository" -> URL dieses Repositories einfügen und lokalen Speicherort wählen
 
-<ins>Arbeiten:</ins>
+<ins>Arbeiten (sicher):</ins>
 1. Branch erstellen
     * In der Activity Bar zur "Source Control" navigieren und auf die drei Punkte beim aktuellen Repository klicken
     * Branch -> Create Branch -> sinnvollen Namen geben
@@ -19,7 +19,13 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
     * In der Source Control eine aussagekräftige Message schreiben
     * Dropdown-Menü: "Commit & Sync"
 3. Wenn der Code bugfrei ist kann er auf die main-Branch gemerged werden
-    * 
+    * Source Control 3. Symbol von rechts (Create Pull Request)
+    * Titel und Beschreibung ergänzen -> Create
+    * Die Pull Request kann von allen Mitarbeitern kommentiert werden
+    * Collaborators können die Request zulassen, entweder auf Github oder unten in der Activity Bar "Create Merge Commit"
+
+<ins>Arbeiten ("unsicher"):</ins>
+    * Einfach im main-Branch arbeiten und darin "Commit & Sync" 
 
 
 **Das Repository ist wie folgt aufgebaut:**
