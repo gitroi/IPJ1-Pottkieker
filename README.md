@@ -6,12 +6,15 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 **Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
 
-<ins>Initial</ins>: 
+<ins>Initial:</ins>
 1. In VS-Code auf die "Welcome"-Page (erreichbar durch Strg + Shift + P -> "welcome" eingeben)
 2. "Clone Git Repository" -> URL dieses Repositories einfügen und lokalen Speicherort wählen
 
-Arbeiten:
-
+<ins>Arbeiten:</ins>
+1. Branch erstellen
+    1. In der Activity Bar zur "Source Control" navigieren und auf die drei Punkte beim aktuellen Repository klicken
+    2. Branch -> Create Branch -> sinnvollen Namen geben
+2. Coden, die Änderungen werden dabei vorerst nur in der Branch gespeichert
 
 **Das Repository ist wie folgt aufgebaut:**
 
