@@ -8,8 +8,8 @@ import numpy as np
 # C:\Users\joris\Documents\IPJ1\Daten\Erzeugung.csv
 # ==============================   
 
-pfaderzeugung = "C:\\Users\\joris\\Documents\\IPJ1\\Daten\\Erzeugung.csv"
-pfadverbrauch = "C:\\Users\\joris\\Documents\\IPJ1\\Daten\\Verbrauch.csv"
+pfaderzeugung = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\erzeugung.csv"
+pfadverbrauch = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\verbrauch.csv"
 
 # ==============================
 # 1. CSV-Dateien einlesen
