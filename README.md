@@ -12,9 +12,12 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 <ins>Arbeiten:</ins>
 1. Branch erstellen
-    1. In der Activity Bar zur "Source Control" navigieren und auf die drei Punkte beim aktuellen Repository klicken
-    2. Branch -> Create Branch -> sinnvollen Namen geben
-2. Coden, die Änderungen werden dabei vorerst nur in der Branch gespeichert
+    I. In der Activity Bar zur "Source Control" navigieren und auf die drei Punkte beim aktuellen Repository klicken
+    II. Branch -> Create Branch -> sinnvollen Namen geben
+2. Coden, alle Änderungen werden dabei beim committen vorerst nur in der Branch gespeichert
+    * Committen: Lokal gespeicherte Änderungen werden auf Git gepusht, dazu in der Source Control eine aussagekräftige Message schreiben, Dropdown-Menü: "Commit & Sync"
+3. Wenn der Code bugfrei ist kann er auf die main-Branch gemerged werden
+
 
 **Das Repository ist wie folgt aufgebaut:**
 
