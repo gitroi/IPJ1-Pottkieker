@@ -4,6 +4,26 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 ## Dateistruktur
 
+###**Das Repository ist wie folgt aufgebaut:**
+
+### Code
+
+Hier liegen alle Python-/Jupyter-Quelldateien.
+
+### Daten
+
+Hier liegen alle Daten die zur Auswertung eingelesen werden wie CSV-Dateien.
+
+### Quellen
+
+Hier liegen Quellen, die bei der Erstellung der Software genutzt wurden.
+
+### Sonstiges
+
+Hier liegen alle Dateien die nicht den anderen Kategorien zugeordnet werden können (Bei Bedarf einen neuen Ordner erstellen, falls sinnvoll)
+
+##Arbeitsweise
+
 **Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
 
 <ins>Initial:</ins>
@@ -26,23 +46,6 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 4. Branch löschen
 
 <ins>Arbeiten ("unsicher"):</ins>
-* Einfach im main-Branch arbeiten und darin "Commit & Sync" 
+* Am Anfang einer Coding-Session aktuellen Stand pullen/syncen
+* einfach im main-Branch arbeiten und darin "Commit & Sync" 
 
-
-###**Das Repository ist wie folgt aufgebaut:**###
-
-### Code
-
-Hier liegen alle Python-/Jupyter-Quelldateien.
-
-### Daten
-
-Hier liegen alle Daten die zur Auswertung eingelesen werden wie CSV-Dateien.
-
-### Quellen
-
-Hier liegen Quellen, die bei der Erstellung der Software genutzt wurden.
-
-### Sonstiges
-
-Hier liegen alle Dateien die nicht den anderen Kategorien zugeordnet werden können (Bei Bedarf einen neuen Ordner erstellen, falls sinnvoll)
