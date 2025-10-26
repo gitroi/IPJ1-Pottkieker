@@ -4,7 +4,7 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 ## Dateistruktur
 
-###Das Repository ist wie folgt aufgebaut:
+###Aufbau:
 
 #### Code
 
