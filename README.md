@@ -20,7 +20,7 @@ Hier liegen Quellen, die bei der Erstellung der Software genutzt wurden.
 
 Hier liegen alle Dateien die nicht den anderen Kategorien zugeordnet werden können (Bei Bedarf einen neuen Ordner erstellen, falls sinnvoll)
 
-##Arbeitsweise
+## Arbeitsweise
 
 **Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
 
