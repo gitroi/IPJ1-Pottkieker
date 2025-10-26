@@ -22,7 +22,7 @@ Hier liegen alle Dateien die nicht den anderen Kategorien zugeordnet werden kön
 
 ## Arbeitsweise
 
-**Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
+### **Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
 
 <ins>Initial:</ins>
 1. In VS-Code auf die "Welcome"-Page (erreichbar durch Strg + Shift + P -> "welcome" eingeben)
