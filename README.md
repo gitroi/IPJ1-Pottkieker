@@ -29,7 +29,7 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 * Einfach im main-Branch arbeiten und darin "Commit & Sync" 
 
 
-**Das Repository ist wie folgt aufgebaut:**
+###**Das Repository ist wie folgt aufgebaut:**###
 
 ### Code
 
