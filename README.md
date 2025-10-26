@@ -4,8 +4,6 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 ## Dateistruktur
 
-###Aufbau:
-
 #### Code
 
 Hier liegen alle Python-/Jupyter-Quelldateien.
