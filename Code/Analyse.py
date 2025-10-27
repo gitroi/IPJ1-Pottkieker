@@ -99,61 +99,61 @@ gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).r
 # ==============================
 # 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre
 # ==============================
+def plot_ee_anteil_histogram(gesamt):
+    # erstellen der Bins für das Histogram mit den Abständen von 0 bis 100 in 10 Schritten
+    bins = np.linspace(0, 100, 11)
 
-# erstellen der Bins für das Histogram mit den Abständen von 0 bis 100 in 10 Schritten
-bins = np.linspace(0, 100, 11)
+    plt.style.use('_mpl-gallery')
+    # größere Figur und höhere DPI für bessere Lesbarkeit
+    fig, ax = plt.subplots(figsize=(12, 6), dpi=140)
 
-plt.style.use('_mpl-gallery')
-# größere Figur und höhere DPI für bessere Lesbarkeit
-fig, ax = plt.subplots(figsize=(12, 6), dpi=140)
+    # Defensive Vorbereitung der Daten: konvertieren, Inf/NaN entfernen
+    vals = pd.to_numeric(gesamt["Anteil Erneuerbare [MWh]"], errors="coerce")
+    vals = vals.replace([np.inf, -np.inf], np.nan).dropna()
 
-# Defensive Vorbereitung der Daten: konvertieren, Inf/NaN entfernen
-vals = pd.to_numeric(gesamt["Anteil Erneuerbare [MWh]"], errors="coerce")
-vals = vals.replace([np.inf, -np.inf], np.nan).dropna()
+    if len(vals) == 0:
+        print("Keine gültigen Werte zum Plotten.")
+    else:
+        # Histogramm erstellen und Prozentwerte berechnen
+        n, bins, patches = ax.hist(vals, bins=bins, color='skyblue', edgecolor='white')
+        total = n.sum()
+        # Prozentwerte je Bin (in %)
+        pct = (n / total) * 100
 
-if len(vals) == 0:
-    print("Keine gültigen Werte zum Plotten.")
-else:
-    # Histogramm erstellen und Prozentwerte berechnen
-    n, bins, patches = ax.hist(vals, bins=bins, color='skyblue', edgecolor='white')
-    total = n.sum()
-    # Prozentwerte je Bin (in %)
-    pct = (n / total) * 100
+        # Beschriftungen über den Balken
+        for count, x_left, x_right, p in zip(n, bins[:-1], bins[1:], pct):
+            # x-Position in der Mitte des Balkens
+            x = (x_left + x_right) / 2
+            # y-Position leicht über dem Balken
+            y = count
+            ax.text(x, y + max(n) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
 
-    # Beschriftungen über den Balken
-    for count, x_left, x_right, p in zip(n, bins[:-1], bins[1:], pct):
-        # x-Position in der Mitte des Balkens
-        x = (x_left + x_right) / 2
-        # y-Position leicht über dem Balken
-        y = count
-        ax.text(x, y + max(n) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
+        # Achsentitel und Diagrammtitel
+        ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch der Jahre 2020-2025')
+        ax.set_xlabel('Anteil Erneuerbare [%]')
+        ax.set_ylabel('Anzahl Viertelstunden')
 
-    # Achsentitel und Diagrammtitel
-    ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch der Jahre 2020-2025')
-    ax.set_xlabel('Anteil Erneuerbare [%]')
-    ax.set_ylabel('Anzahl Viertelstunden')
+        # Optional: x-Lim auf sinnvollen Bereich setzen (0-100% für prozentuale Anteile)
+        ax.set_xlim(0, 100)
 
-    # Optional: x-Lim auf sinnvollen Bereich setzen (0-100% für prozentuale Anteile)
-    ax.set_xlim(0, 100)
+        # Y-Achse in Tausender-Einheiten formatieren (z.B. 5,10,15 statt 5000,10000,15000)
+        from matplotlib.ticker import MultipleLocator, FuncFormatter
+        import math
 
-    # Y-Achse in Tausender-Einheiten formatieren (z.B. 5,10,15 statt 5000,10000,15000)
-    from matplotlib.ticker import MultipleLocator, FuncFormatter
-    import math
+        max_count = int(max(n)) if len(n) > 0 else 0
+        # Ziel: ca. 6 Ticks => Schritt in Tausendern bestimmen
+        approx_ticks = 6
+        step_thousands = max(1, math.ceil((max_count / 1000) / approx_ticks))
+        step = step_thousands * 1000
 
-    max_count = int(max(n)) if len(n) > 0 else 0
-    # Ziel: ca. 6 Ticks => Schritt in Tausendern bestimmen
-    approx_ticks = 6
-    step_thousands = max(1, math.ceil((max_count / 1000) / approx_ticks))
-    step = step_thousands * 1000
+        ax.yaxis.set_major_locator(MultipleLocator(step))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f"{int(x/1000)}"))
+        ax.set_ylabel('Anzahl (in 1.000)')
 
-    ax.yaxis.set_major_locator(MultipleLocator(step))
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f"{int(x/1000)}"))
-    ax.set_ylabel('Anzahl (in 1.000)')
-
-    # verhindert, dass Labels vom Fensterrand oder Menüs überdeckt werden
-    plt.tight_layout()
-    
-plt.show()
+        # verhindert, dass Labels vom Fensterrand oder Menüs überdeckt werden
+        plt.tight_layout()
+        
+    plt.show()
 
 # ==============================
 # 8. Anzahl der Viertelstunden mit EE-Anteil von 100%
@@ -161,3 +161,44 @@ plt.show()
 
 anzahl = (gesamt["Anteil Erneuerbare [MWh]"] >= 100).sum()
 print(f"Anzahl der Viertelstunden mit einem EE-Anteil von 100%: {anzahl}")
+
+# ==============================
+# 9. erzeugung in stacked bar plot visualisieren
+# ==============================
+
+def plot_erzeugung_stacked_bar(erzeugung):
+    # Daten für das Jahr 2025 filtern
+    erzeugung_2025 = erzeugung[(erzeugung["Datum von"].dt.year == 2025)&(erzeugung["Datum von"].dt.month == 6)].copy()
+    erzeugung_2025.set_index("Datum von", inplace=True)
+
+    # Spalten für die gestapelten Balken
+    stacked_cols = [
+        "Biomasse [MWh] Originalauflösungen",
+        "Wasserkraft [MWh] Originalauflösungen",
+        "Wind Offshore [MWh] Originalauflösungen",
+        "Wind Onshore [MWh] Originalauflösungen",
+        "Photovoltaik [MWh] Originalauflösungen",
+        "Sonstige Erneuerbare [MWh] Originalauflösungen",
+    ]
+
+    # Plot erstellen
+    plt.style.use('_mpl-gallery')
+    fig, ax = plt.subplots(figsize=(14, 7), dpi=140)
+
+    erzeugung_2025[stacked_cols].plot(
+        kind='bar',
+        stacked=True,
+        ax=ax,
+        width=1.0,
+        edgecolor='none',
+        colormap='tab20'
+    )
+
+    ax.set_title('Stromerzeugung nach Energiequellen im Jahr 2025')
+    ax.set_xlabel('Datum')
+    ax.set_ylabel('Erzeugung [MWh]')
+    ax.legend(title='Energiequellen', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+    plt.show()
+
+#plot_erzeugung_stacked_bar(erzeugung)
