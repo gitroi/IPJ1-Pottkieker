@@ -23,25 +23,36 @@ verbrauch_df["Netzlast [MWh]"] = pd.to_numeric(
     errors='coerce'
 )
 
-#feb_Woche = verbrauch_df[(verbrauch_df["Datum von"] >= "2024-10-14") & (verbrauch_df["Datum von"] < "2024-10-21")]
-
-# plt.figure(figsize=(12,5))
-# plt.plot(feb_Woche["Datum von"], feb_Woche["Netzlast [MWh]"], lw=0.7)
-# plt.title("Beispiel: Stromverbrauch Prognose Oktober 2024")
-# plt.xlabel("Datum")
-# plt.ylabel("MWh")
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
 verbrauch_df["Jahr"]= verbrauch_df["Datum von"].dt.year
 verbrauch_df["Monat"]= verbrauch_df["Datum von"].dt.month
 verbrauch_df["Wochentag"] = verbrauch_df["Datum von"].dt.weekday
 verbrauch_df["Uhrzeit"] = verbrauch_df["Datum von"].dt.hour
 verbrauch_df["Minute"] = verbrauch_df["Datum von"].dt.minute
 
-#print(verbrauch_df.head(8))
+#=== Gesamtverbrauch 2025 aus bestehenden Messungen berechnen ===
 
+gesamtverbrauch_2025_messungen = verbrauch_df[verbrauch_df["Jahr"] == 2025]["Netzlast [MWh]"].sum()
+print(f"Gesamtverbrauch 2025: {gesamtverbrauch_2025_messungen/1e6:.2f} TWh")
+
+#=== Anzahl viertelstündliche Messungen 2025 ===
+
+anzahl_messungen_2025 = verbrauch_df[verbrauch_df["Jahr"] == 2025].shape[0]
+print(f"Anzahl viertelstündliche Messungen 2025: {anzahl_messungen_2025}")
+
+#=== Messungen für 2025 auf ganzes Jahr hochrechen ===
+
+gesamtverbrauch_2025 = gesamtverbrauch_2025_messungen * (365*24*4)/anzahl_messungen_2025
+gesamtverbrauch_2025 = gesamtverbrauch_2025.round(2)
+print(gesamtverbrauch_2025/1000000)
+
+#=== Wachstumsfaktoren berechnen ===
+
+stromverbrauch_2030 = 650000000 
+
+#Formel exp-Wachstumt: verrbauch = start * (1+wachstumsrate) ** (jahr - 2025)
+
+wachstumsrate_2030 = ((stromverbrauch_2030/gesamtverbrauch_2025)**(1/5)) - 1 
+print(wachstumsrate_2030)
 #=== Daten gruppieren ===
 
 profiel = (verbrauch_df.
@@ -64,14 +75,14 @@ df_gesamt = df_gesamt.merge(profiel, on=["Monat", "Wochentag", "Uhrzeit", "Minut
 
 #=== Verbrauchsprognose berechnen ===
 
-wachstumsrate_2030 = 0.069  # 6.9% jährliches Wachstum
-
 df_gesamt["Netzlast_Prognose [MWh]"] = (
     df_gesamt["Profilmittel [MWh]"]
     * (1 + wachstumsrate_2030) ** (df_gesamt["Jahr"] - 2025)  # ** Exponentiation
 )
 
 df_gesamt["Netzlast_Prognose [MWh]"] = df_gesamt["Netzlast_Prognose [MWh]"].round(2)
+
+#=== bis 2045 erweitern ===
 
 jan_woche = df_gesamt[(df_gesamt["Datum von"] >= "2026-10-14") & (df_gesamt["Datum von"] < "2026-10-21")]
 
@@ -99,10 +110,6 @@ plt.grid(axis='y')
 plt.tight_layout()
 plt.show()
 
-#df_Netzlast_Prognose = df_gesamt[["Datum von", "Netzlast_Prognose [MWh]"]]
-
-#df_Netzlast_Prognose.to_csv('Verbrauchsprognose_2026_2030.csv', index=False, sep=';', decimal=',')
-
 #=== Erweitern bis 2045 ===
 
 date_range_2045 = pd.date_range(start='2031-01-01 00:00', end='2046-12-31 23:45', freq='15min')
@@ -114,26 +121,28 @@ df_2045["Wochentag"] = df_2045["Datum von"].dt.weekday
 df_2045["Uhrzeit"] = df_2045["Datum von"].dt.hour
 df_2045["Minute"] = df_2045["Datum von"].dt.minute
 
+
 df_gesamt_2045 = pd.concat([df_gesamt, df_2045], ignore_index=True)
 
-wachstumsrate_2045 = 0.049  # 4.9% jährliches Wachstum ab 2031
+#===  wachstumsfaktor für 2031 bis 2045 berechnen ===
 
-# Berechne Wachstumsfaktoren für jedes Jahr nach 2030
-jahre_nach_2030 = df_gesamt_2045["Jahr"] - 2030
-wachstumsfaktor = (1 + wachstumsrate_2045) ** jahre_nach_2030
+gesamtverbrauch_2045 = 1200000000
+gesamtverbrauch_2030_berechnet = df_gesamt[df_gesamt["Jahr"] == 2030]["Netzlast_Prognose [MWh]"].sum()
+
+wachstumsrate_2045 = (gesamtverbrauch_2045/gesamtverbrauch_2030_berechnet) **(1/15) - 1
 
 basisprofil_2030 = df_gesamt_2045[df_gesamt_2045["Jahr"] == 2030].copy()
 
-for jahr in range(2031, 2046):
-    faktor = (1 + wachstumsrate_2045) ** (jahr - 2030)
-    df_gesamt_2045.loc[df_gesamt_2045["Jahr"] == jahr, "Netzlast_Prognose [MWh]"] = (
-        basisprofil_2030["Netzlast_Prognose [MWh]"].values * faktor
-)
+# for jahr in range(2031, 2046):
+#     faktor = (1 + wachstumsrate_2045) ** (jahr - 2030)
+#     df_gesamt_2045.loc[df_gesamt_2045["Jahr"] == jahr, "Netzlast_Prognose [MWh]"] = (
+#         basisprofil_2030["Netzlast_Prognose [MWh]"].values * faktor
+# )
 
 
-df_gesamt_2045["Netzlast_Prognose [MWh]"] = df_gesamt_2045["Netzlast_Prognose [MWh]"].round(2)
+# df_gesamt_2045["Netzlast_Prognose [MWh]"] = df_gesamt_2045["Netzlast_Prognose [MWh]"].round(2)
 
-df_prognose_2045 = df_gesamt_2045[["Datum von", "Netzlast_Prognose [MWh]"]]
+# df_prognose_2045 = df_gesamt_2045[["Datum von", "Netzlast_Prognose [MWh]"]]
 
 #=== Darstellung in TWh in Balkendiagramm für Jahressummen===
 
