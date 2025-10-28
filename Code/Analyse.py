@@ -100,10 +100,17 @@ gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).r
 # 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre
 # ==============================
 def plot_ee_anteil_histogram(gesamt):
+    """
+    Erstellt ein Histogramm des Anteils der Erneuerbaren Energien am Stromverbrauch.
+    Args:
+    gesamt (pd.DataFrame): DataFrame mit der Spalte "Anteil Erneuerbare [MWh]"
+    """
+
     # erstellen der Bins für das Histogram mit den Abständen von 0 bis 100 in 10 Schritten
     bins = np.linspace(0, 100, 11)
 
     plt.style.use('_mpl-gallery')
+
     # größere Figur und höhere DPI für bessere Lesbarkeit
     fig, ax = plt.subplots(figsize=(12, 6), dpi=140)
 
@@ -150,7 +157,6 @@ def plot_ee_anteil_histogram(gesamt):
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f"{int(x/1000)}"))
         ax.set_ylabel('Anzahl (in 1.000)')
 
-        # verhindert, dass Labels vom Fensterrand oder Menüs überdeckt werden
         plt.tight_layout()
         
     plt.show()
@@ -166,10 +172,16 @@ print(f"Anzahl der Viertelstunden mit einem EE-Anteil von 100%: {anzahl}")
 # 9. erzeugung in stacked bar plot visualisieren
 # ==============================
 
-def plot_erzeugung_stacked_bar(erzeugung):
+def plot_erzeugung_stacked_bar(werte):
     # Daten für das Jahr 2025 filtern
-    erzeugung_2025 = erzeugung[(erzeugung["Datum von"].dt.year == 2025)&(erzeugung["Datum von"].dt.month == 6)].copy()
-    erzeugung_2025.set_index("Datum von", inplace=True)
+    erzeugung_2025 = werte[(werte["Datum von"].dt.year == 2025)].copy()
+
+    erzeugung_2025["Tag"] = erzeugung_2025["Datum von"].dt.day
+    erzeugung_2025["Woche"]= erzeugung_2025["Datum von"].dt.isocalendar().week
+
+    erzeugung_2025 =  erzeugung_2025.set_index("Datum von")
+    erzeugung_2025 = (erzeugung_2025.groupby(["Woche","Tag"]).sum())
+    erzeugung_2025.reset_index(inplace=True)
 
     # Spalten für die gestapelten Balken
     stacked_cols = [
@@ -201,4 +213,4 @@ def plot_erzeugung_stacked_bar(erzeugung):
     plt.tight_layout()
     plt.show()
 
-#plot_erzeugung_stacked_bar(erzeugung)
+plot_erzeugung_stacked_bar(erzeugung)
