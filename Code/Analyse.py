@@ -106,8 +106,8 @@ def plot_ee_anteil_histogram(gesamt):
     gesamt (pd.DataFrame): DataFrame mit der Spalte "Anteil Erneuerbare [MWh]"
     """
 
-    # erstellen der Bins für das Histogram mit den Abständen von 0 bis 100 in 10 Schritten
-    bins = np.linspace(0, 100, 11)
+    # erstellen der Bins für das Histogram mit den Abständen von 0 bis 120 in 10 Schritten
+    bins = np.linspace(0, 120, 13)  # 0, 10, 20, ..., 100, 110
 
     plt.style.use('_mpl-gallery')
 
@@ -127,6 +127,10 @@ def plot_ee_anteil_histogram(gesamt):
         # Prozentwerte je Bin (in %)
         pct = (n / total) * 100
 
+        # X-Achsen-Labels erstellen (0-10%, 10-20%, etc.)
+        labels = [f"{int(bins[i])}-{int(bins[i+1])}%" for i in range(len(bins)-1)]
+        plt.xticks(bins[:-1] + 5, labels, rotation=45)  # Labels um 45 Grad drehen für bessere Lesbarkeit
+
         # Beschriftungen über den Balken
         for count, x_left, x_right, p in zip(n, bins[:-1], bins[1:], pct):
             # x-Position in der Mitte des Balkens
@@ -140,8 +144,8 @@ def plot_ee_anteil_histogram(gesamt):
         ax.set_xlabel('Anteil Erneuerbare [%]')
         ax.set_ylabel('Anzahl Viertelstunden')
 
-        # Optional: x-Lim auf sinnvollen Bereich setzen (0-100% für prozentuale Anteile)
-        ax.set_xlim(0, 100)
+        # Optional: x-Lim auf sinnvollen Bereich setzen (0-120% für prozentuale Anteile)
+        ax.set_xlim(0, 120)
 
         # Y-Achse in Tausender-Einheiten formatieren (z.B. 5,10,15 statt 5000,10000,15000)
         from matplotlib.ticker import MultipleLocator, FuncFormatter
@@ -213,4 +217,6 @@ def plot_erzeugung_stacked_bar(werte):
     plt.tight_layout()
     plt.show()
 
-plot_erzeugung_stacked_bar(erzeugung)
+plot_ee_anteil_histogram(gesamt)
+
+#plot_erzeugung_stacked_bar(erzeugung)
