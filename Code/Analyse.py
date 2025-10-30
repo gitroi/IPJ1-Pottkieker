@@ -26,7 +26,7 @@ erzeugung["Datum von"] = pd.to_datetime(erzeugung["Datum von"], format="%d.%m.%Y
 verbrauch["Datum von"] = pd.to_datetime(verbrauch["Datum von"], format="%d.%m.%Y %H:%M")
 
 # ==============================
-# 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.)
+# 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.) 
 # ==============================
 
 for col in erzeugung.columns:
@@ -91,10 +91,10 @@ gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).r
 # ==============================
 # 6. Ergebnisse in eine Excel-Datei speichern
 # ==============================
-# gesamt.to_excel(
-#    "C:\\Users\\joris\\Documents\\IPJ1\\Daten\\Analyse_Erneuerbare_Anteil.xlsx",
-#   index=False,
-# )
+#  gesamt.to_excel(
+#     "C:\\Users\\joris\\Documents\\IPJ1\\Daten\\Analyse_Erneuerbare_Anteil.xlsx",
+#    index=False, 
+#  )
 
 # ==============================
 # 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre
@@ -107,7 +107,7 @@ def plot_ee_anteil_histogram(gesamt):
     """
 
     # erstellen der Bins für das Histogram mit den Abständen von 0 bis 120 in 10 Schritten
-    bins = np.linspace(0, 120, 13)  # 0, 10, 20, ..., 100, 110
+    bins = np.linspace(0, 120, 13)  # 0, 10, 20, ..., 100, 110, 120
 
     plt.style.use('_mpl-gallery')
 
@@ -161,7 +161,7 @@ def plot_ee_anteil_histogram(gesamt):
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f"{int(x/1000)}"))
         ax.set_ylabel('Anzahl (in 1.000)')
 
-        plt.tight_layout()
+        plt.tight_layout() #tight layout for better spacing
         
     plt.show()
 
@@ -169,7 +169,7 @@ def plot_ee_anteil_histogram(gesamt):
 # 8. Anzahl der Viertelstunden mit EE-Anteil von 100%
 # ==============================
 
-anzahl = (gesamt["Anteil Erneuerbare [MWh]"] >= 100).sum()
+anzahl = (gesamt["Anteil Erneuerbare [MWh]"] > 100).sum()
 print(f"Anzahl der Viertelstunden mit einem EE-Anteil von 100%: {anzahl}")
 
 # ==============================
