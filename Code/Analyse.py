@@ -152,8 +152,8 @@ def plot_ee_anteil_histogram(gesamt):
         import math
 
         max_count = int(max(n)) if len(n) > 0 else 0
-        # Ziel: ca. 6 Ticks => Schritt in Tausendern bestimmen
-        approx_ticks = 6
+        # Ziel: ca. 7 Ticks => Schritt in Tausendern bestimmen
+        approx_ticks = 7
         step_thousands = max(1, math.ceil((max_count / 1000) / approx_ticks))
         step = step_thousands * 1000
 
