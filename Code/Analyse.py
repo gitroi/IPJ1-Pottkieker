@@ -2,75 +2,81 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ==============================
-# Pfad zu den CSV-Dateien
-# C:\Users\joris\Documents\IPJ1\Daten\Verbrauch.csv
-# C:\Users\joris\Documents\IPJ1\Daten\Erzeugung.csv
-# ==============================   
+def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrauch):
+    """
+    Analysiert den Anteil der Erneuerbaren Energien am Stromverbrauch
+    basierend auf den CSV-Dateien 'erzeugung.csv' und 'verbrauch.csv'.
+    Erstellt Visualisierungen und speichert die Ergebnisse in einer Excel-Datei.
+    """
+    # ==============================
+    # Pfad zu den CSV-Dateien
+    # C:\Users\joris\Documents\IPJ1\Daten\Verbrauch.csv
+    # C:\Users\joris\Documents\IPJ1\Daten\Erzeugung.csv
+    # ==============================   
 
-pfaderzeugung = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\erzeugung.csv"
-pfadverbrauch = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\verbrauch.csv"
+    #pfaderzeugung = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\erzeugung.csv"
+    #pfadverbrauch = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\verbrauch.csv"
 
-# ==============================
-# 1. CSV-Dateien einlesen
-# ==============================
+    # ==============================
+    # 1. CSV-Dateien einlesen
+    # ==============================
 
-erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
-verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
+    erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
+    verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
 
-# ==============================
-# 2. Datumsangaben konvertieren
-# ==============================
+    # ==============================
+    # 2. Datumsangaben konvertieren
+    # ==============================
 
-erzeugung["Datum von"] = pd.to_datetime(erzeugung["Datum von"], format="%d.%m.%Y %H:%M")
-verbrauch["Datum von"] = pd.to_datetime(verbrauch["Datum von"], format="%d.%m.%Y %H:%M")
+    erzeugung["Datum von"] = pd.to_datetime(erzeugung["Datum von"], format="%d.%m.%Y %H:%M")
+    verbrauch["Datum von"] = pd.to_datetime(verbrauch["Datum von"], format="%d.%m.%Y %H:%M")
 
-# ==============================
-# 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.) 
-# ==============================
+    # ==============================
+    # 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.) 
+    # ==============================
 
-for col in erzeugung.columns:
-    if "MWh" in col:
-        erzeugung[col] = (
-            erzeugung[col]
-            .astype(str)
-            .str.replace("-", "0", regex=False)
-            .str.replace(".", "", regex=False)
-            .str.replace(",", ".", regex=False)
-            .astype(float)
+    for col in erzeugung.columns:
+        if "MWh" in col:
+            erzeugung[col] = (
+                erzeugung[col]
+                .astype(str)
+                .str.replace("-", "0", regex=False)
+                .str.replace(".", "", regex=False)
+                .str.replace(",", ".", regex=False)
+                .astype(float)
+    )
+
+    for col in verbrauch.columns:
+        if "MWh" in col:
+            verbrauch[col] = (
+                verbrauch[col]
+                .astype(str)
+                .str.replace("-", "0", regex=False)
+                .str.replace(".", "", regex=False)
+                .str.replace(",", ".", regex=False)
+                .astype(float)
         )
 
-for col in verbrauch.columns:
-    if "MWh" in col:
-        verbrauch[col] = (
-            verbrauch[col]
-            .astype(str)
-            .str.replace("-", "0", regex=False)
-            .str.replace(".", "", regex=False)
-            .str.replace(",", ".", regex=False)
-            .astype(float)
-        )
+    # ==============================
+    # 4. Erneuerbare Energien zusammenfassen
+    # ==============================
 
-# ==============================
-# 4. Erneuerbare Energien zusammenfassen
-# ==============================
-
-erneuerbare_cols = [
+    erneuerbare_cols = [
     "Biomasse [MWh] Originalauflösungen",
     "Wasserkraft [MWh] Originalauflösungen",
     "Wind Offshore [MWh] Originalauflösungen",
     "Wind Onshore [MWh] Originalauflösungen",
     "Photovoltaik [MWh] Originalauflösungen",
     "Sonstige Erneuerbare [MWh] Originalauflösungen",
-]
+    ]
 
-erzeugung["Erneuerbare [MWh]"] = erzeugung[erneuerbare_cols].sum(axis=1)
+    erzeugung["Erneuerbare [MWh]"] = erzeugung[erneuerbare_cols].sum(axis=1)
 
-# ==============================
-# 5. verbrauch und erzeugung zusammenführen und anteile berechnen
-# ==============================
+    # ==============================
+    # 5. verbrauch und erzeugung zusammenführen und anteile berechnen
+    # ==============================
 
-gesamt = pd.merge(
+    gesamt = pd.merge(
     erzeugung[["Datum von","Biomasse [MWh] Originalauflösungen",
         "Wasserkraft [MWh] Originalauflösungen",
         "Wind Offshore [MWh] Originalauflösungen",
@@ -78,23 +84,26 @@ gesamt = pd.merge(
         "Photovoltaik [MWh] Originalauflösungen",
         "Sonstige Erneuerbare [MWh] Originalauflösungen",
         "Erneuerbare [MWh]"]],
-    verbrauch[["Datum von", "Netzlast [MWh] Originalauflösungen",
-        "Netzlast inkl. Pumpspeicher [MWh] Originalauflösungen"]],
+    verbrauch[["Datum von", spaltenname_verbrauch]],
     on="Datum von",
     how="inner",
-)
+    )
 
-# sichere Division: ersetze 0 durch np.nan vor Division
-den = gesamt["Netzlast inkl. Pumpspeicher [MWh] Originalauflösungen"].replace(0, np.nan)
-gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).round(2)
+    # sichere Division: ersetze 0 durch np.nan vor Division
+    den = gesamt[spaltenname_verbrauch].replace(0, np.nan)
+    gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).round(2)
 
-# ==============================
-# 6. Ergebnisse in eine Excel-Datei speichern
-# ==============================
-#  gesamt.to_excel(
-#     "C:\\Users\\joris\\Documents\\IPJ1\\Daten\\Analyse_Erneuerbare_Anteil.xlsx",
-#    index=False, 
-#  )
+    # ==============================
+    # 6. Ergebnisse in eine Excel-Datei speichern
+    # ==============================
+    #  gesamt.to_excel(
+    #     "C:\\Users\\joris\\Documents\\IPJ1\\Daten\\Analyse_Erneuerbare_Anteil.xlsx",
+    #    index=False, 
+    #  )
+
+    return gesamt
+
+
 
 # ==============================
 # 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre
@@ -169,8 +178,8 @@ def plot_ee_anteil_histogram(gesamt):
 # 8. Anzahl der Viertelstunden mit EE-Anteil von 100%
 # ==============================
 
-anzahl = (gesamt["Anteil Erneuerbare [MWh]"] > 100).sum()
-print(f"Anzahl der Viertelstunden mit einem EE-Anteil von 100%: {anzahl}")
+# anzahl = (gesamt["Anteil Erneuerbare [MWh]"] > 100).sum()
+# print(f"Anzahl der Viertelstunden mit einem EE-Anteil von 100%: {anzahl}")
 
 # ==============================
 # 9. erzeugung in stacked bar plot visualisieren
@@ -217,6 +226,6 @@ def plot_erzeugung_stacked_bar(werte):
     plt.tight_layout()
     plt.show()
 
-plot_ee_anteil_histogram(gesamt)
+# plot_ee_anteil_histogram(gesamt)
 
-#plot_erzeugung_stacked_bar(erzeugung)
+# plot_erzeugung_stacked_bar(erzeugung)
