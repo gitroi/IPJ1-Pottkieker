@@ -62,6 +62,10 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     # Erstelle Datumsbereich für 2026-2045
     date_range = pd.date_range(start='2025-01-01 00:00', end='2045-12-31 23:45', freq='15min')
     prognose = pd.DataFrame({'Datum von': date_range})
+
+    # Datum auf Format %d.%m.%Y %H:%M
+    prognose['Datum von'] = prognose['Datum von'].dt.strftime('%d.%m.%Y %H:%M')
+    prognose['Datum von'] = pd.to_datetime(prognose['Datum von'], format='%d.%m.%Y %H:%M')
     
     # Extrahiere Zeitkomponenten für die Prognose
     prognose['Monat'] = prognose['Datum von'].dt.month
@@ -111,6 +115,14 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
         prognose.loc[mask, 'Sonstige_Prognose_MWh'] = (
             prognose.loc[mask, 'Crestfaktor_Sonstige'] * installierte_leistung_Sonstige * 0.25
         )
+
+   # Werte auf 2 Nachkommastellen runden
+    prognose['PV_Prognose_MWh'] = prognose['PV_Prognose_MWh'].round(2)
+    prognose['Wind_Onshore_Prognose_MWh'] = prognose['Wind_Onshore_Prognose_MWh'].round(2)
+    prognose['Wind_Offshore_Prognose_MWh'] = prognose['Wind_Offshore_Prognose_MWh'].round(2)
+    prognose['Biomasse_Prognose_MWh'] = prognose['Biomasse_Prognose_MWh'].round(2)
+    prognose['Wasser_Prognose_MWh'] = prognose['Wasser_Prognose_MWh'].round(2)
+    prognose['Sonstige_Prognose_MWh'] = prognose['Sonstige_Prognose_MWh'].round(2)
 
    # Speichere Prognose
     prognose_export = prognose[['Datum von', 'PV_Prognose_MWh', 'Wind_Onshore_Prognose_MWh', 'Wind_Offshore_Prognose_MWh','Biomasse_Prognose_MWh', 'Wasser_Prognose_MWh', 'Sonstige_Prognose_MWh']]
