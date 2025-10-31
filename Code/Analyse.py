@@ -115,8 +115,8 @@ def plot_ee_anteil_histogram(gesamt):
     gesamt (pd.DataFrame): DataFrame mit der Spalte "Anteil Erneuerbare [MWh]"
     """
 
-    # erstellen der Bins für das Histogram mit den Abständen von 0 bis 120 in 10 Schritten
-    bins = np.linspace(0, 120, 13)  # 0, 10, 20, ..., 100, 110, 120
+    # erstellen der Bins für das Histogram mit den Abständen von 0 bis 750 in 10 Schritten
+    bins = np.linspace(0, 400, 41)  # 0, 10, 20, ..., 100, 110, 120
 
     plt.style.use('_mpl-gallery')
 
@@ -153,8 +153,8 @@ def plot_ee_anteil_histogram(gesamt):
         ax.set_xlabel('Anteil Erneuerbare [%]')
         ax.set_ylabel('Anzahl Viertelstunden')
 
-        # Optional: x-Lim auf sinnvollen Bereich setzen (0-120% für prozentuale Anteile)
-        ax.set_xlim(0, 120)
+        # Optional: x-Lim auf sinnvollen Bereich setzen (0-600% für prozentuale Anteile)
+        ax.set_xlim(0, 400)
 
         # Y-Achse in Tausender-Einheiten formatieren (z.B. 5,10,15 statt 5000,10000,15000)
         from matplotlib.ticker import MultipleLocator, FuncFormatter

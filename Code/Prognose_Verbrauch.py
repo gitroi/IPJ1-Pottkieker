@@ -55,7 +55,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     ["Netzlast [MWh]"].mean().rename(columns={"Netzlast [MWh]": "Profilmittel [MWh]"})
     )
 
-    date_range = pd.date_range(start='2026-01-01 00:00', end='2030-12-31 23:45', freq='15min')
+    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2030 23:45', freq='15min')
     df_gesamt = pd.DataFrame({"Datum von": date_range})
 
     df_gesamt["Jahr"]= df_gesamt["Datum von"].dt.year
@@ -79,7 +79,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     #=== Erweitern bis 2045 ===
 
-    date_range_2045 = pd.date_range(start='2031-01-01 00:00', end='2046-12-31 23:45', freq='15min')
+    date_range_2045 = pd.date_range(start='01-01-2031 00:00', end='31-12-2045 23:45', freq='15min')
     df_2045 = pd.DataFrame({"Datum von": date_range_2045})
 
     df_2045["Jahr"]= df_2045["Datum von"].dt.year
@@ -118,7 +118,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     
     #speichern
     df_prognose_export = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
-    df_prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',')
+    df_prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamt_2045
 
