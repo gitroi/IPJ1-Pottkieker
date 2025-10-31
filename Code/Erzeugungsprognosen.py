@@ -60,12 +60,8 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     crestfaktoren = erzeugung_df.groupby(["Monat", "Tag", "Stunde", "Minute"])[["Crestfaktor_PV","Crestfaktor_Wind_onshore","Crestfaktor_Wind_offshore","Crestfaktor_Biomasse","Crestfaktor_Wasser","Crestfaktor_Sonstige"]].mean().reset_index()
 
     # Erstelle Datumsbereich für 2026-2045
-    date_range = pd.date_range(start='2025-01-01 00:00', end='2045-12-31 23:45', freq='15min')
+    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2030 23:45', freq='15min')
     prognose = pd.DataFrame({'Datum von': date_range})
-
-    # Datum auf Format %d.%m.%Y %H:%M
-    prognose['Datum von'] = prognose['Datum von'].dt.strftime('%d.%m.%Y %H:%M')
-    prognose['Datum von'] = pd.to_datetime(prognose['Datum von'], format='%d.%m.%Y %H:%M')
     
     # Extrahiere Zeitkomponenten für die Prognose
     prognose['Monat'] = prognose['Datum von'].dt.month
@@ -134,8 +130,9 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
         'Wasser_Prognose_MWh': 'Wasserkraft [MWh] Originalauflösungen',
         'Sonstige_Prognose_MWh': 'Sonstige Erneuerbare [MWh] Originalauflösungen'
     })
-    prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Erzeugungs_Prognose_2026_2045.csv', index=False, sep=';', decimal=',')
+    prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Erzeugungs_Prognose_2026_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return prognose_export
 
-Prognose_erzeugung(0.068, 0.045, 0.09, 0, 0, 0)
+# Prognose_erzeugung(0.068, 0.045, 0.09, 0, 0, 0)
+Prognose_erzeugung(0, 0, 0, 0, 0, 0)
