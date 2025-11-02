@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrauch):
+def analyse_erneuerbare_anteil(erzeugerdaten, verbrauchdaten, spaltenname_verbrauch):
     """
     Analysiert den Anteil der Erneuerbaren Energien am Stromverbrauch
     basierend auf den CSV-Dateien 'erzeugung.csv' und 'verbrauch.csv'.
@@ -21,24 +21,24 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
     # 1. CSV-Dateien einlesen
     # ==============================
 
-    erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
-    verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
+    # erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
+    # verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
 
     # ==============================
     # 2. Datumsangaben konvertieren
     # ==============================
 
-    erzeugung["Datum von"] = pd.to_datetime(erzeugung["Datum von"], format="%d.%m.%Y %H:%M")
-    verbrauch["Datum von"] = pd.to_datetime(verbrauch["Datum von"], format="%d.%m.%Y %H:%M")
+    erzeugerdaten["Datum von"] = pd.to_datetime(erzeugerdaten["Datum von"], format="%d.%m.%Y %H:%M")
+    verbrauchdaten["Datum von"] = pd.to_datetime(verbrauchdaten["Datum von"], format="%d.%m.%Y %H:%M")
 
     # ==============================
     # 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.) 
     # ==============================
 
-    for col in erzeugung.columns:
+    for col in erzeugerdaten.columns:
         if "MWh" in col:
-            erzeugung[col] = (
-                erzeugung[col]
+            erzeugerdaten[col] = (
+                erzeugerdaten[col]
                 .astype(str)
                 .str.replace("-", "0", regex=False)
                 .str.replace(".", "", regex=False)
@@ -46,10 +46,10 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
                 .astype(float)
     )
 
-    for col in verbrauch.columns:
+    for col in verbrauchdaten.columns:
         if "MWh" in col:
-            verbrauch[col] = (
-                verbrauch[col]
+            verbrauchdaten[col] = (
+                verbrauchdaten[col]
                 .astype(str)
                 .str.replace("-", "0", regex=False)
                 .str.replace(".", "", regex=False)
@@ -70,21 +70,21 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
     "Sonstige Erneuerbare [MWh] Originalauflösungen",
     ]
 
-    erzeugung["Erneuerbare [MWh]"] = erzeugung[erneuerbare_cols].sum(axis=1)
+    erzeugerdaten["Erneuerbare [MWh]"] = erzeugerdaten[erneuerbare_cols].sum(axis=1)
 
     # ==============================
     # 5. verbrauch und erzeugung zusammenführen und anteile berechnen
     # ==============================
 
     gesamt = pd.merge(
-    erzeugung[["Datum von","Biomasse [MWh] Originalauflösungen",
+    erzeugerdaten[["Datum von","Biomasse [MWh] Originalauflösungen",
         "Wasserkraft [MWh] Originalauflösungen",
         "Wind Offshore [MWh] Originalauflösungen",
         "Wind Onshore [MWh] Originalauflösungen",
         "Photovoltaik [MWh] Originalauflösungen",
         "Sonstige Erneuerbare [MWh] Originalauflösungen",
         "Erneuerbare [MWh]"]],
-    verbrauch[["Datum von", spaltenname_verbrauch]],
+    verbrauchdaten[["Datum von", spaltenname_verbrauch]],
     on="Datum von",
     how="inner",
     )
