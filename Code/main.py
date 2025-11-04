@@ -6,10 +6,10 @@ import Erzeugungsprognosen
 import Prognose_Verbrauch
 
 verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650e6, 1200e6)
-erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.068, 0.045, 0.09, 0, 0, 0)
+erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.068, 0.045, 0.1, 0.01, 0, 0)
 
 
-Analyse.plot_ee_anteil_histogram(Analyse.analyse_erneuerbare_anteil(
+Analyse.plot_ee_anteil_histogram_overflow(Analyse.analyse_erneuerbare_anteil(
     erzeugung,
     verbrauch,
     "Netzlast [MWh] Originalauflösungen"
