@@ -2,51 +2,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrauch):
+def anteil_erneuerbare_df(erzeugung: pd.DataFrame, verbrauch: pd.DataFrame, spaltenname_verbrauch: str) -> pd.DataFrame:
     """
     Analysiert den Anteil der Erneuerbaren Energien am Stromverbrauch
-    basierend auf den CSV-Dateien 'erzeugung.csv' und 'verbrauch.csv'.
-    Erstellt Visualisierungen und speichert die Ergebnisse in einer Excel-Datei.
+    basierend auf den Dataframes 'erzeugung' und 'verbrauch'.
     """
     # ==============================
-    # 1. CSV-Dateien einlesen
-    # ==============================
-
-    erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
-    verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
-
-    # ==============================
-    # 2. Datumsangaben konvertieren
+    # 1. Datumsangaben konvertieren
     # ==============================
 
     erzeugung["Datum von"] = pd.to_datetime(erzeugung["Datum von"], format="%d.%m.%Y %H:%M")
     verbrauch["Datum von"] = pd.to_datetime(verbrauch["Datum von"], format="%d.%m.%Y %H:%M")
-
-    # ==============================
-    # 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.) 
-    # ==============================
-
-    for col in erzeugung.columns:
-        if "MWh" in col:
-            erzeugung[col] = (
-                erzeugung[col]
-                .astype(str)
-                .str.replace("-", "0", regex=False)
-                .str.replace(".", "", regex=False)
-                .str.replace(",", ".", regex=False)
-                .astype(float)
-    )
-
-    for col in verbrauch.columns:
-        if "MWh" in col:
-            verbrauch[col] = (
-                verbrauch[col]
-                .astype(str)
-                .str.replace("-", "0", regex=False)
-                .str.replace(".", "", regex=False)
-                .str.replace(",", ".", regex=False)
-                .astype(float)
-        )
 
     # ==============================
     # 4. Erneuerbare Energien zusammenfassen
@@ -62,6 +28,7 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
     ]
 
     erzeugung["Erneuerbare [MWh]"] = erzeugung[erneuerbare_cols].sum(axis=1)
+
     # ==============================
     # 5. verbrauch und erzeugung zusammenführen und anteile berechnen
     # ==============================
