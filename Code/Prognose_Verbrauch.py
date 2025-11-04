@@ -46,13 +46,9 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     wachstumsrate_2030 = ((verbrauch_2030_MWh/gesamtverbrauch_2025)**(1/5)) - 1
 
-    #=== Das Jahr 2024 als Prognosegrundlage nehmen ===
-
-    verbrauch_df = verbrauch_df[verbrauch_df["Jahr"] == 2024].reset_index(drop=True)
-
     #=== Daten gruppieren ===
 
-    profiel = (verbrauch_df.
+    profil = (verbrauch_df.
     groupby(["Monat", "Wochentag", "Uhrzeit", "Minute"],as_index=False)
     ["Netzlast [MWh]"].mean().rename(columns={"Netzlast [MWh]": "Profilmittel [MWh]"})
     )
@@ -66,7 +62,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     df_gesamt["Uhrzeit"] = df_gesamt["Datum von"].dt.hour
     df_gesamt["Minute"] = df_gesamt["Datum von"].dt.minute
 
-    df_gesamt = df_gesamt.merge(profiel, on=["Monat", "Wochentag", "Uhrzeit", "Minute"
+    df_gesamt = df_gesamt.merge(profil, on=["Monat", "Wochentag", "Uhrzeit", "Minute"
         ], how='left'
     )
 
@@ -123,44 +119,3 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     # df_prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamt_2045
-
-
-
-# #=== Juni 2045 Beispielplot ===
-
-# prognose = Prognose_Verbrauch(650e6, 1200e6)
-# juni_2045 = prognose[(prognose["Datum von"] >= "2045-06-01") & (prognose["Datum von"] < "2045-06-08")]
-
-# plt.figure(figsize=(12,5))
-# plt.plot(juni_2045["Datum von"], juni_2045["Netzlast [MWh] Originalauflösungen"], lw=0.7)
-# plt.title("Beispiel: Stromverbrauch Prognose Juni 2045")
-# plt.xlabel("Datum")
-# plt.ylabel("MWh")
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-# #=== Darstellung in TWh in Balkendiagramm für Jahressummen===
-
-# df_jahressummen_2045 = prognose.groupby("Jahr", as_index=False)["Netzlast [MWh] Originalauflösungen"].sum()
-# df_jahressummen_2045["Netzlast [MWh] Originalauflösungen"] = df_jahressummen_2045["Netzlast [MWh] Originalauflösungen"] / 1000000
-
-# plt.figure(figsize=(10,5))
-# plt.bar(df_jahressummen_2045["Jahr"], df_jahressummen_2045["Netzlast [MWh] Originalauflösungen"], color='skyblue')
-# plt.title("Jährliche Stromverbrauchsprognose (2026-2045)") 
-# plt.xlabel("Jahr")
-# plt.ylabel("Netzlast Prognose [TWh]")
-# plt.grid(axis='y')
-# plt.tight_layout()
-# plt.show()
-
-# jan_woche = prognose[(prognose["Datum von"] >= "2026-10-14") & (prognose["Datum von"] < "2026-10-21")]
-
-# plt.figure(figsize=(12,5))
-# plt.plot(jan_woche["Datum von"], jan_woche["Netzlast [MWh] Originalauflösungen"], lw=0.7)
-# plt.title("Beispiel: Stromverbrauch Prognose Oktober 2026")
-# plt.xlabel("Datum")
-# plt.ylabel("MWh")
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
