@@ -9,12 +9,11 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     installierte_leistung_Biomasse_2024_MW = 9000  # Installierte Leistung Biomasse in MW im Jahr 2024
     installierte_leistung_Wasser_2024_MW = 5000    # Installierte Leistung Wasser in MW im Jahr 2024
     installierte_leistung_Sonstige_2024_MW = 3000   # Installierte Leistung Sonstige in MW im Jahr 2024
-
+    
     #==== Einlesen der Daten und anpassung ====
     erzeugungpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\erzeugung_2024.csv"
     erzeugung_df = pd.read_csv(erzeugungpfad,
-    sep=';', decimal=',', parse_dates=['Datum von'],
-    dayfirst=True, low_memory=False
+    sep=';', low_memory=False
     )
 
     for col in erzeugung_df.columns:

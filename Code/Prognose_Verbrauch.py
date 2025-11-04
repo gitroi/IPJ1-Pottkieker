@@ -7,9 +7,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     verbrauchpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\verbrauch.csv"
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
-    sep=';', decimal=',', parse_dates=['Datum von'],
-    dayfirst=True, low_memory=False
-    )
+    sep=';', low_memory=False)
 
     verbrauch_df["Datum von"] = pd.to_datetime(verbrauch_df["Datum von"], format="%d.%m.%Y %H:%M")
 
@@ -47,6 +45,10 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     #ziel = start * (1+ r) ** n  => r = (ziel/start)^(1/n) -1
 
     wachstumsrate_2030 = ((verbrauch_2030_MWh/gesamtverbrauch_2025)**(1/5)) - 1
+
+    #=== Das Jahr 2024 als Prognosegrundlage nehmen ===
+
+    verbrauch_df = verbrauch_df[verbrauch_df["Jahr"] == 2024].reset_index(drop=True)
 
     #=== Daten gruppieren ===
 
