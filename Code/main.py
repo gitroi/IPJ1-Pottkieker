@@ -4,6 +4,7 @@ import numpy as np
 import Analyse
 import Erzeugungsprognosen
 import Prognose_Verbrauch
+import Histogramme as Hist
 
 # verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650e6, 1200e6)
 # erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.068, 0.045, 0.1, 0.01, 0, 0)
@@ -17,4 +18,4 @@ gesamt =Analyse.analyse_erneuerbare_anteil(
     "Netzlast inkl. Pumpspeicher [MWh] Originalauflösungen"
 )
 
-Analyse.plot_ee_anteil_histogram_overflow(gesamt)
+Hist.plot_ee_anteil_histogram_overflow(gesamt)
