@@ -2,43 +2,34 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def analyse_erneuerbare_anteil(erzeugerdaten, verbrauchdaten, spaltenname_verbrauch):
+def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrauch):
     """
     Analysiert den Anteil der Erneuerbaren Energien am Stromverbrauch
     basierend auf den CSV-Dateien 'erzeugung.csv' und 'verbrauch.csv'.
     Erstellt Visualisierungen und speichert die Ergebnisse in einer Excel-Datei.
     """
     # ==============================
-    # Pfad zu den CSV-Dateien
-    # C:\Users\joris\Documents\IPJ1\Daten\Verbrauch.csv
-    # C:\Users\joris\Documents\IPJ1\Daten\Erzeugung.csv
-    # ==============================   
-
-    #pfaderzeugung = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\erzeugung.csv"
-    #pfadverbrauch = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\verbrauch.csv"
-
-    # ==============================
     # 1. CSV-Dateien einlesen
     # ==============================
 
-    # erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
-    # verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
+    erzeugung = pd.read_csv(pfaderzeugung, sep=";", low_memory=False)
+    verbrauch = pd.read_csv(pfadverbrauch, sep=";", low_memory=False)
 
     # ==============================
     # 2. Datumsangaben konvertieren
     # ==============================
 
-    erzeugerdaten["Datum von"] = pd.to_datetime(erzeugerdaten["Datum von"], format="%d.%m.%Y %H:%M")
-    verbrauchdaten["Datum von"] = pd.to_datetime(verbrauchdaten["Datum von"], format="%d.%m.%Y %H:%M")
+    erzeugung["Datum von"] = pd.to_datetime(erzeugung["Datum von"], format="%d.%m.%Y %H:%M")
+    verbrauch["Datum von"] = pd.to_datetime(verbrauch["Datum von"], format="%d.%m.%Y %H:%M")
 
     # ==============================
     # 3. Anpassen der Datein (Entfernen von Leerzeichen in Spaltennamen etc.) 
     # ==============================
 
-    for col in erzeugerdaten.columns:
+    for col in erzeugung.columns:
         if "MWh" in col:
-            erzeugerdaten[col] = (
-                erzeugerdaten[col]
+            erzeugung[col] = (
+                erzeugung[col]
                 .astype(str)
                 .str.replace("-", "0", regex=False)
                 .str.replace(".", "", regex=False)
@@ -46,10 +37,10 @@ def analyse_erneuerbare_anteil(erzeugerdaten, verbrauchdaten, spaltenname_verbra
                 .astype(float)
     )
 
-    for col in verbrauchdaten.columns:
+    for col in verbrauch.columns:
         if "MWh" in col:
-            verbrauchdaten[col] = (
-                verbrauchdaten[col]
+            verbrauch[col] = (
+                verbrauch[col]
                 .astype(str)
                 .str.replace("-", "0", regex=False)
                 .str.replace(".", "", regex=False)
@@ -70,27 +61,27 @@ def analyse_erneuerbare_anteil(erzeugerdaten, verbrauchdaten, spaltenname_verbra
     "Sonstige Erneuerbare [MWh] Originalauflösungen",
     ]
 
-    erzeugerdaten["Erneuerbare [MWh]"] = erzeugerdaten[erneuerbare_cols].sum(axis=1)
+    erzeugung["Erneuerbare [MWh]"] = erzeugung[erneuerbare_cols].sum(axis=1)
 
     # ==============================
     # 5. verbrauch und erzeugung zusammenführen und anteile berechnen
     # ==============================
 
     gesamt = pd.merge(
-    erzeugerdaten[["Datum von","Biomasse [MWh] Originalauflösungen",
+    erzeugung[["Datum von","Biomasse [MWh] Originalauflösungen",
         "Wasserkraft [MWh] Originalauflösungen",
         "Wind Offshore [MWh] Originalauflösungen",
         "Wind Onshore [MWh] Originalauflösungen",
         "Photovoltaik [MWh] Originalauflösungen",
         "Sonstige Erneuerbare [MWh] Originalauflösungen",
         "Erneuerbare [MWh]"]],
-    verbrauchdaten[["Datum von", spaltenname_verbrauch]],
+    verbrauch[["Datum von",  spaltenname_verbrauch]],
     on="Datum von",
     how="inner",
     )
 
     # sichere Division: ersetze 0 durch np.nan vor Division
-    den = gesamt[spaltenname_verbrauch].replace(0, np.nan)
+    den = gesamt[ spaltenname_verbrauch].replace(0, np.nan)
     gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).round(2)
 
     # ==============================
@@ -174,61 +165,6 @@ def plot_ee_anteil_histogram(gesamt):
         
     plt.show()
 
-# ==============================
-# 8. Anzahl der Viertelstunden mit EE-Anteil von 100%
-# ==============================
-
-# anzahl = (gesamt["Anteil Erneuerbare [MWh]"] > 100).sum()
-# print(f"Anzahl der Viertelstunden mit einem EE-Anteil von 100%: {anzahl}")
-
-# ==============================
-# 9. erzeugung in stacked bar plot visualisieren
-# ==============================
-
-def plot_erzeugung_stacked_bar(werte):
-    # Daten für das Jahr 2025 filtern
-    erzeugung_2025 = werte[(werte["Datum von"].dt.year == 2025)].copy()
-
-    erzeugung_2025["Tag"] = erzeugung_2025["Datum von"].dt.day
-    erzeugung_2025["Woche"]= erzeugung_2025["Datum von"].dt.isocalendar().week
-
-    erzeugung_2025 =  erzeugung_2025.set_index("Datum von")
-    erzeugung_2025 = (erzeugung_2025.groupby(["Woche","Tag"]).sum())
-    erzeugung_2025.reset_index(inplace=True)
-
-    # Spalten für die gestapelten Balken
-    stacked_cols = [
-        "Biomasse [MWh] Originalauflösungen",
-        "Wasserkraft [MWh] Originalauflösungen",
-        "Wind Offshore [MWh] Originalauflösungen",
-        "Wind Onshore [MWh] Originalauflösungen",
-        "Photovoltaik [MWh] Originalauflösungen",
-        "Sonstige Erneuerbare [MWh] Originalauflösungen",
-    ]
-
-    # Plot erstellen
-    plt.style.use('_mpl-gallery')
-    fig, ax = plt.subplots(figsize=(14, 7), dpi=140)
-
-    erzeugung_2025[stacked_cols].plot(
-        kind='bar',
-        stacked=True,
-        ax=ax,
-        width=1.0,
-        edgecolor='none',
-        colormap='tab20'
-    )
-
-    ax.set_title('Stromerzeugung nach Energiequellen im Jahr 2025')
-    ax.set_xlabel('Datum')
-    ax.set_ylabel('Erzeugung [MWh]')
-    ax.legend(title='Energiequellen', bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.tight_layout()
-    plt.show()
-
-# plot_ee_anteil_histogram(gesamt)
-
-# plot_erzeugung_stacked_bar(erzeugung)
 
 def plot_ee_anteil_histogram_overflow(gesamt):
     """
@@ -279,7 +215,7 @@ def plot_ee_anteil_histogram_overflow(gesamt):
         ax.text(x, count + max(counts) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
 
     # Achsentitel und Diagrammtitel
-    ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch der Jahre 2020-2025 (>=100% als ein Balken)')
+    ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch der Jahre 2020-2025')
     ax.set_xlabel('Anteil Erneuerbare [%]')
     ax.set_ylabel('Anzahl Viertelstunden')
 
