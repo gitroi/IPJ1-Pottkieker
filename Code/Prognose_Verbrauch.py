@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     
     #==== Einlesen der Daten und anpassung ====
-    verbrauchpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\verbrauch.csv"
+    verbrauchpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_2024.csv"
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
     sep=';', low_memory=False)
@@ -17,7 +17,8 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     verbrauch_df["Netzlast [MWh]"] = pd.to_numeric(
     verbrauch_df["Netzlast [MWh]"].astype(str)
     .str.replace('.', '',regex=False)
-    .str.replace(',', '.',regex=False),
+    .str.replace(',', '.',regex=False)
+    .str.replace('-', '0', regex=False),
     errors='coerce'
     )
 
@@ -26,25 +27,17 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     verbrauch_df["Wochentag"] = verbrauch_df["Datum von"].dt.weekday
     verbrauch_df["Uhrzeit"] = verbrauch_df["Datum von"].dt.hour
     verbrauch_df["Minute"] = verbrauch_df["Datum von"].dt.minute
+    verbrauch_df["Woche"] = verbrauch_df["Datum von"].dt.isocalendar().week
 
-    #=== Gesamtverbrauch 2025 aus bestehenden Messungen berechnen ===
+    #=== Gesamtverbrauch 2024 aus bestehenden Messungen berechnen ===
 
-    gesamtverbrauch_2025_messungen = verbrauch_df[verbrauch_df["Jahr"] == 2025]["Netzlast [MWh]"].sum()
-
-    #=== Anzahl viertelstündliche Messungen 2025 ===
-
-    anzahl_messungen_2025 = verbrauch_df[verbrauch_df["Jahr"] == 2025].shape[0] #shape gibt (Anzahl Zeilen, Anzahl Spalten) zurück 0 für Zeilen 1 für Spalten
-
-    #=== Messungen für 2025 auf ganzes Jahr hochrechen ===
-
-    gesamtverbrauch_2025 = gesamtverbrauch_2025_messungen * (365*24*4)/anzahl_messungen_2025
-    gesamtverbrauch_2025 = gesamtverbrauch_2025.round(2)
+    gesamtverbrauch_2024 = verbrauch_df[verbrauch_df["Jahr"] == 2024]["Netzlast [MWh]"].sum().round(2)    
 
     #=== Wachstumsrate bis 2030 berechnen ===
 
     #ziel = start * (1+ r) ** n  => r = (ziel/start)^(1/n) -1
 
-    wachstumsrate_2030 = ((verbrauch_2030_MWh/gesamtverbrauch_2025)**(1/5)) - 1
+    wachstumsrate_2030 = ((verbrauch_2030_MWh/gesamtverbrauch_2024)**(1/6)) - 1
 
     #=== Daten gruppieren ===
 
@@ -61,6 +54,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     df_gesamt["Wochentag"] = df_gesamt["Datum von"].dt.weekday
     df_gesamt["Uhrzeit"] = df_gesamt["Datum von"].dt.hour
     df_gesamt["Minute"] = df_gesamt["Datum von"].dt.minute
+    df_gesamt["Woche"] = df_gesamt["Datum von"].dt.isocalendar().week
 
     df_gesamt = df_gesamt.merge(profil, on=["Monat", "Wochentag", "Uhrzeit", "Minute"
         ], how='left'
@@ -70,7 +64,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     df_gesamt["Netzlast_Prognose [MWh]"] = (
         df_gesamt["Profilmittel [MWh]"]
-        * (1 + wachstumsrate_2030) ** (df_gesamt["Jahr"] - 2025)  # ** notation für potenzieren
+        * (1 + wachstumsrate_2030) ** (df_gesamt["Jahr"] - 2024) 
     )
 
     df_gesamt["Netzlast_Prognose [MWh]"] = df_gesamt["Netzlast_Prognose [MWh]"].round(2)

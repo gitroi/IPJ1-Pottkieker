@@ -84,3 +84,4 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
     gesamt["Anteil Erneuerbare [MWh]"] = (gesamt["Erneuerbare [MWh]"] / den * 100).round(2)
 
     return gesamt
+
