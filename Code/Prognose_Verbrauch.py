@@ -1,10 +1,14 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
 def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     
     #==== Einlesen der Daten und anpassung ====
-    verbrauchpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_2024.csv"
+    # Pfad relativ zum Skript bestimmen
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    verbrauchpfad = os.path.join(repo_root, "Daten", "verbrauch_2024.csv")
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
     sep=';', low_memory=False)
@@ -86,6 +90,8 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     profil_2030 = (basisprofil_2030.rename(columns={"Netzlast_Prognose [MWh]": "Profil [MWh]"})
     )
+
+    profil_2030 = profil_2030.drop(columns=["Jahr"])
 
     prognose_2045 = df_2045.merge(profil_2030, on=["Monat", "Wochentag", "Uhrzeit", "Minute","Woche"
         ], how='left'
