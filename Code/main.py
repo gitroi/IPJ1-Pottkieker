@@ -10,17 +10,6 @@ import EE_Anteil_DataFrame as EEdf
 verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650e6, 1200e6)
 erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.06, 0.065, 0.09, 0, 0, 0)
 
-gemerged = pd.merge(
-    erzeugung,
-    verbrauch,
-    on="Datum von",
-    how="inner",
-)   
-
-gemerged = gemerged.head()
-
-sample = gemerged.iloc[0:5]
-
 gesamt2 = EEdf.anteil_erneuerbare_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen")
 
 # gesamt =Analyse.analyse_erneuerbare_anteil(
