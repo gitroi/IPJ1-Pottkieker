@@ -27,10 +27,9 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     )
 
     verbrauch_df["Monat"]= verbrauch_df["Datum von"].dt.month
-    verbrauch_df["Wochentag"] = verbrauch_df["Datum von"].dt.weekday
+    verbrauch_df["Wochentag"] = verbrauch_df["Datum von"].dt.dayofweek
     verbrauch_df["Uhrzeit"] = verbrauch_df["Datum von"].dt.hour
     verbrauch_df["Minute"] = verbrauch_df["Datum von"].dt.minute
-    verbrauch_df["Woche"] = verbrauch_df["Datum von"].dt.isocalendar().week
 
     #=== Gesamtverbrauch 2024 aus bestehenden Messungen berechnen ===
 
@@ -39,8 +38,11 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     #=== Wachstumsrate bis 2030 berechnen ===
 
     #ziel = start * (1+ r) ** n  => r = (ziel/start)^(1/n) -1
-
     wachstumsrate_2030 = ((verbrauch_2030_MWh/gesamtverbrauch_2024)**(1/6)) - 1
+
+    #=== profil für 2024 erstellen ===
+
+    basisprofil_2024 = verbrauch_df.groupby(["Monat", "Wochentag", "Uhrzeit", "Minute"])[["Netzlast [MWh]"]].mean().reset_index()
 
     #=== Dataframe für die Jahre bis 2030 erstellen ===
 
@@ -49,12 +51,11 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     df_gesamt["Jahr"]= df_gesamt["Datum von"].dt.year
     df_gesamt["Monat"]= df_gesamt["Datum von"].dt.month
-    df_gesamt["Wochentag"] = df_gesamt["Datum von"].dt.weekday
+    df_gesamt["Wochentag"] = df_gesamt["Datum von"].dt.dayofweek
     df_gesamt["Uhrzeit"] = df_gesamt["Datum von"].dt.hour
     df_gesamt["Minute"] = df_gesamt["Datum von"].dt.minute
-    df_gesamt["Woche"] = df_gesamt["Datum von"].dt.isocalendar().week
 
-    df_gesamt = df_gesamt.merge(verbrauch_df, on=["Monat", "Wochentag", "Uhrzeit", "Minute","Woche"
+    df_gesamt = df_gesamt.merge(basisprofil_2024, on=["Monat", "Wochentag", "Uhrzeit", "Minute"
         ], how='left'
     )
 
@@ -74,10 +75,9 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     df_2045["Jahr"]= df_2045["Datum von"].dt.year
     df_2045["Monat"]= df_2045["Datum von"].dt.month
-    df_2045["Wochentag"] = df_2045["Datum von"].dt.weekday
+    df_2045["Wochentag"] = df_2045["Datum von"].dt.dayofweek    
     df_2045["Uhrzeit"] = df_2045["Datum von"].dt.hour
     df_2045["Minute"] = df_2045["Datum von"].dt.minute
-    df_2045["Woche"] = df_2045["Datum von"].dt.isocalendar().week
 
     #===  wachstumsfaktor für 2031 bis 2045 berechnen ===
 
@@ -86,14 +86,14 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     wachstumsrate_2045 = (verbrauch_2045_MWh/gesamtverbrauch_2030_berechnet) **(1/15) - 1
 
-    basisprofil_2030 = df_gesamt[df_gesamt["Jahr"] == 2030][["Jahr","Monat","Wochentag","Uhrzeit","Minute","Woche" ,"Netzlast_Prognose [MWh]"]].copy()
+    basisprofil_2030 = df_gesamt[df_gesamt["Jahr"] == 2030][["Jahr","Monat","Wochentag","Uhrzeit","Minute" ,"Netzlast_Prognose [MWh]"]].copy()
 
-    profil_2030 = (basisprofil_2030.rename(columns={"Netzlast_Prognose [MWh]": "Profil [MWh]"})
+    profil_2030 = (basisprofil_2030.groupby(["Monat","Wochentag","Uhrzeit","Minute"]).mean().reset_index().rename(columns={"Netzlast_Prognose [MWh]": "Profil [MWh]"})
     )
 
-    profil_2030 = profil_2030.drop(columns=["Jahr"])
+    profil_2030 = profil_2030.drop(columns=["Jahr","Datum von"], errors='ignore')
 
-    prognose_2045 = df_2045.merge(profil_2030, on=["Monat", "Wochentag", "Uhrzeit", "Minute","Woche"
+    prognose_2045 = df_2045.merge(profil_2030, on=["Monat", "Wochentag", "Uhrzeit", "Minute"
         ], how='left'
     )
 
@@ -106,9 +106,12 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     df_gesamt_2045 = pd.concat([df_gesamt, prognose_2045], ignore_index=True)
     df_gesamt_2045 = df_gesamt_2045.rename(columns={"Netzlast_Prognose [MWh]": "Netzlast [MWh] Originalauflösungen"})
-    
+
     # #speichern
     # df_prognose_export = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
     # df_prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+
+    #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
+    df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
 
     return df_gesamt_2045
