@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich
 
 def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsrate_wind_offshore, wachstumsrate_Biomasse, wachstumsrate_Wasser, wachstumsrate_Sonstige):
     #=== Variablen ===#
@@ -11,7 +12,7 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     installierte_leistung_Sonstige_2024_MW = 3000   # Installierte Leistung Sonstige in MW im Jahr 2024
     
     #==== Einlesen der Daten und anpassung ====
-    erzeugungpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\erzeugung_2024.csv"
+    erzeugungpfad = PROJECT_ROOT / "Daten" / "erzeugung_2024.csv"
     erzeugung_df = pd.read_csv(erzeugungpfad,
     sep=';', low_memory=False
     )
@@ -129,7 +130,7 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
         'Wasser_Prognose_MWh': 'Wasserkraft [MWh] Originalauflösungen',
         'Sonstige_Prognose_MWh': 'Sonstige Erneuerbare [MWh] Originalauflösungen'
     })
-    #prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Erzeugungs_Prognose_2026_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # prognose_export.to_csv(PROJECT_ROOT / "Daten" / "Erzeugungs_Prognose_2026_2045.csv", index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return prognose_export
 

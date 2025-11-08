@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from config import PROJECT_ROOT
 
 # ==============================
 # Code zum darstellen der EE erzeugung aus den verschiedenen Quellen pro monat in einem Jahr für die Jahre 2020 bis 2024
@@ -11,8 +12,8 @@ def plot_ee_erzeugung_jaehrlich():
     aus verschiedenen Quellen für die Jahre 2020 bis 2024.
     """
     # Pfad zur CSV-Datei mit Erzeugungsdaten
-    erzeugungpfad = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\Ist_Analyse\\erzeugung.csv"
-    erzeugungpfad2 = "C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\erzeugung_2019.csv"
+    erzeugungpfad = PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv"
+    erzeugungpfad2 = PROJECT_ROOT / "Daten" / "erzeugung_2019.csv"
     
     # Lese die CSV-Datei ein
     erzeugung_df = pd.read_csv(erzeugungpfad2, sep=";", dtype=str)

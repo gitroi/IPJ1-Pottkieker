@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from config import PROJECT_ROOT 
 
 def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     
     #==== Einlesen der Daten und anpassung ====
     # Pfad relativ zum Skript bestimmen
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    verbrauchpfad = os.path.join(repo_root, "Daten", "verbrauch_2024.csv")
+    verbrauchpfad = PROJECT_ROOT / "Daten" / "verbrauch_2024.csv"
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
     sep=';', low_memory=False)
@@ -109,7 +109,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
 
     # #speichern
     # df_prognose_export = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
-    # df_prognose_export.to_csv('C:\\Users\\joris\\OneDrive - HAW-HH\\Labore\\Integrationsprojekt1\\IPJ1-Pottkieker\\Daten\\verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_prognose_export.to_csv(PROJECT_ROOT / 'Daten' / 'verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
