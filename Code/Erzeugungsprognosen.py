@@ -39,6 +39,9 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
 
     erzeugung_df = erzeugung_df[["Datum von", "Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen","Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen","Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]]
 
+    erzeugung_df = erzeugung_df[~((erzeugung_df["Datum von"].dt.month == 2) & (erzeugung_df["Datum von"].dt.day == 29))]
+    erzeugung_df = erzeugung_df.drop_duplicates()
+
     # WICHTIG: Kein inplace=True mit Zuweisung verwenden, da dies None zurückgibt
     erzeugung_df = erzeugung_df.rename(columns={
         "Photovoltaik [MWh] Originalauflösungen": "PV [MWh]",
@@ -76,6 +79,8 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     prognose['Minute'] = prognose['Datum von'].dt.minute
     prognose['Jahr'] = prognose['Datum von'].dt.year
     
+    prognose = prognose[~((prognose['Monat'] == 2) & (prognose['Tag'] == 29))]  
+
     # Merge mit Crestfaktoren
     prognose = prognose.merge(crestfaktoren, on=['Monat', 'Tag', 'Stunde', 'Minute'], how='left')
 
@@ -98,15 +103,15 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
         mask = prognose['Jahr'] == jahr
         prognose.loc[mask, 'PV_Prognose_MWh'] = (
             installierte_leistung_pv
-            * prognose.loc[mask, 'Crestfaktor_PV'] * 0.25  # 15-Minuten-Intervall
+            * prognose.loc[mask, 'Crestfaktor_PV'] * 0.25  
         )
         prognose.loc[mask, 'Wind_Onshore_Prognose_MWh'] = (
             installierte_leistung_wind_onshore 
-            * prognose.loc[mask, 'Crestfaktor_Wind_onshore'] * 0.25  # 15-Minuten-Intervall
+            * prognose.loc[mask, 'Crestfaktor_Wind_onshore'] * 0.25  
         )
         prognose.loc[mask, 'Wind_Offshore_Prognose_MWh'] = (
             installierte_leistung_wind_offshore 
-            * prognose.loc[mask, 'Crestfaktor_Wind_offshore'] * 0.25  # 15-Minuten-Intervall
+            * prognose.loc[mask, 'Crestfaktor_Wind_offshore'] * 0.25 
         )
         prognose.loc[mask, 'Biomasse_Prognose_MWh'] = (
             prognose.loc[mask, 'Crestfaktor_Biomasse'] * installierte_leistung_Biomasse * 0.25
@@ -137,6 +142,12 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
         'Sonstige_Prognose_MWh': 'Sonstige Erneuerbare [MWh] Originalauflösungen'
     })
     # prognose_export.to_csv(PROJECT_ROOT / "Daten" / "Erzeugungs_Prognose_2026_2045.csv", index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    if(prognose_export.isna().any().any()):
+        print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
+        print(prognose_export.isna().sum())
+        mask = prognose_export.isna() | prognose_export.isin([np.inf, -np.inf])
+        print(prognose_export[mask.any(axis=1)])
+
 
     return prognose_export
 
