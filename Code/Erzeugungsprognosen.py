@@ -1,3 +1,9 @@
+"""
+Zentrales Programm der Erzeugungsprognose von der Gruppe Pottkieker.
+Nutzt Daten aus 2024 um eine Prognose bis 2045 zu erstellen.
+Unterstützt durch KI (Claude Sonnet 4.5)
+"""
+
 import pandas as pd
 import numpy as np
 from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich

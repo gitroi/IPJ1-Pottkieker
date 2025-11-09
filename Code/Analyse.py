@@ -1,3 +1,8 @@
+"""
+Programm zur Analyse des Anteils der Erneuerbaren Energien am Stromverbrauch.
+Nutzt SMARD-Daten aus CSV-Dateien und berechnet den Anteil der Erneuerbaren Energien.
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
