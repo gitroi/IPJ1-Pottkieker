@@ -17,7 +17,7 @@ from config import PROJECT_ROOT
 verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650e6, 1200e6)
 erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.06, 0.065, 0.09, 0, 0, 0)
 
-gesamt2 = EEdf.anteil_erneuerbare_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen")
+gesamt2 = EEdf.anteil_erneuerbare_Jahrx_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen",2045)
 
 # gesamt =Analyse.analyse_erneuerbare_anteil(
 #      PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv",
