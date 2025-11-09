@@ -1,3 +1,9 @@
+"""
+Zentrales Programm der Gruppe Pottkieker.
+Nutz die anderen Module zur Analyse und Visualisierung.
+Ünterstützt durch KI (Claude Sonnet 4.5)
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np

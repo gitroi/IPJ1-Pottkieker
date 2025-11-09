@@ -6,6 +6,13 @@ def anteil_erneuerbare_df(erzeugung: pd.DataFrame, verbrauch: pd.DataFrame, spal
     """
     Analysiert den Anteil der Erneuerbaren Energien am Stromverbrauch
     basierend auf den Dataframes 'erzeugung' und 'verbrauch'.
+    Args:
+        erzeugung (pd.DataFrame): DataFrame mit Erzeugungsdaten
+        verbrauch (pd.DataFrame): DataFrame mit Verbrauchsdaten
+        spaltenname_verbrauch (str): Name der Spalte im Verbrauchs-DataFrame, die den Verbrauch in MWh enthält
+    Returns:
+        pd.DataFrame: DataFrame mit dem Anteil der Erneuerbaren Energien am Stromverbrauch
+    Unterstützt durch KI (Claude Sonnet 4.5)
     """
     # ==============================
     # 1. Datumsangaben konvertieren

@@ -1,3 +1,9 @@
+"""
+Zentrales Programm der Prognose von dem Verbrauch der Gruppe Pottkieker.
+Nutzt Daten aus 2024 um eine Prognose bis 2045 zu erstellen.
+Ünterstützt durch KI (Claude Sonnet 4.5)
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
