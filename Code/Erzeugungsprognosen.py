@@ -10,9 +10,9 @@ from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, d
 
 def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsrate_wind_offshore, wachstumsrate_Biomasse, wachstumsrate_Wasser, wachstumsrate_Sonstige):
     #=== Variablen ===#
-    installierte_leistung_PV_2024_MW = 101000  # Installierte Leistung PV in MW im Jahr 2024
-    installierte_leistung_Wind_onshore_2024_MW = 64000
-    installierte_leistung_Wind_offshore_2024_MW = 9000
+    installierte_leistung_PV_2024_MW = 60000  # Installierte Leistung PV in MW im Jahr 2024
+    installierte_leistung_Wind_onshore_2024_MW = 56000
+    installierte_leistung_Wind_offshore_2024_MW = 8000
     installierte_leistung_Biomasse_2024_MW = 9000  # Installierte Leistung Biomasse in MW im Jahr 2024
     installierte_leistung_Wasser_2024_MW = 5000    # Installierte Leistung Wasser in MW im Jahr 2024
     installierte_leistung_Sonstige_2024_MW = 3000   # Installierte Leistung Sonstige in MW im Jahr 2024
@@ -40,7 +40,7 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     erzeugung_df = erzeugung_df[["Datum von", "Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen","Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen","Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]]
 
     erzeugung_df = erzeugung_df[~((erzeugung_df["Datum von"].dt.month == 2) & (erzeugung_df["Datum von"].dt.day == 29))]
-    erzeugung_df = erzeugung_df.drop_duplicates()
+    erzeugung_df = erzeugung_df.drop_duplicates("Datum von").reset_index(drop=True)
 
     # WICHTIG: Kein inplace=True mit Zuweisung verwenden, da dies None zurückgibt
     erzeugung_df = erzeugung_df.rename(columns={
@@ -141,7 +141,15 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
         'Wasser_Prognose_MWh': 'Wasserkraft [MWh] Originalauflösungen',
         'Sonstige_Prognose_MWh': 'Sonstige Erneuerbare [MWh] Originalauflösungen'
     })
-    # prognose_export.to_csv(PROJECT_ROOT / "Daten" / "Erzeugungs_Prognose_2026_2045.csv", index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+
+    # Interpolation auf den numerischen Spalten 
+    spalten = ["Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen",
+               "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
+               "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
+    prognose_export[spalten] = prognose_export[spalten].interpolate(method='linear')
+    
+    prognose_export = prognose_export[["Datum von"] + spalten]
+
     if(prognose_export.isna().any().any()):
         print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
         print(prognose_export.isna().sum())
