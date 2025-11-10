@@ -14,14 +14,14 @@ import Histogramme as Hist
 import EE_Anteil_DataFrame as EEdf
 from config import PROJECT_ROOT
 
-verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650e6, 1200e6)
-erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.06, 0.065, 0.09, 0, 0, 0)
+verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650e6, 1000e6)
+erzeugung = Erzeugungsprognosen.Prognose_erzeugung(385, 145, 70, 4, 9, 3)
 
 gesamt2 = EEdf.anteil_erneuerbare_Jahrx_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen",2045)
 
 gesamt2["Jahr"] = gesamt2["Datum von"].dt.year
-print(gesamt2[gesamt2["Jahr"]==2045]["Erneuerbare [MWh]"].sum())
-print(gesamt2[gesamt2["Jahr"]==2045]["Netzlast [MWh] Originalauflösungen"].sum())
+print(gesamt2[gesamt2["Jahr"]==2045]["Erneuerbare [MWh]"].sum()/1e6)
+print(gesamt2[gesamt2["Jahr"]==2045]["Netzlast [MWh] Originalauflösungen"].sum()/1e6)
 
 # gesamt =Analyse.analyse_erneuerbare_anteil(
 #      PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv",
