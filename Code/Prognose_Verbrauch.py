@@ -14,7 +14,7 @@ def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
     
     #==== Einlesen der Daten und anpassung ====
     # Pfad relativ zum Skript bestimmen
-    verbrauchpfad = PROJECT_ROOT / "Daten" / "verbrauch_2024.csv"
+    verbrauchpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten" / "verbrauch_2024.csv"
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
     sep=';', low_memory=False)

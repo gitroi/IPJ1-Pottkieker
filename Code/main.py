@@ -19,6 +19,10 @@ erzeugung = Erzeugungsprognosen.Prognose_erzeugung(0.06, 0.065, 0.09, 0, 0, 0)
 
 gesamt2 = EEdf.anteil_erneuerbare_Jahrx_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen",2045)
 
+gesamt2["Jahr"] = gesamt2["Datum von"].dt.year
+print(gesamt2[gesamt2["Jahr"]==2045]["Erneuerbare [MWh]"].sum())
+print(gesamt2[gesamt2["Jahr"]==2045]["Netzlast [MWh] Originalauflösungen"].sum())
+
 # gesamt =Analyse.analyse_erneuerbare_anteil(
 #      PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv",
 #      PROJECT_ROOT / "Daten" / "Ist_Analyse" / "verbrauch.csv",
