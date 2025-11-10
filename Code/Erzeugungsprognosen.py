@@ -18,7 +18,7 @@ def Prognose_erzeugung(wachstumsrate_pv, wachstumsrate_wind_onshore, wachstumsra
     installierte_leistung_Sonstige_2024_MW = 3000   # Installierte Leistung Sonstige in MW im Jahr 2024
     
     #==== Einlesen der Daten und anpassung ====
-    erzeugungpfad = PROJECT_ROOT / "Daten" / "erzeugung_2024.csv"
+    erzeugungpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten"/ "erzeugung_2021.csv"
     erzeugung_df = pd.read_csv(erzeugungpfad,
     sep=';', low_memory=False
     )
