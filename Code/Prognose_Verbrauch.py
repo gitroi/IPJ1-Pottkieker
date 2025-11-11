@@ -10,8 +10,12 @@ import matplotlib.pyplot as plt
 import os
 from config import PROJECT_ROOT 
 
-def Prognose_Verbrauch(verbrauch_2030_MWh , verbrauch_2045_MWh):
+def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     
+    #=== Parameter in MWh umrechnen ===
+    verbrauch_2030_MWh = verbrauch_2030_TWh * 1e6
+    verbrauch_2045_MWh = verbrauch_2045_TWh * 1e6
+
     #==== Einlesen der Daten und anpassung ====
     # Pfad relativ zum Skript bestimmen
     verbrauchpfad = PROJECT_ROOT / "Daten" /"SMARD-Daten"/ "verbrauch_2024.csv"
