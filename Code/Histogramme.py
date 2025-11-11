@@ -48,7 +48,7 @@ def plot_ee_anteil_histogram(gesamt):
             ax.text(x, y + max(n) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
 
         # Achsentitel und Diagrammtitel
-        ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch der Jahre 2020-2025')
+        ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch')
         ax.set_xlabel('Anteil Erneuerbare [%]')
         ax.set_ylabel('Anzahl Viertelstunden')
 
@@ -123,7 +123,7 @@ def plot_ee_anteil_histogram_overflow(gesamt):
         ax.text(x, count + max(counts) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
 
     # Achsentitel und Diagrammtitel
-    ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch der Jahre 2020-2025')
+    ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch')
     ax.set_xlabel('Anteil Erneuerbare [%]')
     ax.set_ylabel('Anzahl Viertelstunden')
 
