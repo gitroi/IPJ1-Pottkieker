@@ -14,8 +14,17 @@ import Histogramme as Hist
 import EE_Anteil_DataFrame as EEdf
 from config import PROJECT_ROOT
 
+map_installed_capacity = {
+    "pv": 485,  
+    "wind_onshore": 145,
+    "wind_offshore": 75,
+    "biomasse": 4,
+    "wasser": 9,
+    "sonstige": 3
+}
+
 verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650, 1000)
-erzeugung = Erzeugungsprognosen.Prognose_erzeugung(485, 145, 75, 4, 9, 3)
+erzeugung = Erzeugungsprognosen.Prognose_erzeugung(map_installed_capacity, installierte_2045=None)
 
 gesamt2 = EEdf.anteil_erneuerbare_Jahrx_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen",2045)
     
