@@ -15,7 +15,16 @@ import EE_Anteil_DataFrame as EEdf
 from config import PROJECT_ROOT
 
 map_installed_capacity = {
-    "pv": 485,  
+    "pv": 285,  
+    "wind_onshore": 90,
+    "wind_offshore": 40,
+    "biomasse": 6,
+    "wasser": 9,
+    "sonstige": 3
+}
+
+map_installed_capacity_2045 = {
+    "pv": 485,
     "wind_onshore": 145,
     "wind_offshore": 75,
     "biomasse": 4,
@@ -24,7 +33,7 @@ map_installed_capacity = {
 }
 
 verbrauch = Prognose_Verbrauch.Prognose_Verbrauch(650, 1000)
-erzeugung = Erzeugungsprognosen.Prognose_erzeugung(map_installed_capacity, installierte_2045=None)
+erzeugung = Erzeugungsprognosen.Prognose_erzeugung(map_installed_capacity, map_installed_capacity_2045)
 
 gesamt2 = EEdf.anteil_erneuerbare_Jahrx_df(erzeugung, verbrauch, "Netzlast [MWh] Originalauflösungen",2045)
     
