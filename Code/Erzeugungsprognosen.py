@@ -8,16 +8,12 @@ import pandas as pd
 import numpy as np
 from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich
 
-def Prognose_erzeugung(installierte_Leistung_pv_GW, installierte_Leistung_wind_onshore_GW, installierte_Leistung_wind_offshore_GW, installierte_Leistung_Biomasse_GW, installierte_Leistung_Wasser_GW, installierte_Leistung_Sonstige_GW):
+def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.DataFrame:
     """
     Funktion zur Prognose der Erneuerbaren Energieerzeugung von 2026 bis 2045 basierend auf dem Ausbaustand für verschiedene Energiequellen.
     Parameters:
-    installierte_Leistung_pv_GW (float): Installierte Leistung für Photovoltaik in GW im Jahr 2045.
-    installierte_Leistung_wind_onshore_GW (float): Installierte Leistung für Wind Onshore in GW im Jahr 2045.
-    installierte_Leistung_wind_offshore_GW (float): Installierte Leistung für Wind Offshore in GW im Jahr 2045.
-    installierte_Leistung_Biomasse_GW (float): Installierte Leistung für Biomasse in GW im Jahr 2045.
-    installierte_Leistung_Wasser_GW (float): Installierte Leistung für Wasserkraft in GW im Jahr 2045.
-    installierte_Leistung_Sonstige_GW (float): Installierte Leistung für Sonstige Erneuerbare in GW im Jahr 2045.
+        installierte_2030 (dict): Installierte Leistung für 2030 in GW. Schlüssel: 'pv', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige'.
+        installierte_2045 (dict): Installierte Leistung für 2045 in GW. Schlüssel: 'pv', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige'.
 
     """
     #=== Variablen ===#
@@ -29,12 +25,12 @@ def Prognose_erzeugung(installierte_Leistung_pv_GW, installierte_Leistung_wind_o
     installierte_leistung_Sonstige_2021_GW = 3
 
     #=== Zuwachs pro Jahr berechnen ===#
-    zuwachsrate_pv = (installierte_Leistung_pv_GW  - installierte_leistung_PV_2021_GW) / 24
-    zuwachsrate_wind_onshore = (installierte_Leistung_wind_onshore_GW  - installierte_leistung_Wind_onshore_2021_GW) / 24
-    zuwachsrate_wind_offshore = (installierte_Leistung_wind_offshore_GW  - installierte_leistung_Wind_offshore_2021_GW) / 24
-    zuwachsrate_Biomasse = (installierte_Leistung_Biomasse_GW  - installierte_leistung_Biomasse_2021_GW) / 24
-    zuwachsrate_Wasser = (installierte_Leistung_Wasser_GW  - installierte_leistung_Wasser_2021_GW) / 24
-    zuwachsrate_Sonstige = (installierte_Leistung_Sonstige_GW  - installierte_leistung_Sonstige_2021_GW) / 24
+    zuwachsrate_pv = (installierte_2030['pv']  - installierte_leistung_PV_2021_GW) / 24
+    zuwachsrate_wind_onshore = (installierte_2030['wind_onshore']  - installierte_leistung_Wind_onshore_2021_GW) / 24
+    zuwachsrate_wind_offshore = (installierte_2030['wind_offshore']  - installierte_leistung_Wind_offshore_2021_GW) / 24
+    zuwachsrate_Biomasse = (installierte_2030['biomasse']  - installierte_leistung_Biomasse_2021_GW) / 24
+    zuwachsrate_Wasser = (installierte_2030['wasser']  - installierte_leistung_Wasser_2021_GW) / 24
+    zuwachsrate_Sonstige = (installierte_2030['sonstige']  - installierte_leistung_Sonstige_2021_GW) / 24
 
     #==== Einlesen der Daten und anpassung ====
     erzeugungpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten"/ "erzeugung_2021.csv"
@@ -77,21 +73,17 @@ def Prognose_erzeugung(installierte_Leistung_pv_GW, installierte_Leistung_wind_o
     erzeugung_df["Kapazitätsfaktor_Wasser"] = erzeugung_df["Wasser [MWh]"] / (installierte_leistung_Wasser_2021_GW * 1000 * 0.25)  # 0.25 da 15min Intervalle
     erzeugung_df["Kapazitätsfaktor_Sonstige"] = erzeugung_df["Sonstige [MWh]"] / (installierte_leistung_Sonstige_2021_GW * 1000 * 0.25)  # 0.25 da 15min Intervalle
 
-
-    # Extrahiere die Zeitkomponenten für das Mapping
     erzeugung_df["Monat"] = erzeugung_df["Datum von"].dt.month
     erzeugung_df["Tag"] = erzeugung_df["Datum von"].dt.day
     erzeugung_df["Stunde"] = erzeugung_df["Datum von"].dt.hour
     erzeugung_df["Minute"] = erzeugung_df["Datum von"].dt.minute
 
-    # Erstelle Kapazitätsfaktoren-Profil
     kapazitätsfaktoren = erzeugung_df[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]]
     
     # Erstelle Datumsbereich für 2026-2045
     date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min')
     prognose = pd.DataFrame({'Datum von': date_range})
     
-    # Extrahiere Zeitkomponenten für die Prognose
     prognose['Monat'] = prognose['Datum von'].dt.month
     prognose['Tag'] = prognose['Datum von'].dt.day
     prognose['Stunde'] = prognose['Datum von'].dt.hour
@@ -142,15 +134,14 @@ def Prognose_erzeugung(installierte_Leistung_pv_GW, installierte_Leistung_wind_o
             prognose.loc[mask, 'Kapazitätsfaktor_Sonstige'] * installierte_leistung_Sonstige * 0.25
         )
 
-   # Werte auf 2 Nachkommastellen runden
+   
     prognose['PV_Prognose_MWh'] = prognose['PV_Prognose_MWh'].round(2)
     prognose['Wind_Onshore_Prognose_MWh'] = prognose['Wind_Onshore_Prognose_MWh'].round(2)
     prognose['Wind_Offshore_Prognose_MWh'] = prognose['Wind_Offshore_Prognose_MWh'].round(2)
     prognose['Biomasse_Prognose_MWh'] = prognose['Biomasse_Prognose_MWh'].round(2)
     prognose['Wasser_Prognose_MWh'] = prognose['Wasser_Prognose_MWh'].round(2)
     prognose['Sonstige_Prognose_MWh'] = prognose['Sonstige_Prognose_MWh'].round(2)
-
-   # Speichere Prognose
+    # Speichere Prognose
     prognose_export = prognose[['Datum von', 'PV_Prognose_MWh', 'Wind_Onshore_Prognose_MWh', 'Wind_Offshore_Prognose_MWh','Biomasse_Prognose_MWh', 'Wasser_Prognose_MWh', 'Sonstige_Prognose_MWh']]
     prognose_export = prognose_export.rename(columns={
         'PV_Prognose_MWh': 'Photovoltaik [MWh] Originalauflösungen',
@@ -161,7 +152,6 @@ def Prognose_erzeugung(installierte_Leistung_pv_GW, installierte_Leistung_wind_o
         'Sonstige_Prognose_MWh': 'Sonstige Erneuerbare [MWh] Originalauflösungen'
     })
 
-    # Interpolation auf den numerischen Spalten 
     spalten = ["Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen",
                "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
                "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
