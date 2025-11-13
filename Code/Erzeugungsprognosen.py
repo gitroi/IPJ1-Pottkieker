@@ -16,30 +16,36 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
         installierte_2045 (dict): Installierte Leistung für 2045 in GW. Schlüssel: 'pv', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige'.
 
     """
-    #=== Variablen ===#
-    installierte_leistung_PV_2021_GW = 60  
-    installierte_leistung_Wind_onshore_2021_GW = 56
-    installierte_leistung_Wind_offshore_2021_GW = 8
-    installierte_leistung_Biomasse_2021_GW = 9  
-    installierte_leistung_Wasser_2021_GW = 5    
-    installierte_leistung_Sonstige_2021_GW = 3
+    #=== Feste Variablen ===
+    map_wirkungsgrade = {
+        "pv": 0.88,
+        "wind_onshore": 0.95,
+        "wind_offshore": 0.95,
+        "biomasse": 0.95,
+        "wasser": 0.92,
+        "sonstige": 0.9
+    }
 
-    #=== Zuwachs pro Jahr berechnen ===#
+    #=== Installierte Leistung in GW einlesen ===
+    pfad = PROJECT_ROOT / "Daten" / "Feste_Parameter" / "Netto_Installiert_GW.csv"
+    installierte_leistung_df = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False)
+
+    #=== Zuwachs pro Monat berechnen ===#
     # bis 2030
-    zuwachsrate_pv_30 = (installierte_2030['pv']  - installierte_leistung_PV_2021_GW) / 9
-    zuwachsrate_wind_onshore_30 = (installierte_2030['wind_onshore']  - installierte_leistung_Wind_onshore_2021_GW) / 9
-    zuwachsrate_wind_offshore_30 = (installierte_2030['wind_offshore']  - installierte_leistung_Wind_offshore_2021_GW) / 9
-    zuwachsrate_biomasse_30 = (installierte_2030['biomasse']  - installierte_leistung_Biomasse_2021_GW) / 9
-    zuwachsrate_wasser_30 = (installierte_2030['wasser']  - installierte_leistung_Wasser_2021_GW) / 9
-    zuwachsrate_sonstige_30 = (installierte_2030['sonstige']  - installierte_leistung_Sonstige_2021_GW) / 9
+    zuwachsrate_pv_30 = (installierte_2030['pv']  - (installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)]["PV"] / map_wirkungsgrade["pv"])) / 72
+    zuwachsrate_wind_onshore_30 = (installierte_2030['wind_onshore']  - (installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)]["Wind_onshore"] / map_wirkungsgrade["wind_onshore"])) / 72
+    zuwachsrate_wind_offshore_30 = (installierte_2030['wind_offshore']  - (installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)]["Wind_offshore"] / map_wirkungsgrade["wind_offshore"])) / 72
+    zuwachsrate_biomasse_30 = (installierte_2030['biomasse']  - (installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)]["Biomasse"] / map_wirkungsgrade["biomasse"])) / 72
+    zuwachsrate_wasser_30 = (installierte_2030['wasser']  - (installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)]["Wasser"] / map_wirkungsgrade["wasser"])) / 72
+    zuwachsrate_sonstige_30 = (installierte_2030['sonstige']  - (installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)]["Sonstige"] / map_wirkungsgrade["sonstige"])) / 72
     # bis 2045
-    zuwachsrate_pv_45 = (installierte_2045['pv']  - installierte_2030['pv']) / 15
-    zuwachsrate_wind_onshore_45 = (installierte_2045['wind_onshore']  - installierte_2030['wind_onshore']) / 15
-    zuwachsrate_wind_offshore_45 = (installierte_2045['wind_offshore']  - installierte_2030['wind_offshore']) / 15
-    zuwachsrate_biomasse_45 = (installierte_2045['biomasse']  - installierte_2030['biomasse']) / 15
-    zuwachsrate_wasser_45 = (installierte_2045['wasser']  - installierte_2030['wasser']) / 15
-    zuwachsrate_sonstige_45 = (installierte_2045['sonstige']  - installierte_2030['sonstige']) / 15
-
+    zuwachsrate_pv_45 = (installierte_2045['pv']  - installierte_2030['pv']) / 180
+    zuwachsrate_wind_onshore_45 = (installierte_2045['wind_onshore']  - installierte_2030['wind_onshore']) / 180
+    zuwachsrate_wind_offshore_45 = (installierte_2045['wind_offshore']  - installierte_2030['wind_offshore']) / 180
+    zuwachsrate_biomasse_45 = (installierte_2045['biomasse']  - installierte_2030['biomasse']) / 180
+    zuwachsrate_wasser_45 = (installierte_2045['wasser']  - installierte_2030['wasser']) / 180
+    zuwachsrate_sonstige_45 = (installierte_2045['sonstige']  - installierte_2030['sonstige']) / 180
+    
     #==== Einlesen der Daten und anpassung ====
     erzeugungpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten"/ "erzeugung_2021.csv"
     erzeugung_df = pd.read_csv(erzeugungpfad,
@@ -62,9 +68,6 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
 
     erzeugung_df = erzeugung_df[["Datum von", "Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen","Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen","Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]]
 
-    # erzeugung_df = erzeugung_df[~((erzeugung_df["Datum von"].dt.month == 2) & (erzeugung_df["Datum von"].dt.day == 29))]
-    # erzeugung_df = erzeugung_df.drop_duplicates("Datum von").reset_index(drop=True)
-
     # WICHTIG: Kein inplace=True mit Zuweisung verwenden, da dies None zurückgibt
     erzeugung_df = erzeugung_df.rename(columns={
         "Photovoltaik [MWh] Originalauflösungen": "PV [MWh]",
@@ -74,6 +77,8 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
         "Wasserkraft [MWh] Originalauflösungen": "Wasser [MWh]",
         "Sonstige Erneuerbare [MWh] Originalauflösungen": "Sonstige [MWh]"
     })
+    
+    #=== Kapazitätsfaktoren berechnen ===
     erzeugung_df["Kapazitätsfaktor_PV"] = erzeugung_df["PV [MWh]"] / (installierte_leistung_PV_2021_GW * 1000 * 0.25)  # 0.25 da 15min Intervalle
     erzeugung_df["Kapazitätsfaktor_Wind_Onshore"] = erzeugung_df["Wind Onshore [MWh]"] / (installierte_leistung_Wind_onshore_2021_GW * 1000 * 0.25)  # 0.25 da 15min Intervalle
     erzeugung_df["Kapazitätsfaktor_Wind_Offshore"] = erzeugung_df["Wind Offshore [MWh]"] / (installierte_leistung_Wind_offshore_2021_GW * 1000 * 0.25)  # 0.25 da 15min Intervalle
