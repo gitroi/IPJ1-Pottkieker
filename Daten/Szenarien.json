@@ -1,0 +1,75 @@
+[
+    {
+        "Name": "Name Szenario 1",
+        "Beschreibung": "Beschreibung Szenario 1",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv": 285,  
+                "wind_onshore": 90,
+                "wind_offshore": 40,
+                "biomasse": 6,
+                "wasser": 9,
+                "sonstige": 3
+            },
+            "Ausbau Speicher": {
+                "Pumpspeicher": 0.4,
+                "Batteriespeicher": 0.5,
+                "Power-to-Gas": 0.3
+            },
+            "Strombedarf": 650
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv": 485,
+                "wind_onshore": 145,
+                "wind_offshore": 75,
+                "biomasse": 4,
+                "wasser": 9,
+                "sonstige": 3
+            },
+            "Ausbau Speicher": {
+                "Pumpspeicher": 0.4,
+                "Batteriespeicher": 0.5,
+                "Power-to-Gas": 0.3
+            },
+            "Strombedarf": 650
+        }
+    },
+     {
+        "Name": "Name Szenario 1",
+        "Beschreibung": "Beschreibung Szenario 1",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv": 285,  
+                "wind_onshore": 90,
+                "wind_offshore": 40,
+                "biomasse": 6,
+                "wasser": 9,
+                "sonstige": 3
+            },
+            "Ausbau Speicher": {
+                "Pumpspeicher": 0.4,
+                "Batteriespeicher": 0.5,
+                "Power-to-Gas": 0.3
+            },
+            "Strombedarf": 650
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv": 485,
+                "wind_onshore": 145,
+                "wind_offshore": 75,
+                "biomasse": 4,
+                "wasser": 9,
+                "sonstige": 3
+            },
+            "Ausbau Speicher": {
+                "Pumpspeicher": 0.4,
+                "Batteriespeicher": 0.5,
+                "Power-to-Gas": 0.3
+            },
+            "Strombedarf": 650
+        }
+    }
+]
+
