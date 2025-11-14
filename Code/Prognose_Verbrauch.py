@@ -44,14 +44,14 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     #=== Gesamtverbrauch 2024 aus bestehenden Messungen berechnen ===
 
     gesamtverbrauch_2024 = verbrauch_df["Netzlast [MWh]"].sum().round(2)    
-    print(f"Gesamtverbrauch 2024: {gesamtverbrauch_2024/1e6} TWh")
+
     #=== Wachstumsrate bis 2030 berechnen ===
 
-    # lineare Interpolation mit jährlichem Wachstumswert 
-    virtelstunden_pro_Jahr = 365 * 24 * 4
-    zuwachs_2030 = (verbrauch_2030_MWh - gesamtverbrauch_2024) / (6 * virtelstunden_pro_Jahr)
-    zuwachs_2030 = zuwachs_2030.round(6)
+    #ziel = start * (1+ r) ** n  => r = (ziel/start)^(1/n) -1
+    wachstumsrate_2030 = ((verbrauch_2030_MWh/gesamtverbrauch_2024)**(1/6)) - 1
+
     #=== profil für 2024 erstellen ===
+
     basisprofil_2024 = verbrauch_df.groupby(["Monat", "Wochentag", "Uhrzeit", "Minute"])[["Netzlast [MWh]"]].mean().reset_index()
 
     #=== Dataframe für die Jahre bis 2030 erstellen ===
@@ -72,7 +72,8 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     #=== Verbrauchsprognose berechnen ===
 
     df_gesamt["Netzlast_Prognose [MWh]"] = (
-        df_gesamt["Netzlast [MWh]"] + (zuwachs_2030 * (df_gesamt["Jahr"] - 2024) )
+        df_gesamt["Netzlast [MWh]"]
+        * (1 + wachstumsrate_2030) ** (df_gesamt["Jahr"] - 2024) 
     )
 
     df_gesamt["Netzlast_Prognose [MWh]"] = df_gesamt["Netzlast_Prognose [MWh]"].round(2)
@@ -93,7 +94,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
    
     gesamtverbrauch_2030_berechnet = df_gesamt[df_gesamt["Jahr"] == 2030]["Netzlast_Prognose [MWh]"].sum()
 
-    zuwachs_2045 = (verbrauch_2045_MWh - gesamtverbrauch_2030_berechnet) / 15
+    wachstumsrate_2045 = (verbrauch_2045_MWh/gesamtverbrauch_2030_berechnet) **(1/15) - 1
 
     basisprofil_2030 = df_gesamt[df_gesamt["Jahr"] == 2030][["Jahr","Monat","Wochentag","Uhrzeit","Minute" ,"Netzlast_Prognose [MWh]"]].copy()
 
@@ -108,7 +109,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
 
     prognose_2045["Netzlast_Prognose [MWh]"] = (
         prognose_2045["Profil [MWh]"]
-        + (zuwachs_2045 * (prognose_2045["Jahr"] - 2030))
+        * (1 + wachstumsrate_2045) ** (prognose_2045["Jahr"] - 2030)
     )
 
     prognose_2045["Netzlast_Prognose [MWh]"] = prognose_2045["Netzlast_Prognose [MWh]"].round(2)
@@ -116,8 +117,12 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     df_gesamt_2045 = pd.concat([df_gesamt, prognose_2045], ignore_index=True)
     df_gesamt_2045 = df_gesamt_2045.rename(columns={"Netzlast_Prognose [MWh]": "Netzlast [MWh] Originalauflösungen"})
 
+    # #speichern
+    # df_prognose_export = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
+    # df_prognose_export.to_csv(PROJECT_ROOT / 'Daten' / 'verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
     df_gesamt_2045 = df_gesamt_2045[~((df_gesamt_2045["Datum von"].dt.month == 2) & (df_gesamt_2045["Datum von"].dt.day == 29))]
-    
+
     return df_gesamt_2045
