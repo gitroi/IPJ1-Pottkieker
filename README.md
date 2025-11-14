@@ -25,7 +25,7 @@ Hier liegen alle Dateien die nicht den anderen Kategorien zugeordnet werden kön
 ### **Wenn an dem Projekt gearbeitet wird bitte wie folgt vorgehen:**
 
 <ins>Initial:</ins>
-1. In VS-Code auf die "Welcome"-Page (erreichbar durch Strg + Shift + P -> "welcome" eingeben)
+1. In VS-Code auf die "Welcome"-Page (erreichbar durch F1 -> "welcome" eingeben)
 2. "Clone Git Repository" -> URL dieses Repositories einfügen und lokalen Speicherort wählen
 
 <ins>Arbeiten (sicher):</ins>
