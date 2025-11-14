@@ -1,0 +1,2 @@
+https://www.geeksforgeeks.org/python/create-a-column-using-for-loop-in-pandas-dataframe/
+https://www.w3schools.com/python/python_for_loops.asp
