@@ -4,9 +4,10 @@ Zentrales Programm der Prognose vom Stromspeicher.
 """
 import pandas as pd
 import numpy as np
+from functools import reduce
 from config import PROJECT_ROOT
 
-def Prognose_Speicher_Ausbau(bestand2025, bestand2030, bestand2045):
+def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045):
     """
     Berechnet den Verlauf des Speicherausbaus einer Speicherart
     Ünterstützt durch KI (Claude Sonnet 4.5)
@@ -34,8 +35,10 @@ def Prognose_Speicher_Ausbau(bestand2025, bestand2030, bestand2045):
     speicher = []
     for i in range(anzahl_viertelstunden_2030):
         speicher.append(bestand2025 + wachstumsrate_2030 * (i+1))
+
+    speichername = f"Speicherkapazität {speicherart} [MWh]"
     
-    df_2030["Speicherkapazität [MWh]"] = speicher
+    df_2030[speichername] = speicher
 
     #df_2030.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
@@ -57,11 +60,32 @@ def Prognose_Speicher_Ausbau(bestand2025, bestand2030, bestand2045):
     for i in range(anzahl_viertelstunden_2045):
         speicher.append(bestand2030 + wachstumsrate_2045 * (i+1))
     
-    df_2045["Speicherkapazität [MWh]"] = speicher
+    df_2045[speichername] = speicher
 
     df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True)
-    df_gesamt["Speicherkapazität [MWh]"] = df_gesamt["Speicherkapazität [MWh]"].round(2)
+    df_gesamt[speichername] = df_gesamt[speichername].round(2)
 
     #df_gesamt.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
-Prognose_Speicher_Ausbau(51, 160, 400)
+    return df_gesamt
+
+df_batterie = Prognose_Speicher_Ausbau("Batterie", 51, 160, 400)
+df_auto = Prognose_Speicher_Ausbau("E-Auto", 51, 160, 400)
+df_schwungrad = Prognose_Speicher_Ausbau("Schwungrad", 51, 160, 400)
+df_wasserstoff = Prognose_Speicher_Ausbau("Wasserstoff", 51, 160, 400)
+df_pump = Prognose_Speicher_Ausbau("Pumpspeicher", 51, 160, 400)
+
+
+dfs = [df_batterie, df_auto, df_schwungrad, df_wasserstoff, df_pump]
+
+# Merge alle DataFrames auf gemeinsamen Spalten
+df_ausbau = reduce(
+    lambda left, right: left.merge(
+        right, 
+        on=['Datum', 'Jahr', 'Monat', 'Wochentag', 'Uhrzeit', 'Minute'], 
+        how='outer'
+    ), 
+    dfs
+)
+
+df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
