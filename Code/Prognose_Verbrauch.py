@@ -1,13 +1,14 @@
 """
 Zentrales Programm der Prognose von dem Verbrauch der Gruppe Pottkieker.
 Nutzt Daten aus 2024 um eine Prognose bis 2045 zu erstellen.
-Ünterstützt durch KI (Claude Sonnet 4.5)
+Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
 """
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from config import PROJECT_ROOT
+import os
+from config import PROJECT_ROOT 
 
 def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     
@@ -122,6 +123,6 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
 
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
-    df_gesamt_2045 = df_gesamt_2045[~((df_gesamt_2045["Datum von"].dt.month == 2) & (df_gesamt_2045["Datum von"].dt.day == 29))]
+    # df_gesamt_2045 = df_gesamt_2045[~((df_gesamt_2045["Datum von"].dt.month == 2) & (df_gesamt_2045["Datum von"].dt.day == 29))]
 
     return df_gesamt_2045
