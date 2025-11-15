@@ -12,7 +12,7 @@ def anteil_erneuerbare_df(erzeugung: pd.DataFrame, verbrauch: pd.DataFrame, spal
         spaltenname_verbrauch (str): Name der Spalte im Verbrauchs-DataFrame, die den Verbrauch in MWh enthält
     Returns:
         pd.DataFrame: DataFrame mit dem Anteil der Erneuerbaren Energien am Stromverbrauch
-    Unterstützt durch KI (Claude Sonnet 4.5)
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
     # ==============================
     # 1. Datumsangaben konvertieren
@@ -70,7 +70,7 @@ def anteil_erneuerbare_Jahrx_df(erzeugung: pd.DataFrame, verbrauch: pd.DataFrame
         jahr (int): Jahr, für das die Analyse durchgeführt werden soll
     Returns:
         pd.DataFrame: DataFrame mit dem Anteil der Erneuerbaren Energien am Stromverbrauch
-    Unterstützt durch KI (Claude Sonnet 4.5)
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
     # ==============================
     # 1. Datumsangaben konvertieren
