@@ -10,7 +10,7 @@ from config import PROJECT_ROOT
 def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045):
     """
     Berechnet den Verlauf des Speicherausbaus einer Speicherart
-    Ünterstützt durch KI (Claude Sonnet 4.5)
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
 
     #=== Kapazitäten in MWh umrechnen ===
@@ -28,7 +28,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     df_2030["Uhrzeit"] = df_2030["Datum"].dt.hour
     df_2030["Minute"] = df_2030["Datum"].dt.minute
 
-    anzahl_viertelstunden_2030 = len(df_2030["Datum"].unique())
+    anzahl_viertelstunden_2030 = len(df_2030["Datum"].unique()) #TODO: Auf Tage umstellen
     
     wachstumsrate_2030 = (bestand2030 - bestand2025) / anzahl_viertelstunden_2030
 
@@ -65,7 +65,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True)
     df_gesamt[speichername] = df_gesamt[speichername].round(2)
 
-    #df_gesamt.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_gesamt.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamt
 
@@ -88,4 +88,4 @@ df_ausbau = reduce(
     dfs
 )
 
-df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+# df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
