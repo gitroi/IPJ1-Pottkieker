@@ -10,7 +10,7 @@ def plot_ee_erzeugung_jaehrlich():
     """
     Erstellt ein Liniendiagramm der jährlichen Erneuerbaren Energieerzeugung
     aus verschiedenen Quellen für die Jahre 2020 bis 2024.
-    Unterstützt durch KI (Claude Sonnet 4.5)
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
     # Pfad zur CSV-Datei mit Erzeugungsdaten
     erzeugungpfad = PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv"

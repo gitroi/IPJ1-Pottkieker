@@ -1,7 +1,7 @@
 """
 Zentrales Programm der Erzeugungsprognose von der Gruppe Pottkieker.
 Nutzt Daten aus 2024 um eine Prognose bis 2045 zu erstellen.
-Unterstützt durch KI (Claude Sonnet 4.5)
+Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
 """
 
 import pandas as pd
@@ -113,8 +113,6 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
     prognose['Stunde'] = prognose['Datum von'].dt.hour
     prognose['Minute'] = prognose['Datum von'].dt.minute
     prognose['Jahr'] = prognose['Datum von'].dt.year
-
-    # prognose = prognose[~((prognose['Monat'] == 2) & (prognose['Tag'] == 29))]
     
     prognose = prognose.merge(kapazitätsfaktoren, on=['Monat', 'Tag', 'Stunde', 'Minute'], how='left')
 
