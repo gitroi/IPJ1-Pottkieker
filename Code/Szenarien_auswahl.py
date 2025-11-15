@@ -11,6 +11,11 @@ def load_scenarios():
 
     return scenarios
 
-scenarios = load_scenarios()
-for i in range(len(scenarios)):
-    print(f"Szenario {i+1}: {scenarios[i]['Name']}")
+def get_scenario_by_name(szenarien, name):
+    """Gibt ein Szenario basierend auf dem Namen zurück."""
+    for szenario in szenarien:
+        if szenario["name"] == name:
+            return szenario
+    return None
+
+
