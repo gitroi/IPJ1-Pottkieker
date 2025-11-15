@@ -11,7 +11,7 @@ def plot_ee_anteil_histogram(gesamt):
     Erstellt ein Histogramm des Anteils der Erneuerbaren Energien am Stromverbrauch.
     Args:
     gesamt (pd.DataFrame): DataFrame mit der Spalte "Anteil Erneuerbare [MWh]"
-    Unterstützt durch KI (Claude Sonnet 4.5)
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
 
     # erstellen der Bins für das Histogram mit den Abständen von 0 bis 110 in 10 Schritten und sammeln der werte über 100%

@@ -10,7 +10,7 @@ from config import PROJECT_ROOT
 def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045):
     """
     Berechnet den Verlauf des Speicherausbaus einer Speicherart
-    Ünterstützt durch KI (Claude Sonnet 4.5)
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
 
     #=== Kapazitäten in MWh umrechnen ===
