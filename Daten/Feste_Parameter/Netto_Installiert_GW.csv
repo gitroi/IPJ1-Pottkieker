@@ -1,4 +1,4 @@
-Jahr;Monat;PV;Wind_onshore;Wind_offshore;Biomasse;Wasserkraft;Sonstige
+Jahr;Monat;pv;wind_onshore;wind_offshore;biomasse;wasser;sonstige
 2020;1;45,49;53,27;7,79;8,35;5,24;0,18
 2020;2;45,76;53,4;7,79;8,35;5,24;0,18
 2020;3;46,08;53,5;7,79;8,35;5,24;0,18
