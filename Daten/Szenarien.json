@@ -1,7 +1,7 @@
 [
     {
-        "Name": "Massiver Ausbaue erneuerbarer Energien",
-        "Beschreibung": "Beschreibung Szenario 1",
+        "Name": "Test Szenario",
+        "Beschreibung": "Szenario zum Testen der Implementierung",
         "Ziele 2030": {
             "Ausbau EE": {
                 "pv": 285,  
