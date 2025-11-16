@@ -4,7 +4,8 @@
         "Beschreibung": "Szenario zum Testen der Implementierung",
         "Ziele 2030": {
             "Ausbau EE": {
-                "pv": 285,  
+                "pv_dach": 295,
+                "pv_frei": 90,  
                 "wind_onshore": 90,
                 "wind_offshore": 40,
                 "biomasse": 6,
@@ -20,7 +21,8 @@
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv": 485,
+                "pv_dach": 495,
+                "pv_frei": 90,  
                 "wind_onshore": 145,
                 "wind_offshore": 75,
                 "biomasse": 4,
@@ -40,7 +42,8 @@
         "Beschreibung": "Beschreibung Szenario 1",
         "Ziele 2030": {
             "Ausbau EE": {
-                "pv": 285,  
+                "pv_dach": 295,
+                "pv_frei": 90,  
                 "wind_onshore": 90,
                 "wind_offshore": 40,
                 "biomasse": 6,
@@ -56,7 +59,8 @@
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv": 485,
+                "pv_dach": 495,
+                "pv_frei": 90,  
                 "wind_onshore": 145,
                 "wind_offshore": 75,
                 "biomasse": 4,
