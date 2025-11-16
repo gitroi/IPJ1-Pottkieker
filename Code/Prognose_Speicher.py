@@ -28,19 +28,15 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     df_2030["Uhrzeit"] = df_2030["Datum"].dt.hour
     df_2030["Minute"] = df_2030["Datum"].dt.minute
 
-    anzahl_viertelstunden_2030 = len(df_2030["Datum"].unique()) #TODO: Auf Tage umstellen
+    anzahl_tage_2030 = len(df_2030["Datum"].dt.date.unique())
     
-    wachstumsrate_2030 = (bestand2030 - bestand2025) / anzahl_viertelstunden_2030
-
-    speicher = []
-    for i in range(anzahl_viertelstunden_2030):
-        speicher.append(bestand2025 + wachstumsrate_2030 * (i+1))
+    wachstumsrate_2030 = (bestand2030 - bestand2025) / anzahl_tage_2030
 
     speichername = f"Speicherkapazität {speicherart} [MWh]"
     
-    df_2030[speichername] = speicher
+    df_2030[speichername] = bestand2025 + wachstumsrate_2030 * ((df_2030['Datum'] - df_2030['Datum'].min()).dt.days + 1)
 
-    #df_2030.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_2030.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     #=== Dataframe für die Jahre 2030 bis 2045 erstellen ===
     date_range = pd.date_range(start='2031-01-01', end='2045-12-31 23:45', freq='15min')
@@ -52,17 +48,13 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     df_2045["Uhrzeit"] = df_2045["Datum"].dt.hour
     df_2045["Minute"] = df_2045["Datum"].dt.minute
 
-    anzahl_viertelstunden_2045 = len(df_2045["Datum"].unique())
+    anzahl_tage_2045 = len(df_2045["Datum"].dt.date.unique())
     
-    wachstumsrate_2045 = (bestand2045 - bestand2030) / anzahl_viertelstunden_2045
-    
-    speicher = []
-    for i in range(anzahl_viertelstunden_2045):
-        speicher.append(bestand2030 + wachstumsrate_2045 * (i+1))
-    
-    df_2045[speichername] = speicher
+    wachstumsrate_2045 = (bestand2045 - bestand2030) / anzahl_tage_2045
 
-    df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True)
+    df_2045[speichername] = bestand2030 + wachstumsrate_2045 * ((df_2045['Datum'] - df_2045['Datum'].min()).dt.days + 1)
+
+    df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True) # Bereich von 2026 bis 2030 und 2031 bis 2045 zusammenfügen
     df_gesamt[speichername] = df_gesamt[speichername].round(2)
 
     # df_gesamt.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
