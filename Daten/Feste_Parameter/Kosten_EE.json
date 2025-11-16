@@ -1,6 +1,7 @@
 {
     "baukosten": {
-        "pv": 800,
+        "pv_dach": 800,
+        "pv_frei": 1300,
         "wind_onshore": 1200,
         "wind_offshore": 3500,
         "biomasse": 4000,
@@ -8,7 +9,8 @@
         "sonstige": 6000
     },
     "betriebskosten": {
-        "pv": 10,
+        "pv_dach": 10,
+        "pv_frei": 7,
         "wind_onshore": 25,
         "wind_offshore": 70,
         "biomasse": 80,
