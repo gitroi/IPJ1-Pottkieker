@@ -1,0 +1,18 @@
+{
+    "baukosten": {
+        "pv": 800,
+        "wind_onshore": 1200,
+        "wind_offshore": 3500,
+        "biomasse": 4000,
+        "wasser": 5000,
+        "sonstige": 6000
+    },
+    "betriebskosten": {
+        "pv": 10,
+        "wind_onshore": 25,
+        "wind_offshore": 70,
+        "biomasse": 80,
+        "wasser": 100,
+        "sonstige": 120
+    }
+}
