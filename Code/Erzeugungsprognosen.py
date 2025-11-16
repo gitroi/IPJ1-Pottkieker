@@ -151,9 +151,10 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
                 installierte_leistung_Biomasse = ( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["biomasse"].iloc[0] / map_wirkungsgrade["biomasse"])  + zuwachs_Biomasse) * 1000
                 installierte_leistung_Wasser = ( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["wasser"].iloc[0] / map_wirkungsgrade["wasser"])  + zuwachs_Wasser) * 1000
                 installierte_leistung_Sonstige = ((installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["sonstige"].iloc[0] / map_wirkungsgrade["sonstige"])  + zuwachs_Sonstige) * 1000
-            elif(jahr <= 2045):
+            elif(jahr > 2030):
                 jahre_seit_start = jahr - 2031 
                 anzahl_monate = (12 * jahre_seit_start) + monat 
+                zuwachs_pv = zuwachsrate_pv_45 * anzahl_monate
                 zuwachs_wind_onshore = zuwachsrate_wind_onshore_45 * anzahl_monate
                 zuwachs_wind_offshore = zuwachsrate_wind_offshore_45 * anzahl_monate
                 zuwachs_Biomasse = zuwachsrate_biomasse_45 * anzahl_monate
@@ -195,6 +196,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
     prognose['Biomasse_Prognose_MWh'] = prognose['Biomasse_Prognose_MWh'].round(2)
     prognose['Wasser_Prognose_MWh'] = prognose['Wasser_Prognose_MWh'].round(2)
     prognose['Sonstige_Prognose_MWh'] = prognose['Sonstige_Prognose_MWh'].round(2)
+   
     # Speichere Prognose
     prognose_export = prognose[['Datum von', 'PV_Prognose_MWh', 'Wind_Onshore_Prognose_MWh', 'Wind_Offshore_Prognose_MWh','Biomasse_Prognose_MWh', 'Wasser_Prognose_MWh', 'Sonstige_Prognose_MWh']]
     prognose_export = prognose_export.rename(columns={
@@ -221,6 +223,3 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
 
 
     return prognose_export
-
-# Prognose_erzeugung(0.068, 0.045, 0.09, 0, 0, 0)
-# Prognose_erzeugung(0, 0, 0, 0, 0, 0)
