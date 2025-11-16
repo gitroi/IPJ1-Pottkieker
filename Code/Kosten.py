@@ -1,11 +1,12 @@
 from Erzeugungsprognosen import Jährlicher_Zuwachs_EE
 from config import DATA_DIR
 from Feste_Variablen import map_ausbaustand_EE_GW, map_wirkungsgrade
+from Szenarien_auswahl import json_objekt_bearbeiten
 import pandas as pd
 import numpy as np
 import json
 
-def Kosten_Ausbau(zielwerte_2030:dict, zielwerte_2045:dict)-> pd.DataFrame:
+def Kosten_Ausbau(zieldaten: json)-> pd.DataFrame:
     """
     Berechnet die Kosten für den Ausbau der Erneuerbaren Energien basierend auf den Zielwerten für 2030 und 2045.
     
@@ -27,8 +28,16 @@ def Kosten_Ausbau(zielwerte_2030:dict, zielwerte_2045:dict)-> pd.DataFrame:
     kosten_df["Jahr"] = kosten_df["Datum"].dt.year
     kosten_df = kosten_df.drop(columns=["Datum"]).drop_duplicates().reset_index(drop=True)
 
-    
-    jährliche_raten = Jährlicher_Zuwachs_EE(zielwerte_2030, zielwerte_2045)
+    zieldaten_bearbeitet = json_objekt_bearbeiten(zieldaten)
+
+    anteil_dach_pv_2030 = zieldaten["Ziele 2030"]["Ausbau_EE"]["pv_dach"] / (
+        zieldaten["Ziele 2030"]["Ausbau_EE"]["pv_dach"] + zieldaten["Ziele 2030"]["Ausbau_EE"]["pv_frei"]
+    ).round(4)
+    anteil_dach_pv_2045 = zieldaten["Ziele 2045"]["Ausbau_EE"]["pv_dach"] / (
+        zieldaten["Ziele 2045"]["Ausbau_EE"]["pv_dach"] + zieldaten["Ziele 2045"]["Ausbau_EE"]["pv_frei"]
+    ).round(4)
+
+    jährliche_raten = Jährlicher_Zuwachs_EE(zieldaten_bearbeitet["zielwerte_2030"], zieldaten_bearbeitet["zielwerte_2045"])
     baukosten_EE_virstellstündlich = {"2030": 0, "2045": 0}
     for key in kostendaten["baukosten"].keys():
         baukosten_EE_virstellstündlich["2030"] += 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten["baukosten"][key] / (365.25 * 24 * 4)
