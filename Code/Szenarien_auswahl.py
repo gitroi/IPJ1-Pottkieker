@@ -36,7 +36,8 @@ def prognose_eines_Szenarios():
     
     if gewaehltes_szenario:
         print(f"Szenario '{auswahl}' wurde ausgewählt und wird ausgegeben.")
-        prognose_erzeugung = Prognose_erzeugung(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
+        bearbeitetes_szenario = json_objekt_bearbeiten(gewaehltes_szenario)
+        prognose_erzeugung = Prognose_erzeugung(bearbeitetes_szenario["Ziele 2030"]["Ausbau_EE"], bearbeitetes_szenario["Ziele 2045"]["Ausbau_EE"])
         prognose_verbrauch = Prognose_Verbrauch(gewaehltes_szenario["Ziele 2030"]["Strombedarf"], gewaehltes_szenario["Ziele 2045"]["Strombedarf"])
         if jahr.strip().isdigit():
             jahr_int = int(jahr)
@@ -50,3 +51,22 @@ def prognose_eines_Szenarios():
     else:
         print(f"Szenario '{auswahl}' nicht gefunden.")
         return None
+
+def json_objekt_bearbeiten(daten):
+    objekt = {}
+
+    for jahr in ["Ziele 2030", "Ziele 2045"]:
+        ee = daten[jahr]["Ausbau EE"]
+
+        objekt[jahr] = {
+            "Ausbau_EE": {
+                "pv": ee["pv_dach"] + ee["pv_frei"],
+                "wind_onshore": ee["wind_onshore"],
+                "wind_offshore": ee["wind_offshore"],
+                "biomasse": ee["biomasse"],
+                "wasser": ee["wasser"],
+                "sonstige": ee["sonstige"]
+            }
+        }
+
+    return objekt
