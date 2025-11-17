@@ -23,11 +23,13 @@ def Kosten_Ausbau(zieldaten: json)-> pd.DataFrame:
     with open(kostendaten_pfad, "r") as file:
         kostendaten = json.load(file)
     
+    # DataFrame für die Kosten erstellen
     date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min') 
     kosten_df = pd.DataFrame({"Datum": date_range})
     kosten_df["Jahr"] = kosten_df["Datum"].dt.year
     kosten_df = kosten_df.drop(columns=["Datum"]).drop_duplicates().reset_index(drop=True)
-
+    
+    # Capex Berechnung
     zieldaten_bearbeitet = json_objekt_bearbeiten(zieldaten)
 
     anteil_dach_pv_2030 = zieldaten["Ziele 2030"]["Ausbau_EE"]["pv_dach"] / (
@@ -40,8 +42,15 @@ def Kosten_Ausbau(zieldaten: json)-> pd.DataFrame:
     jährliche_raten = Jährlicher_Zuwachs_EE(zieldaten_bearbeitet["zielwerte_2030"], zieldaten_bearbeitet["zielwerte_2045"])
     baukosten_EE_virstellstündlich = {"2030": 0, "2045": 0}
     for key in kostendaten["baukosten"].keys():
-        baukosten_EE_virstellstündlich["2030"] += 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten["baukosten"][key] / (365.25 * 24 * 4)
-        baukosten_EE_virstellstündlich["2045"] += 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten["baukosten"][key] / (365.25 * 24 * 4)
+        if key == "pv_frei":
+            baukosten_EE_virstellstündlich["2030"] += 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten["baukosten"][key] * (1 - anteil_dach_pv_2030) / (365.25 * 24 * 4)
+            baukosten_EE_virstellstündlich["2045"] += 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten["baukosten"][key] * (1 - anteil_dach_pv_2045) / (365.25 * 24 * 4)
+        elif key == "pv_dach":
+            baukosten_EE_virstellstündlich["2030"] += 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten["baukosten"][key] * anteil_dach_pv_2030 / (365.25 * 24 * 4)
+            baukosten_EE_virstellstündlich["2045"] += 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten["baukosten"][key] * anteil_dach_pv_2045 / (365.25 * 24 * 4)
+        else:
+            baukosten_EE_virstellstündlich["2030"] += 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten["baukosten"][key] / (365.25 * 24 * 4)
+            baukosten_EE_virstellstündlich["2045"] += 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten["baukosten"][key] / (365.25 * 24 * 4)
 
     baukosten_EE_virstellstündlich["2030"] = round(baukosten_EE_virstellstündlich["2030"], 2)
     baukosten_EE_virstellstündlich["2045"] = round(baukosten_EE_virstellstündlich["2045"], 2)
@@ -53,3 +62,5 @@ def Kosten_Ausbau(zieldaten: json)-> pd.DataFrame:
         else:
             kosten_df.loc[mask, "Baukosten_EE [€]"] = baukosten_EE_virstellstündlich["2045"]
             
+    # OpEx Berechnung
+    # TODO: Implementierung der OpEx Berechnung basierend auf Kostendaten und Ausbauzustand (Funktion aus Speicherausbau umschreiben (Von Robin borgen :) ))
