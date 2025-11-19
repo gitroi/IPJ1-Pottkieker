@@ -4,13 +4,39 @@ Zentrales Programm der Prognose vom Stromspeicher.
 """
 import pandas as pd
 import numpy as np
+import json
 from functools import reduce
+from dataclasses import dataclass
 from config import PROJECT_ROOT
+
+def Einlesen_Speicherdaten_fix(speicherart):
+    """
+    Liest alle festen Parameter einer Speicherart aus einer JSON-Datei ein
+    """
+
+    @dataclass
+    class Speicher:
+        bestand: float
+        wirkungsgrad: float
+        capex: float
+        opex: float
+        verluste: float
+        leistung: float
+    
+    with open(PROJECT_ROOT / "Daten" / "Feste_Parameter" / "speicherarten.json", "r") as f:
+        data = json.load(f)
+
+    speicher_data = data.get(speicherart)
+    if speicher_data is None:
+        raise ValueError(f"Speicherart '{speicherart}' nicht in der JSON-Datei gefunden.")
+
+    speicher = Speicher(**speicher_data)
+
+    return speicher
 
 def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045):
     """
     Berechnet den Verlauf des Speicherausbaus einer Speicherart
-    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
 
     #=== Kapazitäten in MWh umrechnen ===
@@ -61,23 +87,36 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
 
     return df_gesamt
 
-df_batterie = Prognose_Speicher_Ausbau("Batterie", 51, 160, 400)
-df_auto = Prognose_Speicher_Ausbau("E-Auto", 51, 160, 400)
-df_schwungrad = Prognose_Speicher_Ausbau("Schwungrad", 51, 160, 400)
-df_wasserstoff = Prognose_Speicher_Ausbau("Wasserstoff", 51, 160, 400)
-df_pump = Prognose_Speicher_Ausbau("Pumpspeicher", 51, 160, 400)
+def Prognose_Gesamt_Ausbau_():
+    """
+    Erstellt die Gesamtprognose für alle Speicherarten
+    """
+
+    df_batterie = Prognose_Speicher_Ausbau("Batterie", 51, 160, 400)
+    # df_auto = Prognose_Speicher_Ausbau("E-Auto", 51, 160, 400) erstmal rausgenommen, da unklar ist, wie hier gerechnet werden soll
+    df_schwungrad = Prognose_Speicher_Ausbau("Schwungrad", 51, 160, 400)
+    df_wasserstoff = Prognose_Speicher_Ausbau("Wasserstoff", 51, 160, 400)
+    df_pump = Prognose_Speicher_Ausbau("Pumpspeicher", 51, 160, 400)
 
 
-dfs = [df_batterie, df_auto, df_schwungrad, df_wasserstoff, df_pump]
+    dfs = [df_batterie, df_schwungrad, df_wasserstoff, df_pump] # Auto rausgenommen
 
-# Merge alle DataFrames auf gemeinsamen Spalten
-df_ausbau = reduce(
-    lambda left, right: left.merge(
-        right, 
-        on=['Datum', 'Jahr', 'Monat', 'Wochentag', 'Uhrzeit', 'Minute'], 
-        how='outer'
-    ), 
-    dfs
-)
+    # Merge alle DataFrames auf gemeinsamen Spalten
+    df_ausbau = reduce(
+        lambda left, right: left.merge(
+            right, 
+            on=['Datum', 'Jahr', 'Monat', 'Wochentag', 'Uhrzeit', 'Minute'], 
+            how='outer'
+        ), 
+        dfs
+    )
 
-# df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+
+    return df_ausbau
+
+
+#Test des Parameter Einlesens
+fixparameterBatterie = Einlesen_Speicherdaten_fix("batterie")
+
+print(fixparameterBatterie)
