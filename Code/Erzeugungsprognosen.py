@@ -3,11 +3,11 @@ Zentrales Programm der Erzeugungsprognose von der Gruppe Pottkieker.
 Nutzt Daten aus 2024 um eine Prognose bis 2045 zu erstellen.
 Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
 """
-
+import json
 import pandas as pd
 import numpy as np
-from Feste_Variablen import map_wirkungsgrade
 from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich
+
 def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
     """
     Berechnet den jährlichen Zuwachs der Erneuerbaren Energien zwischen 2024 und 2030 sowie zwischen 2030 und 2045.
@@ -17,16 +17,14 @@ def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
     """
 
     #=== Installierte Leistung in GW einlesen ===
-    pfad = PROJECT_ROOT / "Daten" / "Feste_Parameter" / "Netto_Installiert_GW.csv"
-    installierte_leistung_df = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False)
-
-    installierte_leistung_df["Jahr"] = pd.to_numeric(installierte_leistung_df["Jahr"], errors='coerce').astype(int)
-    installierte_leistung_df["Monat"] = pd.to_numeric(installierte_leistung_df["Monat"], errors='coerce').astype(int)
+    pfad = PROJECT_ROOT / "Daten" / "Feste_Parameter" / "erzeugerarten.json"
+    with open(pfad, "r") as file:
+        erzeugerarten = json.load(file)
 
     #=== Zuwachs pro Jahr berechnen ===#
     zuwachs_dict = {"zuwachsrate_2030": {}, "zuwachsrate_2045": {}}
     for key in zielwert_2030.keys():
-        aktueller_wert_2024 = installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024) & (installierte_leistung_df["Monat"]==12)][key].iloc[0] / map_wirkungsgrade[key]
+        aktueller_wert_2024 = erzeugerarten[key]["bestand"]
         zuwachsrate_2030 = (zielwert_2030[key] - aktueller_wert_2024) / 6  
         zuwachsrate_2045 = (zielwert_2045[key] - zielwert_2030[key]) / 15  
         zuwachs_dict["zuwachsrate_2030"][key] = zuwachsrate_2030
@@ -47,25 +45,27 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
     pfad = PROJECT_ROOT / "Daten" / "Feste_Parameter" / "Netto_Installiert_GW.csv"  
     installierte_leistung_df = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False)
     
+    pfad2 = PROJECT_ROOT / "Daten" / "Feste_Parameter" / "erzeugerarten.json"
+    with open(pfad2, "r") as file:
+        erzeugerarten = json.load(file)
+
     installierte_leistung_df["Jahr"] = pd.to_numeric(installierte_leistung_df["Jahr"], errors='coerce').astype(int)
     installierte_leistung_df["Monat"] = pd.to_numeric(installierte_leistung_df["Monat"], errors='coerce').astype(int)
 
     #=== Zuwachs pro Monat berechnen ===#
     jahres_raten = Jährlicher_Zuwachs_EE(installierte_2030, installierte_2045)
+    zuwachsraten = {"zuwachs_2030": {}, "zuwachs_2045": {}}
+    zuwachsraten["zuwachs_2030"]["pv"] = 0
+    zuwachsraten["zuwachs_2045"]["pv"] = 0
     # bis 2030
-    zuwachsrate_pv_30 = jahres_raten["zuwachsrate_2030"]["pv"] / 12
-    zuwachsrate_wind_onshore_30 = jahres_raten["zuwachsrate_2030"]["wind_onshore"] / 12
-    zuwachsrate_wind_offshore_30 = jahres_raten["zuwachsrate_2030"]["wind_offshore"] / 12
-    zuwachsrate_biomasse_30 = jahres_raten["zuwachsrate_2030"]["biomasse"] / 12
-    zuwachsrate_wasser_30 = jahres_raten["zuwachsrate_2030"]["wasser"] / 12
-    zuwachsrate_sonstige_30 = jahres_raten["zuwachsrate_2030"]["sonstige"] / 12
-    # bis 2045
-    zuwachsrate_pv_45 = jahres_raten["zuwachsrate_2045"]["pv"] / 12
-    zuwachsrate_wind_onshore_45 = jahres_raten["zuwachsrate_2045"]["wind_onshore"] / 12
-    zuwachsrate_wind_offshore_45 = jahres_raten["zuwachsrate_2045"]["wind_offshore"] / 12
-    zuwachsrate_biomasse_45 = jahres_raten["zuwachsrate_2045"]["biomasse"] / 12
-    zuwachsrate_wasser_45 = jahres_raten["zuwachsrate_2045"]["wasser"] / 12
-    zuwachsrate_sonstige_45 = jahres_raten["zuwachsrate_2045"]["sonstige"] / 12
+    for key in jahres_raten["zuwachsrate_2030"].keys():
+        if(key == "pv_dach") or (key == "pv_frei"):
+            zuwachsraten["zuwachs_2030"]["pv"] += jahres_raten["zuwachsrate_2030"][key] / 12
+            zuwachsraten["zuwachs_2045"]["pv"] += jahres_raten["zuwachsrate_2045"][key] / 12
+            continue
+
+        zuwachsraten["zuwachs_2030"][key] = jahres_raten["zuwachsrate_2030"][key] / 12
+        zuwachsraten["zuwachs_2045"][key] = jahres_raten["zuwachsrate_2045"][key] / 12
     
     #==== Einlesen der Daten und anpassung ====
     erzeugungpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten"/ "erzeugung_2021.csv"
@@ -137,30 +137,30 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
     for jahr in range(2026, 2046):
         for monat in range(1,13):
             if(jahr <= 2030):
-                jahre_seit_start = jahr - 2025
+                jahre_seit_start = jahr - 2026
                 anzahl_monate = (12 * jahre_seit_start) + monat 
-                zuwachs_pv = zuwachsrate_pv_30 * anzahl_monate
-                zuwachs_wind_onshore = zuwachsrate_wind_onshore_30 * anzahl_monate
-                zuwachs_wind_offshore = zuwachsrate_wind_offshore_30 * anzahl_monate
-                zuwachs_Biomasse = zuwachsrate_biomasse_30 * anzahl_monate
-                zuwachs_Wasser = zuwachsrate_wasser_30 * anzahl_monate
-                zuwachs_Sonstige = zuwachsrate_sonstige_30 * anzahl_monate
-                installierte_leistung_pv = ( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["pv"].iloc[0] / map_wirkungsgrade["pv"])  + zuwachs_pv) * 1000
-                installierte_leistung_wind_onshore =( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["wind_onshore"].iloc[0] / map_wirkungsgrade["wind_onshore"]) + zuwachs_wind_onshore) * 1000
-                installierte_leistung_wind_offshore = ( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["wind_offshore"].iloc[0] / map_wirkungsgrade["wind_offshore"])  + zuwachs_wind_offshore) * 1000
-                installierte_leistung_Biomasse = ( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["biomasse"].iloc[0] / map_wirkungsgrade["biomasse"])  + zuwachs_Biomasse) * 1000
-                installierte_leistung_Wasser = ( (installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["wasser"].iloc[0] / map_wirkungsgrade["wasser"])  + zuwachs_Wasser) * 1000
-                installierte_leistung_Sonstige = ((installierte_leistung_2024[(installierte_leistung_2024["Monat"]==12)]["sonstige"].iloc[0] / map_wirkungsgrade["sonstige"])  + zuwachs_Sonstige) * 1000
+                zuwachs_pv = zuwachsraten["zuwachs_2030"]["pv"] * anzahl_monate
+                zuwachs_wind_onshore = zuwachsraten["zuwachs_2030"]["wind_onshore"] * anzahl_monate
+                zuwachs_wind_offshore = zuwachsraten["zuwachs_2030"]["wind_offshore"] * anzahl_monate
+                zuwachs_Biomasse = zuwachsraten["zuwachs_2030"]["biomasse"] * anzahl_monate
+                zuwachs_Wasser = zuwachsraten["zuwachs_2030"]["wasser"] * anzahl_monate
+                zuwachs_Sonstige = zuwachsraten["zuwachs_2030"]["sonstige"] * anzahl_monate
+                installierte_leistung_pv = ( erzeugerarten["pv_dach"]["bestand"] + erzeugerarten["pv_frei"]["bestand"] + zuwachs_pv) * 1000
+                installierte_leistung_wind_onshore =( erzeugerarten["wind_onshore"]["bestand"] + zuwachs_wind_onshore) * 1000
+                installierte_leistung_wind_offshore = (erzeugerarten["wind_offshore"]["bestand"] + zuwachs_wind_offshore) * 1000
+                installierte_leistung_Biomasse = ( erzeugerarten["biomasse"]["bestand"] + zuwachs_Biomasse) * 1000
+                installierte_leistung_Wasser = (erzeugerarten["wasser"]["bestand"] + zuwachs_Wasser) * 1000
+                installierte_leistung_Sonstige = (erzeugerarten["sonstige"]["bestand"] + zuwachs_Sonstige) * 1000
             elif(jahr > 2030):
                 jahre_seit_start = jahr - 2031 
                 anzahl_monate = (12 * jahre_seit_start) + monat 
-                zuwachs_pv = zuwachsrate_pv_45 * anzahl_monate
-                zuwachs_wind_onshore = zuwachsrate_wind_onshore_45 * anzahl_monate
-                zuwachs_wind_offshore = zuwachsrate_wind_offshore_45 * anzahl_monate
-                zuwachs_Biomasse = zuwachsrate_biomasse_45 * anzahl_monate
-                zuwachs_Wasser = zuwachsrate_wasser_45 * anzahl_monate
-                zuwachs_Sonstige = zuwachsrate_sonstige_45 * anzahl_monate
-                installierte_leistung_pv = ( installierte_2030["pv"]  + zuwachs_pv) * 1000
+                zuwachs_pv = zuwachsraten["zuwachs_2045"]["pv"] * anzahl_monate
+                zuwachs_wind_onshore = zuwachsraten["zuwachs_2045"]["wind_onshore"] * anzahl_monate
+                zuwachs_wind_offshore = zuwachsraten["zuwachs_2045"]["wind_offshore"] * anzahl_monate
+                zuwachs_Biomasse = zuwachsraten["zuwachs_2045"]["biomasse"] * anzahl_monate
+                zuwachs_Wasser = zuwachsraten["zuwachs_2045"]["wasser"] * anzahl_monate
+                zuwachs_Sonstige = zuwachsraten["zuwachs_2045"]["sonstige"] * anzahl_monate
+                installierte_leistung_pv = ( installierte_2030["pv_dach"]  + installierte_2030["pv_frei"] + zuwachs_pv) * 1000
                 installierte_leistung_wind_onshore =( installierte_2030["wind_onshore"] + zuwachs_wind_onshore) * 1000
                 installierte_leistung_wind_offshore = ( installierte_2030["wind_offshore"] + zuwachs_wind_offshore) * 1000
                 installierte_leistung_Biomasse = ( installierte_2030["biomasse"] + zuwachs_Biomasse) * 1000
@@ -170,24 +170,24 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
             mask = (prognose['Jahr'] == jahr) & (prognose['Monat'] == monat)
             prognose.loc[mask, 'PV_Prognose_MWh'] = (
                 installierte_leistung_pv
-                * prognose.loc[mask, 'Kapazitätsfaktor_PV'] * 0.25 *map_wirkungsgrade["pv"]
+                * prognose.loc[mask, 'Kapazitätsfaktor_PV'] * 0.25 * erzeugerarten["pv_dach"]["wirkungsgrad"]
             )
             prognose.loc[mask, 'Wind_Onshore_Prognose_MWh'] = (
                 installierte_leistung_wind_onshore 
-                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Onshore'] * 0.25 *map_wirkungsgrade["wind_onshore"]
+                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Onshore'] * 0.25 * erzeugerarten["wind_onshore"]["wirkungsgrad"]
             )
             prognose.loc[mask, 'Wind_Offshore_Prognose_MWh'] = (
                 installierte_leistung_wind_offshore
-                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Offshore'] * 0.25 *map_wirkungsgrade["wind_offshore"]
+                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Offshore'] * 0.25 * erzeugerarten["wind_offshore"]["wirkungsgrad"]
             )
             prognose.loc[mask, 'Biomasse_Prognose_MWh'] = (
-                prognose.loc[mask, 'Kapazitätsfaktor_Biomasse'] * installierte_leistung_Biomasse * 0.25 *map_wirkungsgrade["biomasse"]
+                prognose.loc[mask, 'Kapazitätsfaktor_Biomasse'] * installierte_leistung_Biomasse * 0.25 * erzeugerarten["biomasse"]["wirkungsgrad"]
             )
             prognose.loc[mask, 'Wasser_Prognose_MWh'] = (
-                prognose.loc[mask, 'Kapazitätsfaktor_Wasser'] * installierte_leistung_Wasser * 0.25 *map_wirkungsgrade["wasser"]
+                prognose.loc[mask, 'Kapazitätsfaktor_Wasser'] * installierte_leistung_Wasser * 0.25 *erzeugerarten["wasser"]["wirkungsgrad"]
             )
             prognose.loc[mask, 'Sonstige_Prognose_MWh'] = (
-                prognose.loc[mask, 'Kapazitätsfaktor_Sonstige'] * installierte_leistung_Sonstige * 0.25 *map_wirkungsgrade["sonstige"]
+                prognose.loc[mask, 'Kapazitätsfaktor_Sonstige'] * installierte_leistung_Sonstige * 0.25 *erzeugerarten["sonstige"]["wirkungsgrad"]
             )
    
     prognose['PV_Prognose_MWh'] = prognose['PV_Prognose_MWh'].round(2)
@@ -211,8 +211,8 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
     spalten = ["Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen",
                "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
                "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
-    prognose_export[spalten] = prognose_export[spalten].interpolate(method='linear')
-    
+    prognose_export[spalten] = prognose_export[spalten].interpolate(method='linear') 
+
     prognose_export = prognose_export[["Datum von"] + spalten]
 
     if(prognose_export.isna().any().any()):
