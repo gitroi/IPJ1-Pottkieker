@@ -1,0 +1,77 @@
+@startuml Pottkieker_Kompakt
+
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+' ==================== DATEN ====================
+package "Daten" #LightBlue {
+    file "Szenarien.json" as szen
+    file "erzeugerarten.json" as erz
+    file "speicherarten.json" as spei
+    file "Netto_Installiert_GW.csv" as inst
+    file "erzeugung_2021.csv" as erz21
+    file "verbrauch_2024.csv" as verb24
+}
+
+' ==================== MODULE ====================
+package "Kernmodule" #LightGreen {
+    [Erzeugungsprognosen] as PE
+    [Prognose_Verbrauch] as PV
+    [Prognose_Speicher] as PS
+    [EE_Anteil_DataFrame] as EE
+}
+
+package "Steuerung & Kosten" #LightYellow {
+    [Szenarien_auswahl] as SA
+    [Kosten] as K
+    [Main] as M
+}
+
+package "Visualisierung" #LightPink {
+    [Histogramme] as H
+    [Plot] as P
+    [Analyse] as A
+}
+
+' ==================== BEZIEHUNGEN ====================
+
+' Steuerung
+M -[#Black,thickness=2]-> SA
+SA -[#Orange]-> szen
+SA -[#Green]-> PE
+SA -[#Green]-> PV
+SA -[#Green]-> PS
+
+' Datenfluss Prognose
+PE -[#Blue]-> inst
+PE -[#Blue]-> erz21
+PE -[#Blue]-> erz
+PV -[#Blue]-> verb24
+PS -[#Blue]-> spei
+
+' Kosten
+K .[#Red].> PE
+K .[#Red].> PS
+K -[#Purple]-> erz
+K -[#Purple]-> spei
+
+' EE-Anteil & Visualisierung
+EE ..> PE
+EE ..> PV
+M --> EE
+M --> H
+H ..> EE
+P ..> EE
+A --> erz21
+A --> verb24
+
+legend right
+    |= Farbe |= Bedeutung |
+    | <color:Orange>Orange</color> | Szenario laden |
+    | <color:Green>Grün</color> | Starten |
+    | <color:Blue>Blau</color> | Daten lesen |
+    | <color:Purple>Lila</color> | Kosten |
+    | <color:Red>Rot</color> | Ausbauraten |
+endlegend
+
+@enduml
