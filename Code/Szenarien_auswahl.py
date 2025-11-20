@@ -53,22 +53,3 @@ def prognose_eines_Szenarios():
     else:
         print(f"Szenario '{auswahl}' nicht gefunden.")
         return None
-
-def json_objekt_bearbeiten(daten):
-    objekt = {}
-
-    for jahr in ["Ziele 2030", "Ziele 2045"]:
-        ee = daten[jahr]["Ausbau EE"]
-
-        objekt[jahr] = {
-            "Ausbau_EE": {
-                "pv": ee["pv_dach"] + ee["pv_frei"],
-                "wind_onshore": ee["wind_onshore"],
-                "wind_offshore": ee["wind_offshore"],
-                "biomasse": ee["biomasse"],
-                "wasser": ee["wasser"],
-                "sonstige": ee["sonstige"]
-            }
-        }
-
-    return objekt

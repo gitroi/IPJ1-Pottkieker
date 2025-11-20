@@ -1,0 +1,238 @@
+'Durch KI generiertes UML-Diagramm für das Pottkieker-Projekt
+@startuml Pottkieker_Projekt_UML
+
+' Styling
+skinparam packageStyle rectangle
+skinparam class {
+    BackgroundColor<<Module>> LightYellow
+    BackgroundColor<<Data>> LightBlue
+    BorderColor Black
+    ArrowColor Black
+}
+
+' ==================== DATEN LAYER ====================
+package "Datenschicht" #LightBlue {
+    class "Szenarien.json" as SzenJSON <<Data>> {
+        + Name : String
+        + Ziele_2030 : dict
+        + Ziele_2045 : dict
+        + Verbrauch_2030_TWh : float
+        + Verbrauch_2045_TWh : float
+    }
+    
+    class "erzeugerarten.json" as ErzeugerJSON <<Data>> {
+        + pv : dict
+        + wind_onshore : dict
+        + wind_offshore : dict
+        + biomasse : dict
+        + wasser : dict
+        + sonstige : dict
+        --
+        {field} baukosten : float
+        {field} opex : float
+        {field} bestand : float
+    }
+    
+    class "speicherarten.json" as SpeicherJSON <<Data>> {
+        + batterie : dict
+        + pumpspeicher : dict
+        + wasserstoff : dict
+        + schwungrad : dict
+        --
+        {field} bestand : float
+        {field} wirkungsgrad : float
+        {field} capex : float
+        {field} opex : float
+        {field} verluste : float
+        {field} leistung : float
+    }
+    
+    class "Netto_Installiert_GW.csv" as InstalledCSV <<Data>> {
+        + Jahr : int
+        + Monat : int
+        + PV : float
+        + Wind_onshore : float
+        + Wind_offshore : float
+        + Biomasse : float
+        + Wasserkraft : float
+        + Sonstige : float
+    }
+    
+    class "erzeugung_2021.csv" as Erzeugung2021 <<Data>> {
+        + Datum_von : datetime
+        + Photovoltaik_MWh : float
+        + Wind_Onshore_MWh : float
+        + Wind_Offshore_MWh : float
+        + Biomasse_MWh : float
+        + Wasserkraft_MWh : float
+        + Sonstige_MWh : float
+    }
+    
+    class "verbrauch_2024.csv" as Verbrauch2024 <<Data>> {
+        + Datum_von : datetime
+        + Netzlast_MWh : float
+    }
+}
+
+' ==================== MODULE LAYER ====================
+package "Prognose-Module" #LightGreen {
+    
+    class Erzeugungsprognosen <<Module>> {
+        + Jährlicher_Zuwachs_EE(zielwert_2030, zielwert_2045) : dict
+        + Prognose_erzeugung(installierte_2030, installierte_2045) : DataFrame
+        --
+        - berechnet Kapazitätsfaktoren
+        - erstellt Erzeugungsprognose 2026-2045
+    }
+    
+    class Prognose_Verbrauch <<Module>> {
+        + Prognose_Verbrauch(verbrauch_2030_TWh, verbrauch_2045_TWh) : DataFrame
+        --
+        - lineares Wachstumsmodell
+        - 15-Minuten-Auflösung
+    }
+    
+    class Prognose_Speicher <<Module>> {
+        + Einlesen_Speicherdaten_fix(speicherart) : Speicher
+        + Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045) : DataFrame
+        + Prognose_Gesamt_Ausbau_() : DataFrame
+        --
+        - Speicher : dataclass
+        -- Attribute --
+        {field} bestand : float
+        {field} wirkungsgrad : float
+        {field} capex : float
+        {field} opex : float
+    }
+    
+    class EE_Anteil_DataFrame <<Module>> {
+        + anteil_erneuerbare_df(erzeugung, verbrauch, spaltenname_verbrauch) : DataFrame
+        + anteil_erneuerbare_Jahrx_df(erzeugung, verbrauch, spaltenname_verbrauch, jahr) : DataFrame
+        --
+        - berechnet EE-Anteil
+        - merged Erzeugung + Verbrauch
+    }
+}
+
+package "Kosten & Analyse" #LightCoral {
+    
+    class Kosten <<Module>> {
+        + Kosten_EE(zieldaten) : DataFrame
+        --
+        - berechnet Baukosten (Capex)
+        - berechnet Betriebskosten (Opex)
+        - viertelstündliche Auflösung
+    }
+    
+    class Analyse <<Module>> {
+        + analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrauch) : DataFrame
+        --
+        - historische Datenanalyse
+    }
+    
+    class Histogramme <<Module>> {
+        + plot_ee_anteil_histogram(gesamt) : void
+        + plot_ee_anteil_histogram_overflow(gesamt) : void
+        --
+        - Visualisierung EE-Anteil
+        - Überschuss-Darstellung
+    }
+    
+    class Plot <<Module>> {
+        + plot_ee_erzeugung_jaehrlich() : void
+        --
+        - Jahresdiagramme
+    }
+}
+
+package "Steuerung" #LightGoldenRodYellow {
+    
+    class Szenarien_auswahl <<Module>> {
+        + load_scenarios() : list
+        + get_scenario_by_name(szenarien, name) : dict
+        + prognose_eines_Szenarios() : void
+        --
+        - lädt Szenarien aus JSON
+        - koordiniert Prognosen
+        - startet Berechnungen
+    }
+    
+    class Main <<Module>> {
+        + map_installed_capacity : dict
+        + map_installed_capacity_2045 : dict
+        --
+        - Einstiegspunkt
+        - führt Prognosen aus
+        - erstellt Visualisierung
+    }
+    
+    class Config <<Module>> {
+        + PROJECT_ROOT : Path
+        + DATA_DIR : Path
+        --
+        - zentrale Pfad-Konfiguration
+    }
+}
+
+' ==================== BEZIEHUNGEN ====================
+
+' Szenario-Auswahl koordiniert alles
+Szenarien_auswahl -[#Orange,thickness=2]-> SzenJSON : <<lädt>>
+Szenarien_auswahl -[#Green,thickness=2]-> Erzeugungsprognosen : <<startet>>
+Szenarien_auswahl -[#Green,thickness=2]-> Prognose_Verbrauch : <<startet>>
+Szenarien_auswahl -[#Green,thickness=2]-> Prognose_Speicher : <<startet>>
+Szenarien_auswahl -[#Green,thickness=2]-> Kosten : <<startet>>
+
+' Main verwendet Szenario-Auswahl
+Main -[#Black,thickness=2]-> Szenarien_auswahl : <<verwendet>>
+Main --> EE_Anteil_DataFrame : <<verwendet>>
+Main --> Histogramme : <<verwendet>>
+
+' Erzeugungsprognosen verwendet Daten
+Erzeugungsprognosen -[#Blue]-> InstalledCSV : <<liest>>
+Erzeugungsprognosen -[#Blue]-> Erzeugung2021 : <<liest>>
+Erzeugungsprognosen -[#Blue]-> ErzeugerJSON : <<liest>>
+
+' Verbrauchsprognose verwendet Daten
+Prognose_Verbrauch -[#Blue]-> Verbrauch2024 : <<liest>>
+
+' Speicherprognose verwendet Daten
+Prognose_Speicher -[#Blue]-> SpeicherJSON : <<liest>>
+
+' Kosten-Modul
+Kosten .[#Red,thickness=2].> Erzeugungsprognosen : <<holt Ausbauraten>>
+Kosten .[#Red,thickness=2].> Prognose_Speicher : <<holt Ausbauraten>>
+Kosten -[#Purple]-> ErzeugerJSON : <<liest Kosten>>
+Kosten -[#Purple]-> SpeicherJSON : <<liest Kosten>>
+
+' EE-Anteil Berechnung
+EE_Anteil_DataFrame ..> Erzeugungsprognosen : <<nutzt Output>>
+EE_Anteil_DataFrame ..> Prognose_Verbrauch : <<nutzt Output>>
+
+' Visualisierung
+Histogramme ..> EE_Anteil_DataFrame : <<visualisiert>>
+Plot ..> EE_Anteil_DataFrame : <<visualisiert>>
+
+' Analyse
+Analyse -[#Blue]-> Erzeugung2021 : <<liest>>
+Analyse -[#Blue]-> Verbrauch2024 : <<liest>>
+
+' Config wird von allen verwendet
+Erzeugungsprognosen ..|> Config : <<verwendet>>
+Prognose_Verbrauch ..|> Config : <<verwendet>>
+Prognose_Speicher ..|> Config : <<verwendet>>
+Szenarien_auswahl ..|> Config : <<verwendet>>
+Kosten ..|> Config : <<verwendet>>
+
+' ==================== LEGENDE ====================
+legend right
+    |= Farbe |= Bedeutung |
+    | <back:#Orange>Orange</back> | Szenario laden |
+    | <back:#Green>Grün</back> | Konfiguration & Start |
+    | <back:#Blue>Blau</back> | Daten lesen |
+    | <back:#Purple>Lila</back> | Kosteninformationen |
+    | <back:#Red>Rot</back> | Ausbauraten (gestrichelt) |
+    | Schwarz | Hauptfluss |
+endlegend
+
+@enduml
