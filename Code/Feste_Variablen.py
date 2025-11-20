@@ -12,10 +12,10 @@ map_wirkungsgrade = {
     }
 
 map_ausbaustand_EE_GW = {
-        "pv": 59_000,  
-        "wind_onshore": 54_000,  
-        "wind_offshore": 7_700,  
-        "biomasse": 9_500,  
-        "wasser": 5_300,  
-        "sonstige": 1_500  
+        "pv": 59000,  
+        "wind_onshore": 54000,  
+        "wind_offshore": 7700,  
+        "biomasse": 9500,  
+        "wasser": 5300,  
+        "sonstige": 1500  
 }

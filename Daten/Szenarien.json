@@ -21,8 +21,8 @@
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv_dach": 495,
-                "pv_frei": 90,  
+                "pv_dach": 380,
+                "pv_frei": 116,  
                 "wind_onshore": 145,
                 "wind_offshore": 75,
                 "biomasse": 4,

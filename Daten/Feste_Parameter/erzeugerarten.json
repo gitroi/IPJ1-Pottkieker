@@ -1,0 +1,44 @@
+{
+    "pv_dach": {
+        "bestand": 72.6,
+        "wirkungsgrad": 0.9,
+        "capex": 1450,
+        "opex": 24
+    },
+    "pv_frei": {
+        "bestand": 34.9,
+        "wirkungsgrad": 0.9,
+        "capex": 800,
+        "opex": 14
+    },
+    "wind_onshore": {
+        "bestand": 65,
+        "wirkungsgrad": 0.95,
+        "capex": 1600,
+        "opex": 32
+    },
+    "wind_offshore": {
+        "bestand": 9.9,
+        "wirkungsgrad": 0.95,
+        "capex": 2800,
+        "opex": 39
+    },
+    "wasser": {
+        "bestand": 1.8,
+        "wirkungsgrad": 0.94,
+        "capex": 2700,
+        "opex": 17
+    },
+    "biomasse": {
+        "bestand": 9.2,
+        "wirkungsgrad": 0.95,
+        "capex": 4386,
+        "opex": 148
+    },
+    "sonstige": {
+        "bestand": 0.6,
+        "wirkungsgrad": 0.92,
+        "capex": 800,
+        "opex": 15
+    }
+}

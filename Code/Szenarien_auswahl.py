@@ -36,8 +36,7 @@ def prognose_eines_Szenarios():
     
     if gewaehltes_szenario:
         print(f"Szenario '{auswahl}' wurde ausgewählt und wird ausgegeben.")
-        bearbeitetes_szenario = json_objekt_bearbeiten(gewaehltes_szenario)
-        prognose_erzeugung = Prognose_erzeugung(bearbeitetes_szenario["Ziele 2030"]["Ausbau_EE"], bearbeitetes_szenario["Ziele 2045"]["Ausbau_EE"])
+        prognose_erzeugung = Prognose_erzeugung(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
         prognose_verbrauch = Prognose_Verbrauch(gewaehltes_szenario["Ziele 2030"]["Strombedarf"], gewaehltes_szenario["Ziele 2045"]["Strombedarf"])
         if jahr.strip().isdigit():
             jahr_int = int(jahr)
