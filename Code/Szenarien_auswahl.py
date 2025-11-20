@@ -6,6 +6,7 @@ from Erzeugungsprognosen import Prognose_erzeugung
 from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow
 from EE_Anteil_DataFrame import anteil_erneuerbare_df,anteil_erneuerbare_Jahrx_df
+from Kosten import Kosten_EE
 
 def load_scenarios():
     """Lädt Szenarien aus einer JSON-Datei."""
@@ -43,7 +44,9 @@ def prognose_eines_Szenarios():
             gesamt = anteil_erneuerbare_Jahrx_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen", jahr_int)
         else:
             gesamt = anteil_erneuerbare_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen")
-        
+       
+        prognose_kosten = Kosten_EE(gewaehltes_szenario)
+        print(f"Die Gesamtkosten für das Szenario belaufen sich auf {round(prognose_kosten['Gesamtkosten_EE [€]'].sum()/1e12 ,2)} Billionen Euro.")
         plot_ee_anteil_histogram_overflow(gesamt)
 
         return
