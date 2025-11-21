@@ -1,0 +1,142 @@
+@startuml Klassendiagramm_Pottkieker
+
+' ' ==================== DATEN LAYER ====================
+' package "Datenschicht" #LightBlue {
+'     class "Szenarien.json" as SzenJSON <<Data>> {
+'         + Name : String
+'         + Ziele_2030 : dict
+'         + Ziele_2045 : dict
+'         + Verbrauch_2030_TWh : float
+'         + Verbrauch_2045_TWh : float
+'     }
+    
+'     class "erzeugerarten.json" as ErzeugerJSON <<Data>> {
+'         + pv : dict
+'         + wind_onshore : dict
+'         + wind_offshore : dict
+'         + biomasse : dict
+'         + wasser : dict
+'         + sonstige : dict
+'         --
+'         {field} baukosten : float
+'         {field} opex : float
+'         {field} bestand : float
+'     }
+    
+'     class "speicherarten.json" as SpeicherJSON <<Data>> {
+'         + batterie : dict
+'         + pumpspeicher : dict
+'         + wasserstoff : dict
+'         + schwungrad : dict
+'         --
+'         {field} bestand : float
+'         {field} wirkungsgrad : float
+'         {field} capex : float
+'         {field} opex : float
+'         {field} verluste : float
+'         {field} leistung : float
+'     }
+    
+'     class "Netto_Installiert_GW.csv" as InstalledCSV <<Data>> {
+'         + Jahr : int
+'         + Monat : int
+'         + PV : float
+'         + Wind_onshore : float
+'         + Wind_offshore : float
+'         + Biomasse : float
+'         + Wasserkraft : float
+'         + Sonstige : float
+'     }
+    
+'     class "erzeugung_2021.csv" as Erzeugung2021 <<Data>> {
+'         + Datum_von : datetime
+'         + Photovoltaik_MWh : float
+'         + Wind_Onshore_MWh : float
+'         + Wind_Offshore_MWh : float
+'         + Biomasse_MWh : float
+'         + Wasserkraft_MWh : float
+'         + Sonstige_MWh : float
+'     }
+    
+'     class "verbrauch_2024.csv" as Verbrauch2024 <<Data>> {
+'         + Datum_von : datetime
+'         + Netzlast_MWh : float
+'     }
+' }
+
+' package "Prognosen" #LightGreen {
+'     class "Prognose_erzeugung" <<Module>> {
+'         - Jährliche_Wachstumsrate_EE : dict
+'         + prognose_erzeugung() : DataFrame
+'     }
+
+'     class "Prognose_verbrauch" <<Module>> {
+'         + prognose_verbrauch() : DataFrame
+'     }
+
+'     class "Prognose_speicher" <<Module>> {
+     
+'         + bestand : float
+'         + wirkungsgrad : float
+'         + capex : float
+'         + opex : float
+'         + verluste : float
+'         + leistung : float
+'         - einlesen_Speicherarten() : Speicher
+'         + prognose_speicher() : DataFrame
+
+' }
+
+
+' @enduml
+
+@startuml Test
+
+file "Szenarien.json" as szen #LightBlue
+file "erzeugerarten.json" as erzeugerarten #LightBlue
+file "speicherarten.json" as speicherarten #LightBlue
+file "Netto_Installierte_GW.csv" as installed #LightBlue
+file "erzeugung_2021.csv" as erzeugung #LightBlue
+file "verbrauch_2024.csv" as verbrauch #LightBlue
+
+component "Prognose Erzeugung" as prognose_erzeugung
+component "Prognose Verbrauch" as prognose_verbrauch
+component "Prognose Speicher" as prognose_speicher
+
+component "Szenario Auswahl" as szenario_auswahl
+component "Kosten" as kosten
+component "Analyse EE Anteil" as analyse
+file "Ausgaben" as ausgaben
+component "main" as main
+
+main -[#Black,thickness=3]-> szenario_auswahl : <color:Black>startet</color>
+
+kosten -[#Purple,thickness=2]-> prognose_erzeugung : <color:Purple>ausbauraten</color>
+kosten -[#Purple,thickness=2]-> prognose_speicher : <color:Purple>ausbauraten</color>
+kosten -[#Purple]-> erzeugerarten : <color:Purple>kosteninformationen</color>
+kosten -[#Purple]-> speicherarten : <color:Purple>kosteninformationen</color>
+
+szenario_auswahl -[#Orange,thickness=2]-> szen : <color:Orange>lädt</color>
+szenario_auswahl -[#Green,thickness=2]-> prognose_erzeugung : <color:Green>konfiguriert und startet</color>
+szenario_auswahl -[#Green,thickness=2]-> prognose_verbrauch : <color:Green>konfiguriert und startet</color>
+szenario_auswahl -[#Green,thickness=2]-> prognose_speicher : <color:Green>konfiguriert und startet</color>
+szenario_auswahl -[#Green,thickness=2]-> kosten : <color:Green>konfiguriert und startet</color>
+szenario_auswahl -[#Green,thickness=2]-> analyse : <color:Green>konfiguriert und startet</color>
+szenario_auswahl -[#Orange]-> ausgaben : <color:Orange>erzeugt</color>
+
+note bottom of ausgaben
+  <size:30> <&signal>
+end note
+
+analyse .[#Red,thickness=2].> prognose_erzeugung : <color:Red>nutzt Ergebnisse</color>
+analyse .[#Red,thickness=2].> prognose_verbrauch : <color:Red>nutzt Ergebnisse</color>
+analyse .[#Red,thickness=2].> prognose_speicher : <color:Red>nutzt Ergebnisse</color>
+
+prognose_erzeugung -[#Blue]-> installed : <color:Blue>nutzt</color>
+prognose_erzeugung -[#Blue]-> erzeugung : <color:Blue>nutzt</color>
+prognose_erzeugung -[#Blue]-> erzeugerarten : <color:Blue>nutzt</color>
+
+prognose_verbrauch -[#Blue]-> verbrauch : <color:Blue>nutzt</color>
+prognose_speicher -[#Blue]-> speicherarten : <color:Blue>nutzt</color>
+
+@enduml
