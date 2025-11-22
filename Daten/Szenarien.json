@@ -13,9 +13,11 @@
                 "sonstige": 3
             },
             "Ausbau Speicher": {
-                "Pumpspeicher": 0.4,
-                "Batteriespeicher": 0.5,
-                "Power-to-Gas": 0.3
+                "batteriespeicher": 20,
+                "e-auto": 10,
+                "schwungrad": 0.5,
+                "wasserstoff": 50,
+                "pumpspeicher": 30
             },
             "Strombedarf": 650
         },
@@ -30,9 +32,11 @@
                 "sonstige": 3
             },
             "Ausbau Speicher": {
-                "Pumpspeicher": 0.4,
-                "Batteriespeicher": 0.5,
-                "Power-to-Gas": 0.3
+                "batteriespeicher": 20,
+                "e-auto": 10,
+                "schwungrad": 0.5,
+                "wasserstoff": 50,
+                "pumpspeicher": 30
             },
             "Strombedarf": 650
         }
@@ -51,9 +55,11 @@
                 "sonstige": 3
             },
             "Ausbau Speicher": {
-                "Pumpspeicher": 0.4,
-                "Batteriespeicher": 0.5,
-                "Power-to-Gas": 0.3
+                "batteriespeicher": 20,
+                "e-auto": 10,
+                "schwungrad": 0.5,
+                "wasserstoff": 50,
+                "pumpspeicher": 30
             },
             "Strombedarf": 650
         },
@@ -68,9 +74,11 @@
                 "sonstige": 3
             },
             "Ausbau Speicher": {
-                "Pumpspeicher": 0.4,
-                "Batteriespeicher": 0.5,
-                "Power-to-Gas": 0.3
+                "batteriespeicher": 20,
+                "e-auto": 10,
+                "schwungrad": 0.5,
+                "wasserstoff": 50,
+                "pumpspeicher": 30
             },
             "Strombedarf": 650
         }
