@@ -1,0 +1,54 @@
+@startuml Erzeugungsprognose
+start
+
+:Input Daten
+- Aktueller Bestand (B)
+- Zielwerte 2030 (Zi_2030)
+- Zielwerte 2045 (Zi_2045)
+- Ausbaustand 2020-2024 (P_ausbau)
+- SMARD-Erzeugungsdaten 2021;
+
+:Berechne jährliche Zuwächse
+r_2030 = (Zi_2030 - B) / 6
+r_2045 = (Zi_2045 - Zi_2030) / 15;
+
+:Berechne monatliche Zuwächse
+m_2030 = r_2030 / 12
+m_2045 = r_2045 / 12
+PV = Summe(Dach + Frei);
+
+:Berechne Kapazitätsfaktoren aus 2021
+CF = Erzeugung / (P_ausbau_2021 * 0.25);
+
+repeat
+  :Für Jahr t = 2026..2045;
+
+  repeat
+    :Für Monat m = 1..12;
+
+    if (t <= 2030?) then (ja)
+      :Berechne installierte Leistung
+      P(t) = B + m_2030 * MonateSeit2025;
+    else (nein)
+      :Berechne installierte Leistung
+      P(t) = Zi_2030 + m_2045 * MonateSeit2030;
+    endif
+
+    :Hole Kapazitätsfaktor
+    CF anhand Monat/Tag des Monats/Zeit aus 2021;
+
+    :Berechne Erzeugung
+    E = CF * P(t) * 0.25 * η;
+
+    :Schreibe E in Prognosedatensatz;
+
+  repeat while (Monate verbleiben?) 
+repeat while (Jahre verbleiben?)
+
+:Lineare Interpolation fehlender Werte;
+
+:Export Prognosedaten
+(2026–2045);
+
+stop
+@enduml
