@@ -6,7 +6,7 @@
         "opex": 16,
         "verluste": 0.556,
         "leistung": 0.66,
-        "obergrenze": 1.0,
+        "obergrenze": 100.0,
         "untergrenze": 0.0
     },
     "e-auto": {
@@ -16,7 +16,7 @@
         "opex": 12,
         "verluste": 0.556,
         "leistung": 0.1,
-        "obergrenze": 1.0,
+        "obergrenze": 100.0,
         "untergrenze": 0.0
     },
     "schwungrad": {
@@ -26,7 +26,7 @@
         "opex": 70,
         "verluste": 1.0,
         "leistung": 1.0,
-        "obergrenze": 1.0,
+        "obergrenze": 100.0,
         "untergrenze": 0.0
     },
     "wasserstoff": {
@@ -36,7 +36,7 @@
         "opex": 100,
         "verluste": 0.069,
         "leistung": 0.5,
-        "obergrenze": 1.0,
+        "obergrenze": 100.0,
         "untergrenze": 0.0
     },
     "pumpspeicher": {
@@ -46,7 +46,7 @@
         "opex": 20,
         "verluste": 0.014,
         "leistung": 0.25,
-        "obergrenze": 1.0,
+        "obergrenze": 100.0,
         "untergrenze": 0.0
     }
 }
