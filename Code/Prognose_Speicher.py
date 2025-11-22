@@ -9,6 +9,33 @@ from functools import reduce
 from dataclasses import dataclass
 from config import PROJECT_ROOT
 
+
+def Verlauf_Speicher(verbrauchsprognose, erzeugungsprognose, entladegrenze, ladegrenze):
+    """
+    Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
+    """
+
+    fixparameterBatterie = Einlesen_Speicherdaten_fix("batterie")
+    fixparameterEAuto = Einlesen_Speicherdaten_fix("e-auto")
+    fixparameterSchwungrad = Einlesen_Speicherdaten_fix("schwungrad")
+    fixparameterWasserstoff = Einlesen_Speicherdaten_fix("wasserstoff")
+    fixparameterPumpspeicher = Einlesen_Speicherdaten_fix("pumpspeicher")
+
+    bestandBatterie = fixparameterBatterie.bestand
+    bestandEAuto = fixparameterEAuto.bestand
+    bestandSchwungrad = fixparameterSchwungrad.bestand
+    bestandWasserstoff = fixparameterWasserstoff.bestand
+    bestandPumpspeicher = fixparameterPumpspeicher.bestand
+
+    szenarioBatterie = 0 #TODO: Speicherdaten aus Szenario einfügen
+    szenarioEAuto = 0 #TODO: Speicherdaten aus Szenario einfügen
+    szenarioSchwungrad = 0 #TODO: Speicherdaten aus Szenario einfügen
+    szenarioWasserstoff = 0 #TODO: Speicherdaten aus Szenario einfügen
+    szenarioPumpspeicher = 0 #TODO: Speicherdaten aus Szenario einfügen
+
+    gesamtAusbau = Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, 100, 200, 100, 200, 100, 200, 100, 200, 100, 200)
+
+
 def Einlesen_Speicherdaten_fix(speicherart):
     """
     Liest alle festen Parameter einer Speicherart aus einer JSON-Datei ein
@@ -22,6 +49,8 @@ def Einlesen_Speicherdaten_fix(speicherart):
         opex: float
         verluste: float
         leistung: float
+        obergrenze: float
+        untergrenze: float
     
     with open(PROJECT_ROOT / "Daten" / "Feste_Parameter" / "speicherarten.json", "r") as f:
         data = json.load(f)
@@ -87,17 +116,27 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
 
     return df_gesamt
 
-def Prognose_Gesamt_Ausbau_():
+def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, Batterie30, Batterie45, EAuto30, EAuto45, Schwungrad30, Schwungrad45, Wasserstoff30, Wasserstoff45, Pumpspeicher30, Pumpspeicher45):
     """
     Erstellt die Gesamtprognose für alle Speicherarten
     """
 
-    df_batterie = Prognose_Speicher_Ausbau("Batterie", 51, 160, 400)
-    # df_auto = Prognose_Speicher_Ausbau("E-Auto", 51, 160, 400) erstmal rausgenommen, da unklar ist, wie hier gerechnet werden soll
-    df_schwungrad = Prognose_Speicher_Ausbau("Schwungrad", 51, 160, 400)
-    df_wasserstoff = Prognose_Speicher_Ausbau("Wasserstoff", 51, 160, 400)
-    df_pump = Prognose_Speicher_Ausbau("Pumpspeicher", 51, 160, 400)
+    #bestandBatterie30 = szenarioBatterie.bestand_2030
+    #bestandBatterie45 = szenarioBatterie.bestand_2045
+    #bestandEAuto30 = szenarioEAuto.bestand_2030
+    #bestandEAuto45 = szenarioEAuto.bestand_2045
+    #bestandSchwungrad30 = szenarioSchwungrad.bestand_2030
+    #bestandSchwungrad45 = szenarioSchwungrad.bestand_
+    #bestandWasserstoff30 = szenarioWasserstoff.bestand_2030
+    #bestandWasserstoff45 = szenarioWasserstoff.bestand_2045
+    #bestandPumpspeicher30 = szenarioPumpspeicher.bestand_2030
+    #bestandPumpspeicher45 = szenarioPumpspeicher.bestand_2045
 
+    df_batterie = Prognose_Speicher_Ausbau("Batterie", bestandBatterie, Batterie30, Batterie45)
+    # df_auto = Prognose_Speicher_Ausbau("E-Auto", bestandEAuto, EAuto30, EAuto45) erstmal rausgenommen, da unklar ist, wie hier gerechnet werden soll
+    df_schwungrad = Prognose_Speicher_Ausbau("Schwungrad", bestandSchwungrad, Schwungrad30, Schwungrad45)
+    df_wasserstoff = Prognose_Speicher_Ausbau("Wasserstoff", bestandWasserstoff, Wasserstoff30, Wasserstoff45)
+    df_pump = Prognose_Speicher_Ausbau("Pumpspeicher", bestandPumpspeicher, Pumpspeicher30, Pumpspeicher45)
 
     dfs = [df_batterie, df_schwungrad, df_wasserstoff, df_pump] # Auto rausgenommen
 
@@ -114,9 +153,3 @@ def Prognose_Gesamt_Ausbau_():
     # df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_ausbau
-
-
-#Test des Parameter Einlesens
-fixparameterBatterie = Einlesen_Speicherdaten_fix("batterie")
-
-print(fixparameterBatterie)
