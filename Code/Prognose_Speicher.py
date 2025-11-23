@@ -143,33 +143,37 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
             anfang_fehlmenge = fehlmenge 
 
             # Batterie entladen
-            if fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) > fehlmenge:
-                aktuell_batterie -= fehlmenge
-                fehlmenge = 0
-            elif fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) <= fehlmenge :
-                aktuell_batterie -= (aktuelle_leistung_batterie/4)
-                fehlmenge -= ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad)
+            if aktuell_batterie >= (aktuelle_leistung_batterie/4):
+                if fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) > fehlmenge:
+                    aktuell_batterie -= fehlmenge
+                    fehlmenge = 0
+                elif fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) <= fehlmenge :
+                    aktuell_batterie -= (aktuelle_leistung_batterie/4)
+                    fehlmenge -= ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad)
             # Schwungrad entladen
-            if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge:
-                aktuell_schwungrad -= fehlmenge
-                fehlmenge = 0
-            elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge :
-                aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
-                fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
+            if aktuell_schwungrad >= (aktuelle_leistung_schwungrad/4):
+                if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge:
+                    aktuell_schwungrad -= fehlmenge
+                    fehlmenge = 0
+                elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge :
+                    aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
+                    fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
             # Wasserstoff entladen
-            if fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) > fehlmenge:
-                aktuell_wasserstoff -= fehlmenge
-                fehlmenge = 0
-            elif fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) <= fehlmenge :
-                aktuell_wasserstoff -= (aktuelle_leistung_wasserstoff/4)
-                fehlmenge -= ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad)
+            if aktuell_wasserstoff >= (aktuelle_leistung_wasserstoff/4):
+                if fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) > fehlmenge:
+                    aktuell_wasserstoff -= fehlmenge
+                    fehlmenge = 0
+                elif fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) <= fehlmenge :
+                    aktuell_wasserstoff -= (aktuelle_leistung_wasserstoff/4)
+                    fehlmenge -= ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad)
             # Pumpspeicher entladen
-            if fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) > fehlmenge:
-                aktuell_pumpspeicher -= fehlmenge
-                fehlmenge = 0
-            elif fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) <= fehlmenge :
-                aktuell_pumpspeicher -= (aktuelle_leistung_pumpspeicher/4)
-                fehlmenge -= ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad)
+            if aktuell_pumpspeicher >= (aktuelle_leistung_pumpspeicher/4):
+                if fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) > fehlmenge:
+                    aktuell_pumpspeicher -= fehlmenge
+                    fehlmenge = 0
+                elif fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) <= fehlmenge :
+                    aktuell_pumpspeicher -= (aktuelle_leistung_pumpspeicher/4)
+                    fehlmenge -= ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad)
 
             importEnergie += fehlmenge 
             aktuell_zusatz_energie = anfang_fehlmenge - fehlmenge   
