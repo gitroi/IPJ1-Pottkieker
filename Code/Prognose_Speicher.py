@@ -47,17 +47,6 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
         ), 
         dfs
     )
-
-    # # DEBUG: Spaltennamen prüfen
-    # print("Verfügbare Spalten im DataFrame:")
-    # print(df_gesamtVerlauf.columns.tolist())
-    
-    # # DEBUG: Ersten Datensatz prüfen
-    # if len(df_gesamtVerlauf) > 0:
-    #     print("\nErste Zeile als namedtuple:")
-    #     first_row = next(df_gesamtVerlauf.itertuples(index=False))
-    #     print(first_row._fields)
-    #     print("\n")
     
     # df_gesamtVerlauf.to_csv(PROJECT_ROOT / 'Daten' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
