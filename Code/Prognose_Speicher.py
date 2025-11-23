@@ -48,7 +48,18 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
         dfs
     )
 
-    df_gesamtVerlauf.to_csv(PROJECT_ROOT / 'Daten' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # # DEBUG: Spaltennamen prüfen
+    # print("Verfügbare Spalten im DataFrame:")
+    # print(df_gesamtVerlauf.columns.tolist())
+    
+    # # DEBUG: Ersten Datensatz prüfen
+    # if len(df_gesamtVerlauf) > 0:
+    #     print("\nErste Zeile als namedtuple:")
+    #     first_row = next(df_gesamtVerlauf.itertuples(index=False))
+    #     print(first_row._fields)
+    #     print("\n")
+    
+    # df_gesamtVerlauf.to_csv(PROJECT_ROOT / 'Daten' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     # Listen für Ergebnisse initialisieren
     speicherstand_batterie = []
@@ -70,33 +81,29 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
 
 
     # Simulation über alle Zeitpunkte, Leistung durch 4 um auf 15min zu kommen, Wirkungsgrad nur bei Entladung berücksichtigt
-    for row in df_gesamtVerlauf.itertuples(index=False):
-
-        # HINWEIS: Bei itertuples() werden Spaltennamen mit Leerzeichen/[] zu Unterstrichen
-        # "Speicherkapazität Batterie [MWh]" wird zu row.Speicherkapazität_Batterie__MWh_
-        # Prüfen Sie mit print(row) die tatsächlichen Attributnamen!
+    for idx, row in df_gesamtVerlauf.iterrows():
         
-        aktuelle_leistung_batterie = fixparameterBatterie.leistung * row.Speicherkapazität_Batterie__MWh_
-        aktuelle_leistung_schwungrad = fixparameterSchwungrad.leistung * row.Speicherkapazität_Schwungrad__MWh_
-        aktuelle_leistung_wasserstoff = fixparameterWasserstoff.leistung * row.Speicherkapazität_Wasserstoff__MWh_
-        aktuelle_leistung_pumpspeicher = fixparameterPumpspeicher.leistung * row.Speicherkapazität_Pumpspeicher__MWh_
+        aktuelle_leistung_batterie = fixparameterBatterie.leistung * row["Speicherkapazität Batterie [MWh]"]
+        aktuelle_leistung_schwungrad = fixparameterSchwungrad.leistung * row["Speicherkapazität Schwungrad [MWh]"]
+        aktuelle_leistung_wasserstoff = fixparameterWasserstoff.leistung * row["Speicherkapazität Wasserstoff [MWh]"]
+        aktuelle_leistung_pumpspeicher = fixparameterPumpspeicher.leistung * row["Speicherkapazität Pumpspeicher [MWh]"]
         
         #Summe aller Erzeuger berechnen...
         erzeugung = (
-            row.Biomasse__MWh__Originalauflösungen +
-            row.Wasserkraft__MWh__Originalauflösungen + 
-            row.Wind_Offshore__MWh__Originalauflösungen +
-            row.Wind_Onshore__MWh__Originalauflösungen +
-            row.Photovoltaik__MWh__Originalauflösungen +
-            row.Sonstige_Erneuerbare__MWh__Originalauflösungen 
+            row["Biomasse [MWh] Originalauflösungen"] +
+            row["Wasserkraft [MWh] Originalauflösungen"] + 
+            row["Wind Offshore [MWh] Originalauflösungen"] +
+            row["Wind Onshore [MWh] Originalauflösungen"] +
+            row["Photovoltaik [MWh] Originalauflösungen"] +
+            row["Sonstige Erneuerbare [MWh] Originalauflösungen"]
         )     
 
-        if df_gesamtVerlauf["Anteil Erneuerbare [MWh]"] > ladegrenze: #überschüssige Energie vorhanden
+        if row["Anteil Erneuerbare [MWh]"] > ladegrenze: #überschüssige Energie vorhanden
 
-            lademenge = erzeugung - df_gesamtVerlauf["Verbrauch [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
+            lademenge = erzeugung - row["Netzlast [MWh] Originalauflösungen"]*(ladegrenze/100) #überschüssige Energie zum Laden
 
             # Batterie laden
-            if aktuell_batterie <= (df_gesamtVerlauf["Speicherkapazität Batterie [MWh]"] - aktuelle_leistung_batterie/4):
+            if aktuell_batterie <= (row["Speicherkapazität Batterie [MWh]"] - aktuelle_leistung_batterie/4):
                 if lademenge > 0 and (aktuelle_leistung_batterie/4) > lademenge:
                     aktuell_batterie += lademenge
                     lademenge = 0
@@ -104,7 +111,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                     aktuell_batterie += (aktuelle_leistung_batterie/4)
                     lademenge -= (aktuelle_leistung_batterie/4)
             # Schwungrad laden
-            if aktuell_schwungrad <= (df_gesamtVerlauf["Speicherkapazität Schwungrad [MWh]"] - aktuelle_leistung_schwungrad/4):
+            if aktuell_schwungrad <= (row["Speicherkapazität Schwungrad [MWh]"] - aktuelle_leistung_schwungrad/4):
                 if lademenge > 0 and (aktuelle_leistung_schwungrad/4) > lademenge:
                     aktuell_schwungrad += lademenge
                     lademenge = 0
@@ -112,7 +119,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                     aktuell_schwungrad += (aktuelle_leistung_schwungrad/4)
                     lademenge -= (aktuelle_leistung_schwungrad/4)
             # Wasserstoff laden
-            if aktuell_wasserstoff <= (df_gesamtVerlauf["Speicherkapazität Wasserstoff [MWh]"] - aktuelle_leistung_wasserstoff/4):
+            if aktuell_wasserstoff <= (row["Speicherkapazität Wasserstoff [MWh]"] - aktuelle_leistung_wasserstoff/4):
                 if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > lademenge:
                     aktuell_wasserstoff += lademenge
                     lademenge = 0
@@ -120,7 +127,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                     aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
                     lademenge -= (aktuelle_leistung_wasserstoff/4)
             # Pumpspeicher laden
-            if aktuell_pumpspeicher <= (df_gesamtVerlauf["Speicherkapazität Pumpspeicher [MWh]"] - aktuelle_leistung_pumpspeicher/4):
+            if aktuell_pumpspeicher <= (row["Speicherkapazität Pumpspeicher [MWh]"] - aktuelle_leistung_pumpspeicher/4):
                 if lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) > lademenge:
                     aktuell_pumpspeicher += lademenge
                     lademenge = 0
@@ -130,9 +137,9 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
 
             exportEnergie += lademenge
 
-        elif df_gesamtVerlauf["Anteil Erneuerbare [MWh]"] <= entladegrenze: #fehlende Energie vorhanden
+        elif row["Anteil Erneuerbare [MWh]"] <= entladegrenze: #fehlende Energie vorhanden
 
-            fehlmenge = df_gesamtVerlauf["Verbrauch [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie
+            fehlmenge = row["Netzlast [MWh] Originalauflösungen"]*(entladegrenze/100) - erzeugung #fehlende Energie
             anfang_fehlmenge = fehlmenge 
 
             # Batterie entladen
