@@ -1,0 +1,21 @@
+@startuml Szenarienwahl
+start
+
+:Einlesen der Szenarien
+- Szenarien als JSON (json)
+- Darstellung der Szenariennamen;
+
+:Auswahl des Szenarios und Analysejahr durch Nutzer;
+
+:Erstellung der Prognosen und Kostendaten;
+
+if (2025 < Eingegebenes Jahr t < 2046 ) then (True)
+  :Berechnung des Anteils EE an Netzlast für Jahr t;
+else (nein)
+    :Berechnung des Anteils EE an Netzlast in den Jahren 2026-2045;
+endif
+
+:Graphischee Darstellung der Ergebnisse;
+
+stop
+@enduml
