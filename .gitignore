@@ -1,3 +1,7 @@
+# Output folder (ignore all contents except .gitkeep)
+Daten/Output/*
+!Daten/Output/.gitkeep
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
