@@ -150,7 +150,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                     fehlmenge = 0  
                 elif fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) <= fehlmenge :
                     aktuell_batterie -= (aktuelle_leistung_batterie/4)
-                    aktuelle_zusatz_energie += (aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad
+                    aktuell_zusatz_energie += (aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad
                     fehlmenge -= ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad)
             # Schwungrad entladen
             if aktuell_schwungrad >= (aktuelle_leistung_schwungrad/4):
