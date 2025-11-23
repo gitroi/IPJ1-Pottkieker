@@ -47,9 +47,9 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         for jahr in range(2026, 2046):
             mask = kosten_df["Jahr"] == jahr
             if jahr <= 2030:
-                kosten_df.loc[mask, f"Baukosten {key} [€]"] = baukosten_EE_virstellstündlich["2030"]
+                kosten_df.loc[mask, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2030"]
             else:
-                kosten_df.loc[mask, f"Baukosten {key} [€]"] = baukosten_EE_virstellstündlich["2045"]
+                kosten_df.loc[mask, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2045"]
                 
         #=== OpEx Berechnung ===
         
@@ -76,14 +76,14 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
                         opex_bestand_2030_monatlich + monatliche_opex_zunahme_2031_2045 * monate_seit_start
                     ) / mask.sum()
 
-        kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Baukosten {key} [€]"] + kosten_df[f"Opex {key} [€]"]
-        spalten_kosten = [f"Baukosten {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
+        kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Capex {key} [€]"] + kosten_df[f"Opex {key} [€]"]
+        spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
         kosten_df[spalten_kosten] = kosten_df[spalten_kosten].round(2)
 
     kosten_df = kosten_df.drop(columns=["Monat", "Jahr"])
 
     kosten_df["Opex_EE [€]"] = kosten_df.filter(like="Opex").sum(axis=1).round(2)
-    kosten_df["Baukosten_EE [€]"] = kosten_df.filter(like="Baukosten").sum(axis=1).round(2)
+    kosten_df["Capex_EE [€]"] = kosten_df.filter(like="Capex").sum(axis=1).round(2)
     kosten_df["Gesamtkosten_EE [€]"] = kosten_df.filter(like="Gesamtkosten").sum(axis=1).round(2)
    
     return kosten_df
