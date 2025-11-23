@@ -11,7 +11,7 @@ from config import PROJECT_ROOT
 
 
 
-def Verlauf_Speicher(df_verbrauchsprognose, df_erzeugungsprognose, df_anteilEE, entladegrenze, ladegrenze):
+def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
     """
     Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
     """
@@ -36,7 +36,7 @@ def Verlauf_Speicher(df_verbrauchsprognose, df_erzeugungsprognose, df_anteilEE, 
 
     df_gesamtAusbau = Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, 100, 200, 100, 200, 100, 200, 100, 200, 100, 200)
 
-    dfs = [df_verbrauchsprognose, df_erzeugungsprognose, df_anteilEE, df_gesamtAusbau] 
+    dfs = [df_anteilEE, df_gesamtAusbau] 
 
     # Merge alle DataFrames auf gemeinsamen Spalten
     df_gesamtVerlauf = reduce(
