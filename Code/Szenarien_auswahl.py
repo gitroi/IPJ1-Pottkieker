@@ -47,7 +47,7 @@ def prognose_eines_Szenarios():
         else:
             gesamt = anteil_erneuerbare_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen")
             prognose_speicher = Verlauf_Speicher(gesamt, 100, 100)
-            prognose_speicher.to_csv(DATA_DIR / 'speicherprognosetestALLES.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+            prognose_speicher.to_csv(DATA_DIR / 'Output' / 'speicherprognosetestALLES.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
        
         prognose_kosten = Kosten_EE(gewaehltes_szenario)
         print(f"Die Gesamtkosten für das Szenario belaufen sich auf {round(prognose_kosten['Gesamtkosten_EE [€]'].sum()/1e12 ,2)} Billionen Euro.")
