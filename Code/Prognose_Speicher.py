@@ -42,117 +42,144 @@ def Verlauf_Speicher(df_verbrauchsprognose, df_erzeugungsprognose, df_anteilEE, 
     df_gesamtVerlauf = reduce(
         lambda left, right: left.merge(
             right, 
-            on=['Datum', 'Jahr', 'Monat', 'Wochentag', 'Uhrzeit', 'Minute'], #TODO: ACHTUNG HIER NOCH DATUM VON ÄNDERN
+            on=['Datum von'], 
             how='outer'
         ), 
         dfs
     )
+
+    df_gesamtVerlauf.to_csv(PROJECT_ROOT / 'Daten' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     # Listen für Ergebnisse initialisieren
     speicherstand_batterie = []
     speicherstand_schwungrad = []
     speicherstand_wasserstoff = []
     speicherstand_pumpspeicher = []
+    zusatz_energie = [] # Energie, die von den Speichern geliefert wird, und somit die EE-Abdeckung erhöht
 
-    # Anfangswerte (Annahme: 25% geladen im Januar 2026)
+    # Anfangswerte Ladestand(Annahme: 25% geladen im Januar 2026)
     aktuell_batterie = bestandBatterie*0.25*1e3 
     aktuell_schwungrad = bestandSchwungrad*0.25*1e3
     aktuell_wasserstoff = bestandWasserstoff*0.25*1e3
     aktuell_pumpspeicher = bestandPumpspeicher*0.25*1e3
+    aktuell_zusatz_energie = 0 # Energie, die von den Speichern geliefert wird, und somit die EE-Abdeckung erhöht
 
     # Export über den gesamten Zeitraum
     exportEnergie = 0
     importEnergie = 0
 
+
+    # Simulation über alle Zeitpunkte, Leistung durch 4 um auf 15min zu kommen, Wirkungsgrad nur bei Entladung berücksichtigt
     for row in df_gesamtVerlauf.itertuples(index=False):
 
-        aktuelle_leistung_batterie = fixparameterBatterie.leistung * df_gesamtVerlauf["Speicherkapazität Batterie [MWh]"]
-        aktuelle_leistung_schwungrad = fixparameterSchwungrad.leistung * df_gesamtVerlauf["Speicherkapazität Schwungrad [MWh]"]
-        aktuelle_leistung_wasserstoff = fixparameterWasserstoff.leistung * df_gesamtVerlauf["Speicherkapazität Wasserstoff [MWh]"]
-        aktuelle_leistung_pumpspeicher = fixparameterPumpspeicher.leistung * df_gesamtVerlauf["Speicherkapazität Pumpspeicher [MWh]"]
+        # HINWEIS: Bei itertuples() werden Spaltennamen mit Leerzeichen/[] zu Unterstrichen
+        # "Speicherkapazität Batterie [MWh]" wird zu row.Speicherkapazität_Batterie__MWh_
+        # Prüfen Sie mit print(row) die tatsächlichen Attributnamen!
+        
+        aktuelle_leistung_batterie = fixparameterBatterie.leistung * row.Speicherkapazität_Batterie__MWh_
+        aktuelle_leistung_schwungrad = fixparameterSchwungrad.leistung * row.Speicherkapazität_Schwungrad__MWh_
+        aktuelle_leistung_wasserstoff = fixparameterWasserstoff.leistung * row.Speicherkapazität_Wasserstoff__MWh_
+        aktuelle_leistung_pumpspeicher = fixparameterPumpspeicher.leistung * row.Speicherkapazität_Pumpspeicher__MWh_
         
         #Summe aller Erzeuger berechnen...
         erzeugung = (
-            df_gesamtVerlauf["Biomasse [MWh] Originalauflösungen"] +
-            df_gesamtVerlauf["Wasserkraft [MWh] Originalauflösungen"] + 
-            df_gesamtVerlauf["Wind Offshore [MWh] Originalauflösungen"] +
-            df_gesamtVerlauf["Wind Onshore [MWh] Originalauflösungen"] +
-            df_gesamtVerlauf["Photovoltaik [MWh] Originalauflösungen"] +
-            df_gesamtVerlauf["Sonstige Erneuerbare [MWh] Originalauflösungen"] 
+            row.Biomasse__MWh__Originalauflösungen +
+            row.Wasserkraft__MWh__Originalauflösungen + 
+            row.Wind_Offshore__MWh__Originalauflösungen +
+            row.Wind_Onshore__MWh__Originalauflösungen +
+            row.Photovoltaik__MWh__Originalauflösungen +
+            row.Sonstige_Erneuerbare__MWh__Originalauflösungen 
         )     
 
-        if df_gesamtVerlauf["Anteil Erneuerbare [MWh]"] > ladegrenze:
+        if df_gesamtVerlauf["Anteil Erneuerbare [MWh]"] > ladegrenze: #überschüssige Energie vorhanden
 
             lademenge = erzeugung - df_gesamtVerlauf["Verbrauch [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
 
             # Batterie laden
-            if lademenge > 0 and (aktuelle_leistung_batterie/4) > lademenge:
-                aktuell_batterie += lademenge
-                lademenge = 0
-            else :
-                aktuell_batterie += (aktuelle_leistung_batterie/4)
-                lademenge -= (aktuelle_leistung_batterie/4)
+            if aktuell_batterie <= (df_gesamtVerlauf["Speicherkapazität Batterie [MWh]"] - aktuelle_leistung_batterie/4):
+                if lademenge > 0 and (aktuelle_leistung_batterie/4) > lademenge:
+                    aktuell_batterie += lademenge
+                    lademenge = 0
+                elif lademenge > 0 and (aktuelle_leistung_batterie/4) <= lademenge:
+                    aktuell_batterie += (aktuelle_leistung_batterie/4)
+                    lademenge -= (aktuelle_leistung_batterie/4)
             # Schwungrad laden
-            if lademenge > 0 and (aktuelle_leistung_schwungrad/4) > lademenge:
-                aktuell_schwungrad += lademenge
-                lademenge = 0
-            else :
-                aktuell_schwungrad += (aktuelle_leistung_schwungrad/4)
-                lademenge -= (aktuelle_leistung_schwungrad/4)
+            if aktuell_schwungrad <= (df_gesamtVerlauf["Speicherkapazität Schwungrad [MWh]"] - aktuelle_leistung_schwungrad/4):
+                if lademenge > 0 and (aktuelle_leistung_schwungrad/4) > lademenge:
+                    aktuell_schwungrad += lademenge
+                    lademenge = 0
+                elif lademenge > 0 and (aktuelle_leistung_schwungrad/4) <= lademenge:
+                    aktuell_schwungrad += (aktuelle_leistung_schwungrad/4)
+                    lademenge -= (aktuelle_leistung_schwungrad/4)
             # Wasserstoff laden
-            if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > lademenge:
-                aktuell_wasserstoff += lademenge
-                lademenge = 0
-            else :
-                aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
-                lademenge -= (aktuelle_leistung_wasserstoff/4)
+            if aktuell_wasserstoff <= (df_gesamtVerlauf["Speicherkapazität Wasserstoff [MWh]"] - aktuelle_leistung_wasserstoff/4):
+                if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > lademenge:
+                    aktuell_wasserstoff += lademenge
+                    lademenge = 0
+                elif lademenge > 0 and (aktuelle_leistung_wasserstoff/4) <= lademenge:
+                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
+                    lademenge -= (aktuelle_leistung_wasserstoff/4)
             # Pumpspeicher laden
-            if lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) > lademenge:
-                aktuell_pumpspeicher += lademenge
-                lademenge = 0
-            else :
-                aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher/4)
-                lademenge -= (aktuelle_leistung_pumpspeicher/4)
+            if aktuell_pumpspeicher <= (df_gesamtVerlauf["Speicherkapazität Pumpspeicher [MWh]"] - aktuelle_leistung_pumpspeicher/4):
+                if lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) > lademenge:
+                    aktuell_pumpspeicher += lademenge
+                    lademenge = 0
+                elif lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= lademenge:
+                    aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher/4)
+                    lademenge -= (aktuelle_leistung_pumpspeicher/4)
+
             exportEnergie += lademenge
 
-        elif df_gesamtVerlauf["Anteil Erneuerbare [MWh]"] <= entladegrenze:
+        elif df_gesamtVerlauf["Anteil Erneuerbare [MWh]"] <= entladegrenze: #fehlende Energie vorhanden
 
-            fehlmenge = df_gesamtVerlauf["Verbrauch [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie 
+            fehlmenge = df_gesamtVerlauf["Verbrauch [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie
+            anfang_fehlmenge = fehlmenge 
 
             # Batterie entladen
             if fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) > fehlmenge:
                 aktuell_batterie -= fehlmenge
                 fehlmenge = 0
-            else :
+            elif fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) <= fehlmenge :
                 aktuell_batterie -= (aktuelle_leistung_batterie/4)
                 fehlmenge -= ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad)
             # Schwungrad entladen
             if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge:
                 aktuell_schwungrad -= fehlmenge
                 fehlmenge = 0
-            else :
+            elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge :
                 aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
                 fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
             # Wasserstoff entladen
             if fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) > fehlmenge:
                 aktuell_wasserstoff -= fehlmenge
                 fehlmenge = 0
-            else :
+            elif fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) <= fehlmenge :
                 aktuell_wasserstoff -= (aktuelle_leistung_wasserstoff/4)
                 fehlmenge -= ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad)
             # Pumpspeicher entladen
             if fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) > fehlmenge:
                 aktuell_pumpspeicher -= fehlmenge
                 fehlmenge = 0
-            else :
+            elif fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) <= fehlmenge :
                 aktuell_pumpspeicher -= (aktuelle_leistung_pumpspeicher/4)
                 fehlmenge -= ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad)
-            importEnergie += fehlmenge    
+
+            importEnergie += fehlmenge 
+            aktuell_zusatz_energie = anfang_fehlmenge - fehlmenge   
         
         speicherstand_batterie.append(aktuell_batterie)
         speicherstand_schwungrad.append(aktuell_schwungrad) 
         speicherstand_wasserstoff.append(aktuell_wasserstoff)   
-        speicherstand_pumpspeicher.append(aktuell_pumpspeicher)        
+        speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
+        zusatz_energie.append(aktuell_zusatz_energie)   
+
+    df_gesamtVerlauf["Speicherstand Batterie [MWh]"] = speicherstand_batterie
+    df_gesamtVerlauf["Speicherstand Schwungrad [MWh]"] = speicherstand_schwungrad
+    df_gesamtVerlauf["Speicherstand Wasserstoff [MWh]"] = speicherstand_wasserstoff
+    df_gesamtVerlauf["Speicherstand Pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
+    df_gesamtVerlauf["zusätzliche Energie durch Speicher [MWh]"] = zusatz_energie
+
+    return df_gesamtVerlauf
 
 def Einlesen_Speicherdaten_fix(speicherart):
     """
@@ -193,39 +220,39 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
 
     #=== Dataframe für die Jahre 2026 bis 2030 erstellen ===
     date_range = pd.date_range(start='2026-01-01', end='2030-12-31 23:45', freq='15min')
-    df_2030 = pd.DataFrame({'Datum': date_range})
+    df_2030 = pd.DataFrame({'Datum von': date_range})
 
-    df_2030["Jahr"] = df_2030["Datum"].dt.year
-    df_2030["Monat"]= df_2030["Datum"].dt.month
-    df_2030["Wochentag"] = df_2030["Datum"].dt.dayofweek
-    df_2030["Uhrzeit"] = df_2030["Datum"].dt.hour
-    df_2030["Minute"] = df_2030["Datum"].dt.minute
+    # df_2030["Jahr"] = df_2030["Datum von"].dt.year
+    # df_2030["Monat"]= df_2030["Datum von"].dt.month
+    # df_2030["Wochentag"] = df_2030["Datum von"].dt.dayofweek
+    # df_2030["Uhrzeit"] = df_2030["Datum von"].dt.hour
+    # df_2030["Minute"] = df_2030["Datum von"].dt.minute
 
-    anzahl_tage_2030 = len(df_2030["Datum"].dt.date.unique())
+    anzahl_tage_2030 = len(df_2030["Datum von"].dt.date.unique())
     
     wachstumsrate_2030 = (bestand2030 - bestand2025) / anzahl_tage_2030
 
     speichername = f"Speicherkapazität {speicherart} [MWh]"
     
-    df_2030[speichername] = bestand2025 + wachstumsrate_2030 * ((df_2030['Datum'] - df_2030['Datum'].min()).dt.days + 1)
+    df_2030[speichername] = bestand2025 + wachstumsrate_2030 * ((df_2030['Datum von'] - df_2030['Datum von'].min()).dt.days + 1)
 
     # df_2030.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     #=== Dataframe für die Jahre 2030 bis 2045 erstellen ===
     date_range = pd.date_range(start='2031-01-01', end='2045-12-31 23:45', freq='15min')
-    df_2045 = pd.DataFrame({'Datum': date_range})
+    df_2045 = pd.DataFrame({'Datum von': date_range})
 
-    df_2045["Jahr"] = df_2045["Datum"].dt.year
-    df_2045["Monat"]= df_2045["Datum"].dt.month
-    df_2045["Wochentag"] = df_2045["Datum"].dt.dayofweek
-    df_2045["Uhrzeit"] = df_2045["Datum"].dt.hour
-    df_2045["Minute"] = df_2045["Datum"].dt.minute
+    # df_2045["Jahr"] = df_2045["Datum von"].dt.year
+    # df_2045["Monat"]= df_2045["Datum von"].dt.month
+    # df_2045["Wochentag"] = df_2045["Datum von"].dt.dayofweek
+    # df_2045["Uhrzeit"] = df_2045["Datum von"].dt.hour
+    # df_2045["Minute"] = df_2045["Datum von"].dt.minute
 
-    anzahl_tage_2045 = len(df_2045["Datum"].dt.date.unique())
+    anzahl_tage_2045 = len(df_2045["Datum von"].dt.date.unique())
     
     wachstumsrate_2045 = (bestand2045 - bestand2030) / anzahl_tage_2045
 
-    df_2045[speichername] = bestand2030 + wachstumsrate_2045 * ((df_2045['Datum'] - df_2045['Datum'].min()).dt.days + 1)
+    df_2045[speichername] = bestand2030 + wachstumsrate_2045 * ((df_2045['Datum von'] - df_2045['Datum von'].min()).dt.days + 1)
 
     df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True) # Bereich von 2026 bis 2030 und 2031 bis 2045 zusammenfügen
     df_gesamt[speichername] = df_gesamt[speichername].round(2)
@@ -262,7 +289,7 @@ def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, be
     df_ausbau = reduce(
         lambda left, right: left.merge(
             right, 
-            on=['Datum', 'Jahr', 'Monat', 'Wochentag', 'Uhrzeit', 'Minute'], 
+            on=['Datum von'], 
             how='outer'
         ), 
         dfs
