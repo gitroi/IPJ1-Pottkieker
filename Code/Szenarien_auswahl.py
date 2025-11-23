@@ -1,5 +1,6 @@
 "Ünterstützt durch KI (GPT-4.1 Inline Suggestions)"
 import json
+import pandas as pd
 from config import DATA_DIR
 from Analyse import analyse_erneuerbare_anteil
 from Erzeugungsprognosen import Prognose_erzeugung
@@ -45,12 +46,14 @@ def prognose_eines_Szenarios():
             gesamt = anteil_erneuerbare_Jahrx_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen", jahr_int)
         else:
             gesamt = anteil_erneuerbare_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen")
+            prognose_speicher = Verlauf_Speicher(gesamt, 100, 100)
+            prognose_speicher.to_csv(DATA_DIR / 'speicherprognosetestALLES.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
        
         prognose_kosten = Kosten_EE(gewaehltes_szenario)
         print(f"Die Gesamtkosten für das Szenario belaufen sich auf {round(prognose_kosten['Gesamtkosten_EE [€]'].sum()/1e12 ,2)} Billionen Euro.")
         plot_ee_anteil_histogram_overflow(gesamt)
 
-        # Speicherdaten einlesen
+        #TODO Speicherdaten einlesen
 
 
         return
