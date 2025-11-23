@@ -140,43 +140,51 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
         elif row["Anteil Erneuerbare [MWh]"] <= entladegrenze: #fehlende Energie vorhanden
 
             fehlmenge = row["Netzlast [MWh] Originalauflösungen"]*(entladegrenze/100) - erzeugung #fehlende Energie
-            anfang_fehlmenge = fehlmenge 
+            aktuell_zusatz_energie = 0
 
             # Batterie entladen
             if aktuell_batterie >= (aktuelle_leistung_batterie/4):
                 if fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) > fehlmenge:
-                    aktuell_batterie -= fehlmenge
-                    fehlmenge = 0
+                    aktuell_batterie -= (fehlmenge/fixparameterBatterie.wirkungsgrad)
+                    aktuell_zusatz_energie += fehlmenge
+                    fehlmenge = 0  
                 elif fehlmenge > 0 and ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad) <= fehlmenge :
                     aktuell_batterie -= (aktuelle_leistung_batterie/4)
+                    aktuelle_zusatz_energie += (aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad
                     fehlmenge -= ((aktuelle_leistung_batterie/4)*fixparameterBatterie.wirkungsgrad)
             # Schwungrad entladen
             if aktuell_schwungrad >= (aktuelle_leistung_schwungrad/4):
                 if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge:
-                    aktuell_schwungrad -= fehlmenge
+                    aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
+                    aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0
                 elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge :
                     aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
+                    aktuell_zusatz_energie += (aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad
                     fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
             # Wasserstoff entladen
             if aktuell_wasserstoff >= (aktuelle_leistung_wasserstoff/4):
                 if fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) > fehlmenge:
-                    aktuell_wasserstoff -= fehlmenge
+                    aktuell_wasserstoff -= (fehlmenge/fixparameterWasserstoff.wirkungsgrad)
+                    aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0
                 elif fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) <= fehlmenge :
                     aktuell_wasserstoff -= (aktuelle_leistung_wasserstoff/4)
+                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad
                     fehlmenge -= ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad)
             # Pumpspeicher entladen
             if aktuell_pumpspeicher >= (aktuelle_leistung_pumpspeicher/4):
                 if fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) > fehlmenge:
-                    aktuell_pumpspeicher -= fehlmenge
+                    aktuell_pumpspeicher -= (fehlmenge/fixparameterPumpspeicher.wirkungsgrad)
+                    aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0
                 elif fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) <= fehlmenge :
                     aktuell_pumpspeicher -= (aktuelle_leistung_pumpspeicher/4)
+                    aktuell_zusatz_energie += (aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad
                     fehlmenge -= ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad)
 
             importEnergie += fehlmenge 
-            aktuell_zusatz_energie = anfang_fehlmenge - fehlmenge   
+               
         
         speicherstand_batterie.append(aktuell_batterie)
         speicherstand_schwungrad.append(aktuell_schwungrad) 
