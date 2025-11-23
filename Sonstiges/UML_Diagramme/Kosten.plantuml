@@ -12,18 +12,29 @@ repeat
 
 :Berechnung Capex
 - Jährliche Wachstumsrate aus Prognose erezugung
-- Capex_2030 = 1e6 * jährliche_Zubau_2030 * Kosten pro kW / virtelstunden pro Jahr
-- Capex_2045 = 1e6 * jährliche_Zubau_2045 * Kosten pro kW / virtelstunden pro Jahr;
+- Capex_2030 = jährliche_Zubau_2030 * Kosten pro kW / virtelstunden pro Jahr
+- Capex_2045 = jährliche_Zubau_2045 * Kosten pro kW / virtelstunden pro Jahr;
 
-:Berechnung Opex
-- 
--
+:Berechnung Opex;
+
+:Aktuelle Opex aus EE-Daten pro Monat
+- Opex_aktuell = Aktueller Bestand * Kosten pro kW  / 12
+- Opex ab 2030 = Zi_2030 * Kosten pro kW  / 12;
+
+:Opex zunamhme pro Monat
+- Opex_Zunahme_2030 = jährliche_Zubau_2030 * Kosten pro kW  / 12 
+- Opex_Zunahme_2045 = jährliche_Zubau_2045 * Kosten pro kW  / 12;
+
+:Berechnung  Opex
+- Für Monate bis 2030: Opex = Opex_aktuell + Opex_Zunahme_2030 * Monate_seit_Start / Anzahl Virltelstunden im Monat
+- Für Monate ab 2031: Opex = Opex_2030 + Opex_Zunahme_2045 * Monate_seit_2031 / Anzahl Virltelstunden im Monat;
+
 repeat while (Energieträger verbleiben?);
 
-
-
-:Zusammenführung der Prognosedaten
-- V_gesamt = V_2030 + V_2045;
+:Berechnung Gesamtkosten
+- Capex
+- Opex
+- Gesamtkosten = Capex + Opex;
 
 :Export Prognosedaten
 (2026–2045);
