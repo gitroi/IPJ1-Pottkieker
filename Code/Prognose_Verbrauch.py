@@ -117,12 +117,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     df_gesamt_2045 = pd.concat([df_gesamt, prognose_2045], ignore_index=True)
     df_gesamt_2045 = df_gesamt_2045.rename(columns={"Netzlast_Prognose [MWh]": "Netzlast [MWh] Originalauflösungen"})
 
-    # #speichern
-    # df_prognose_export = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
-    # df_prognose_export.to_csv(PROJECT_ROOT / 'Daten' / 'verbrauch_prognose_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
-
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh] Originalauflösungen"]]
-    # df_gesamt_2045 = df_gesamt_2045[~((df_gesamt_2045["Datum von"].dt.month == 2) & (df_gesamt_2045["Datum von"].dt.day == 29))]
 
     return df_gesamt_2045

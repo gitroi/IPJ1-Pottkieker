@@ -1,0 +1,32 @@
+@startuml Capex und Opex des EE-Ausbaus
+
+start
+
+:Input Daten
+- Kosten und Bestandsdaten der Erzeuger (EE-Daten)
+- Zielwerte Ausbau EE 2030 (Zi_2030)
+- Zielwerte Ausbau EE 2045 (Zi_2045);
+
+repeat 
+    :Für jeden Energieträger in EE-Daten;
+
+:Berechnung Capex
+- Jährliche Wachstumsrate aus Prognose erezugung
+- Capex_2030 = 1e6 * jährliche_Zubau_2030 * Kosten pro kW / virtelstunden pro Jahr
+- Capex_2045 = 1e6 * jährliche_Zubau_2045 * Kosten pro kW / virtelstunden pro Jahr;
+
+:Berechnung Opex
+- 
+-
+repeat while (Energieträger verbleiben?);
+
+
+
+:Zusammenführung der Prognosedaten
+- V_gesamt = V_2030 + V_2045;
+
+:Export Prognosedaten
+(2026–2045);
+
+stop
+@enduml
