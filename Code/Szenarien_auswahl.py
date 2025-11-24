@@ -1,11 +1,12 @@
 "Ünterstützt durch KI (GPT-4.1 Inline Suggestions)"
 import json
+import matplotlib.pyplot as plt
 import pandas as pd
 from config import DATA_DIR
 from Analyse import analyse_erneuerbare_anteil
 from Erzeugungsprognosen import Prognose_erzeugung
 from Prognose_Verbrauch import Prognose_Verbrauch
-from Histogramme import plot_ee_anteil_histogram_overflow
+from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
 from EE_Anteil_DataFrame import anteil_erneuerbare_df,anteil_erneuerbare_Jahrx_df
 from Kosten import Kosten_EE
 from Prognose_Speicher import Verlauf_Speicher
@@ -52,7 +53,8 @@ def prognose_eines_Szenarios():
         prognose_kosten = Kosten_EE(gewaehltes_szenario)
         print(f"Die Gesamtkosten für das Szenario belaufen sich auf {round(prognose_kosten['Gesamtkosten_EE [€]'].sum()/1e12 ,2)} Billionen Euro.")
         plot_ee_anteil_histogram_overflow(gesamt)
-
+        plot_histogram_ausbauraten_EE(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
+        plt.show()
         #TODO Speicherdaten einlesen
 
 

@@ -46,13 +46,13 @@
         "Beschreibung": "Beschreibung Szenario 1",
         "Ziele 2030": {
             "Ausbau EE": {
-                "pv_dach": 295,
-                "pv_frei": 90,  
-                "wind_onshore": 90,
-                "wind_offshore": 40,
-                "biomasse": 6,
-                "wasser": 9,
-                "sonstige": 3
+                "pv_dach": 114.5,
+                "pv_frei": 55.1,  
+                "wind_onshore": 114,
+                "wind_offshore": 20.2,
+                "biomasse":12.4,
+                "wasser": 1.7,
+                "sonstige": 1
             },
             "Ausbau Speicher": {
                 "batteriespeicher": 20,
@@ -61,16 +61,16 @@
                 "wasserstoff": 50,
                 "pumpspeicher": 30
             },
-            "Strombedarf": 650
+            "Strombedarf": 628
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv_dach": 495,
-                "pv_frei": 90,  
-                "wind_onshore": 145,
-                "wind_offshore": 75,
-                "biomasse": 4,
-                "wasser": 9,
+                "pv_dach": 196.6,
+                "pv_frei": 94.7,  
+                "wind_onshore": 163.5,
+                "wind_offshore": 35.9,
+                "biomasse": 13.6,
+                "wasser": 1.5,
                 "sonstige": 3
             },
             "Ausbau Speicher": {
@@ -80,7 +80,7 @@
                 "wasserstoff": 50,
                 "pumpspeicher": 30
             },
-            "Strombedarf": 650
+            "Strombedarf": 890
         }
     }
 ]

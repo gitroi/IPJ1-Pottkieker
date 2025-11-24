@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
+from Erzeugungsprognosen import Jährlicher_Zuwachs_EE
 
 # ==============================
 # 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre
@@ -144,4 +144,54 @@ def plot_ee_anteil_histogram_overflow(gesamt):
     ax.set_ylabel('Anzahl (in 1.000)')
 
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
+
+
+def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045):
+    """ Funktiom zur Visualisierung der Ausbauraten der Erneuerbaren Energien als Histogramm.
+    Args:
+        Zieldaten_2030 (dict): Dictionary mit den Zieldaten für 2030.
+        Zieldaten_2045 (dict): Dictionary mit den Zieldaten für 2045.
+    Unterstützt durch KI (GPT-4.1 Inline Suggestions)
+    """
+    ausbauraten = Jährlicher_Zuwachs_EE(Zieldaten_2030, Zieldaten_2045)
+
+    jahre_2030 = list(range(2026, 2031))
+    jahre_2045 = list(range(2031, 2046))
+    jahre = jahre_2030 + jahre_2045
+
+    energietraeger = ['pv_dach','pv_frei', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige']
+    farben = {
+        'pv_dach': "#F9BF02",       # Gold
+        'pv_frei': "#EEFF00FF",       # Gold
+        'wind_onshore': '#87CEEB',  # Sky Blue
+        'wind_offshore': '#4169E1', # Royal Blue
+        'biomasse': '#228B22',     # Forest Green
+        'wasser': '#00CED1',       # Dark Turquoise
+        'sonstige': '#FF8C00'      # Dark Orange
+    }
+
+    data = {et: [] for et in energietraeger}
+
+    for jahr in jahre:
+        for et in energietraeger:
+            if jahr <= 2030:
+                data[et].append(ausbauraten['zuwachsrate_2030'][et])
+            else:
+                data[et].append(ausbauraten['zuwachsrate_2045'][et])
+
+    # Plot erstellen
+    plt.style.use('_mpl-gallery')
+    fig, ax = plt.subplots(figsize=(14, 7), dpi=140)
+    bottom = np.zeros(len(jahre))
+    for et in energietraeger:
+        ax.bar(jahre, data[et], bottom=bottom, color=farben[et], label=et.replace('_', ' ').title())
+        bottom += np.array(data[et])
+
+    ax.set_title('Jährliche Ausbauraten der Erneuerbaren Energien (2026-2045)')
+    ax.set_xlabel('Jahr')
+    ax.set_ylabel('Ausbaurate [GW]')
+    ax.legend(title='Energieträger')
+    plt.tight_layout()
+    plt.show(block =False)
+
