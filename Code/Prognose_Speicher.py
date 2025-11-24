@@ -64,7 +64,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
     aktuell_pumpspeicher = bestandPumpspeicher*0.25*1e3
     aktuell_zusatz_energie = 0 # Energie, die von den Speichern geliefert wird, und somit die EE-Abdeckung erhöht
 
-    # Export über den gesamten Zeitraum
+    # Export/Import über den gesamten Zeitraum
     exportEnergie = 0
     importEnergie = 0
 
