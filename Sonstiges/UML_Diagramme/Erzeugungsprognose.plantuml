@@ -20,13 +20,12 @@ PV = Summe(Dach + Frei);
 :Berechne Kapazitätsfaktoren aus 2021
 CF = Erzeugung / (P_ausbau_2021 * 0.25);
 
-repeat
-  :Für Jahr t = 2026..2045;
+ :Für Jahr t = 2026..2045;
+repeat :Für Monat m = 1..12;
 
-  repeat
-    :Für Monat m = 1..12;
+  repeat  
 
-    if (t <= 2030?) then (ja)
+if (t <= 2030?) then (ja)
       :Berechne installierte Leistung
       P(t) = B + m_2030 * MonateSeit2025;
     else (nein)
@@ -38,9 +37,7 @@ repeat
     CF anhand Monat/Tag des Monats/Zeit aus 2021;
 
     :Berechne Erzeugung
-    E = CF * P(t) * 0.25 * η;
-
-    :Schreibe E in Prognosedatensatz;
+    E = CF * P(t) * 0.25;
 
   repeat while (Monate verbleiben?) 
 repeat while (Jahre verbleiben?)
