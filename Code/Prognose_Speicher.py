@@ -95,14 +95,6 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
 
             lademenge = erzeugung - row["Netzlast [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
 
-            # Batterie laden
-            if aktuell_batterie <= ((row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.obergrenze) - aktuelle_leistung_batterie/4):
-                if lademenge > 0 and (aktuelle_leistung_batterie/4) > lademenge:
-                    aktuell_batterie += lademenge
-                    lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_batterie/4) <= lademenge:
-                    aktuell_batterie += (aktuelle_leistung_batterie/4)
-                    lademenge -= (aktuelle_leistung_batterie/4)
             # Schwungrad laden
             if aktuell_schwungrad <= ((row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.obergrenze) - aktuelle_leistung_schwungrad/4):
                 if lademenge > 0 and (aktuelle_leistung_schwungrad/4) > lademenge:
@@ -111,14 +103,16 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                 elif lademenge > 0 and (aktuelle_leistung_schwungrad/4) <= lademenge:
                     aktuell_schwungrad += (aktuelle_leistung_schwungrad/4)
                     lademenge -= (aktuelle_leistung_schwungrad/4)
-            # Wasserstoff laden
-            if aktuell_wasserstoff <= ((row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.obergrenze) - aktuelle_leistung_wasserstoff/4):
-                if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > lademenge:
-                    aktuell_wasserstoff += lademenge
+
+            # Batterie laden
+            if aktuell_batterie <= ((row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.obergrenze) - aktuelle_leistung_batterie/4):
+                if lademenge > 0 and (aktuelle_leistung_batterie/4) > lademenge:
+                    aktuell_batterie += lademenge
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_wasserstoff/4) <= lademenge:
-                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
-                    lademenge -= (aktuelle_leistung_wasserstoff/4)
+                elif lademenge > 0 and (aktuelle_leistung_batterie/4) <= lademenge:
+                    aktuell_batterie += (aktuelle_leistung_batterie/4)
+                    lademenge -= (aktuelle_leistung_batterie/4)
+
             # Pumpspeicher laden
             if aktuell_pumpspeicher <= ((row["Speicherkapazität Pumpspeicher [MWh]"]*fixparameterPumpspeicher.obergrenze) - aktuelle_leistung_pumpspeicher/4):
                 if lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) > lademenge:
@@ -127,6 +121,16 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                 elif lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= lademenge:
                     aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher/4)
                     lademenge -= (aktuelle_leistung_pumpspeicher/4)
+                    
+            # Wasserstoff laden
+            if aktuell_wasserstoff <= ((row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.obergrenze) - aktuelle_leistung_wasserstoff/4):
+                if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > lademenge:
+                    aktuell_wasserstoff += lademenge
+                    lademenge = 0
+                elif lademenge > 0 and (aktuelle_leistung_wasserstoff/4) <= lademenge:
+                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
+                    lademenge -= (aktuelle_leistung_wasserstoff/4)
+            
 
             exportEnergie += lademenge
 
@@ -134,6 +138,26 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
 
             fehlmenge = row["Netzlast [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie
             aktuell_zusatz_energie = 0
+           
+            # Schwungrad entladen
+            if aktuell_schwungrad > (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze):
+                if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge and aktuell_verfugbare_schwungrad >= (fehlmenge/fixparameterSchwungrad.wirkungsgrad):
+                    aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
+                    aktuell_zusatz_energie += fehlmenge
+                    fehlmenge = 0
+                elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge and aktuell_verfugbare_schwungrad >= (aktuelle_leistung_schwungrad/4):
+                    aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
+                    aktuell_zusatz_energie += (aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad
+                    fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
+                elif fehlmenge > 0 and aktuell_verfugbare_schwungrad < aktuelle_leistung_schwungrad/4:
+                    if fehlmenge < (aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad):
+                        aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
+                        aktuell_zusatz_energie += fehlmenge
+                        fehlmenge = 0
+                    elif fehlmenge >= (aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad):
+                        fehlmenge -= aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad
+                        aktuell_zusatz_energie += aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad
+                        aktuell_schwungrad = (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze)
 
             # Batterie entladen
             if aktuell_batterie > (row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.untergrenze):
@@ -154,47 +178,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                         fehlmenge -= aktuell_verfugbare_batterie*fixparameterBatterie.wirkungsgrad
                         aktuell_zusatz_energie += aktuell_verfugbare_batterie*fixparameterBatterie.wirkungsgrad
                         aktuell_batterie = (row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.untergrenze)
-            
-            # Schwungrad entladen
-            if aktuell_schwungrad > (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze):
-                if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge and aktuell_verfugbare_schwungrad >= (fehlmenge/fixparameterSchwungrad.wirkungsgrad):
-                    aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
-                    aktuell_zusatz_energie += fehlmenge
-                    fehlmenge = 0
-                elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge and aktuell_verfugbare_schwungrad >= (aktuelle_leistung_schwungrad/4):
-                    aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
-                    aktuell_zusatz_energie += (aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad
-                    fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
-                elif fehlmenge > 0 and aktuell_verfugbare_schwungrad < aktuelle_leistung_schwungrad/4:
-                    if fehlmenge < (aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad):
-                        aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
-                        aktuell_zusatz_energie += fehlmenge
-                        fehlmenge = 0
-                    elif fehlmenge >= (aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad):
-                        fehlmenge -= aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad
-                        aktuell_zusatz_energie += aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad
-                        aktuell_schwungrad = (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze)
-            
-            # Wasserstoff entladen
-            if aktuell_wasserstoff > (row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.untergrenze):
-                if fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) > fehlmenge and aktuell_verfugbare_wasserstoff >= (fehlmenge/fixparameterWasserstoff.wirkungsgrad):
-                    aktuell_wasserstoff -= (fehlmenge/fixparameterWasserstoff.wirkungsgrad)
-                    aktuell_zusatz_energie += fehlmenge
-                    fehlmenge = 0
-                elif fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) <= fehlmenge and aktuell_verfugbare_wasserstoff >= (aktuelle_leistung_wasserstoff/4):
-                    aktuell_wasserstoff -= (aktuelle_leistung_wasserstoff/4)
-                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad
-                    fehlmenge -= ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad)
-                elif fehlmenge > 0 and aktuell_verfugbare_wasserstoff < aktuelle_leistung_wasserstoff/4:
-                    if fehlmenge < (aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad):
-                        aktuell_wasserstoff -= (fehlmenge/fixparameterWasserstoff.wirkungsgrad)
-                        aktuell_zusatz_energie += fehlmenge
-                        fehlmenge = 0
-                    elif fehlmenge >= (aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad):
-                        fehlmenge -= aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad
-                        aktuell_zusatz_energie += aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad
-                        aktuell_wasserstoff = (row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.untergrenze)
-            
+                        
             # Pumpspeicher entladen
             if aktuell_pumpspeicher > (row["Speicherkapazität Pumpspeicher [MWh]"]*fixparameterPumpspeicher.untergrenze):
                 if fehlmenge > 0 and ((aktuelle_leistung_pumpspeicher/4)*fixparameterPumpspeicher.wirkungsgrad) > fehlmenge and aktuell_verfugbare_pumpspeicher >= (fehlmenge/fixparameterPumpspeicher.wirkungsgrad):
@@ -215,6 +199,28 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                         aktuell_zusatz_energie += aktuell_verfugbare_pumpspeicher*fixparameterPumpspeicher.wirkungsgrad
                         aktuell_pumpspeicher = (row["Speicherkapazität Pumpspeicher [MWh]"]*fixparameterPumpspeicher.untergrenze)
 
+            # Wasserstoff entladen
+            if aktuell_wasserstoff > (row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.untergrenze):
+                if fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) > fehlmenge and aktuell_verfugbare_wasserstoff >= (fehlmenge/fixparameterWasserstoff.wirkungsgrad):
+                    aktuell_wasserstoff -= (fehlmenge/fixparameterWasserstoff.wirkungsgrad)
+                    aktuell_zusatz_energie += fehlmenge
+                    fehlmenge = 0
+                elif fehlmenge > 0 and ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad) <= fehlmenge and aktuell_verfugbare_wasserstoff >= (aktuelle_leistung_wasserstoff/4):
+                    aktuell_wasserstoff -= (aktuelle_leistung_wasserstoff/4)
+                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad
+                    fehlmenge -= ((aktuelle_leistung_wasserstoff/4)*fixparameterWasserstoff.wirkungsgrad)
+                elif fehlmenge > 0 and aktuell_verfugbare_wasserstoff < aktuelle_leistung_wasserstoff/4:
+                    if fehlmenge < (aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad):
+                        aktuell_wasserstoff -= (fehlmenge/fixparameterWasserstoff.wirkungsgrad)
+                        aktuell_zusatz_energie += fehlmenge
+                        fehlmenge = 0
+                    elif fehlmenge >= (aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad):
+                        fehlmenge -= aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad
+                        aktuell_zusatz_energie += aktuell_verfugbare_wasserstoff*fixparameterWasserstoff.wirkungsgrad
+                        aktuell_wasserstoff = (row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.untergrenze)
+            
+            
+
             importEnergie += fehlmenge 
                
         
@@ -228,7 +234,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
     df_gesamtVerlauf["Speicherstand Schwungrad [MWh]"] = speicherstand_schwungrad
     df_gesamtVerlauf["Speicherstand Wasserstoff [MWh]"] = speicherstand_wasserstoff
     df_gesamtVerlauf["Speicherstand Pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
-    df_gesamtVerlauf["zusätzliche Energie durch Speicher [MWh]"] = zusatz_energie
+    df_gesamtVerlauf["Energie aus Speicher [MWh]"] = zusatz_energie
 
     return df_gesamtVerlauf
 
@@ -279,7 +285,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     # df_2030["Uhrzeit"] = df_2030["Datum von"].dt.hour
     # df_2030["Minute"] = df_2030["Datum von"].dt.minute
 
-    anzahl_tage_2030 = len(df_2030["Datum von"].dt.date.unique())
+    anzahl_tage_2030 = len(df_2030["Datum von"].dt.date.unique()) # type: ignore
     
     wachstumsrate_2030 = (bestand2030 - bestand2025) / anzahl_tage_2030
 
@@ -299,7 +305,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     # df_2045["Uhrzeit"] = df_2045["Datum von"].dt.hour
     # df_2045["Minute"] = df_2045["Datum von"].dt.minute
 
-    anzahl_tage_2045 = len(df_2045["Datum von"].dt.date.unique())
+    anzahl_tage_2045 = len(df_2045["Datum von"].dt.date.unique()) # type: ignore
     
     wachstumsrate_2045 = (bestand2045 - bestand2030) / anzahl_tage_2045
 

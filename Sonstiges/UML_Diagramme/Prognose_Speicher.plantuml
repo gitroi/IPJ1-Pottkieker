@@ -37,7 +37,7 @@ partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
     if (Anteil EE > Ladegrenze?) then (ja)
         :Überschüssige Energie berechnen;
         
-        :Speicher nacheinander laden\n(Batterie → Schwungrad → Wasserstoff → Pumpspeicher);
+        :Speicher nacheinander laden\n(Batterie → Schwungrad → Pumpspeicher → Wasserstoff);
         
         note right
             Pro Speicher:
@@ -50,7 +50,7 @@ partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
     elseif (Anteil EE ≤ Entladegrenze?) then (ja)
         :Fehlende Energie berechnen;
         
-        :Speicher nacheinander entladen\n(Batterie → Schwungrad → Wasserstoff → Pumpspeicher);
+        :Speicher nacheinander entladen\n(Schwungrad → Batterie → Pumpspeicher → Wasserstoff);
         
         note right
             Pro Speicher:
