@@ -91,9 +91,9 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
             row["Sonstige Erneuerbare [MWh] Originalauflösungen"]
         )     
 
-        if row["Anteil Erneuerbare [MWh]"] > ladegrenze: #überschüssige Energie vorhanden
+        if row["Anteil Erneuerbare [%]"] > ladegrenze: #überschüssige Energie vorhanden
 
-            lademenge = erzeugung - row["Netzlast [MWh] Originalauflösungen"]*(ladegrenze/100) #überschüssige Energie zum Laden
+            lademenge = erzeugung - row["Netzlast [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
 
             # Batterie laden
             if aktuell_batterie <= ((row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.obergrenze) - aktuelle_leistung_batterie/4):
@@ -130,9 +130,9 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
 
             exportEnergie += lademenge
 
-        elif row["Anteil Erneuerbare [MWh]"] <= entladegrenze: #fehlende Energie vorhanden
+        elif row["Anteil Erneuerbare [%]"] <= entladegrenze: #fehlende Energie vorhanden
 
-            fehlmenge = row["Netzlast [MWh] Originalauflösungen"]*(entladegrenze/100) - erzeugung #fehlende Energie
+            fehlmenge = row["Netzlast [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie
             aktuell_zusatz_energie = 0
 
             # Batterie entladen

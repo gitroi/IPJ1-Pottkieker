@@ -23,7 +23,7 @@ def plot_ee_anteil_histogram(gesamt):
     fig, ax = plt.subplots(figsize=(12, 6), dpi=140)
 
     # Defensive Vorbereitung der Daten: konvertieren, Inf/NaN entfernen
-    vals = pd.to_numeric(gesamt["Anteil Erneuerbare [MWh]"], errors="coerce")
+    vals = pd.to_numeric(gesamt["Anteil Erneuerbare [%]"], errors="coerce")
     vals = vals.replace([np.inf, -np.inf], np.nan).dropna()
 
     if len(vals) == 0:
@@ -74,7 +74,7 @@ def plot_ee_anteil_histogram(gesamt):
     plt.show()
 
 
-def plot_ee_anteil_histogram_overflow(gesamt):
+def plot_ee_anteil_histogram_overflow(gesamt,jahr:int):
     """
     Erstellt ein Histogramm des Anteils der Erneuerbaren Energien am Stromverbrauch
     und fasst alle Werte >= 100% in einem einzigen Balken zusammen.
@@ -83,13 +83,20 @@ def plot_ee_anteil_histogram_overflow(gesamt):
         gesamt (pd.DataFrame): DataFrame mit der Spalte "Anteil Erneuerbare [MWh]"
     """
 
+    gesamt["Jahr"] = gesamt["Datum von"].dt.year
+    if(jahr):
+        title = f'Anteil der Erneuerbaren Energien am Stromverbrauch im Jahr {jahr}'
+        gesamt = gesamt[gesamt["Jahr"] == jahr]
+    else:
+        title = 'Anteil der Erneuerbaren Energien am Stromverbrauch (alle Jahre)'
+
     plt.style.use('_mpl-gallery')
 
     # größere Figur und höhere DPI für bessere Lesbarkeit
     fig, ax = plt.subplots(figsize=(12, 6), dpi=140)
 
     # Defensive Vorbereitung der Daten: konvertieren, Inf/NaN entfernen
-    vals = pd.to_numeric(gesamt["Anteil Erneuerbare [MWh]"], errors="coerce")
+    vals = pd.to_numeric(gesamt["Anteil Erneuerbare [%]"], errors="coerce")
     vals = vals.replace([np.inf, -np.inf], np.nan).dropna()
 
     if len(vals) == 0:
@@ -123,7 +130,7 @@ def plot_ee_anteil_histogram_overflow(gesamt):
         ax.text(x, count + max(counts) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
 
     # Achsentitel und Diagrammtitel
-    ax.set_title('Anteil der Erneuerbaren Energien am Stromverbrauch')
+    ax.set_title(title)
     ax.set_xlabel('Anteil Erneuerbare [%]')
     ax.set_ylabel('Anzahl Viertelstunden')
 

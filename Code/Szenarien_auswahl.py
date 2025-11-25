@@ -7,7 +7,7 @@ from Analyse import analyse_erneuerbare_anteil
 from Erzeugungsprognosen import Prognose_erzeugung
 from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
-from EE_Anteil_DataFrame import anteil_erneuerbare_df,anteil_erneuerbare_Jahrx_df
+from EE_Anteil_DataFrame import anteil_erneuerbare_df
 from Kosten import Kosten_EE
 from Prognose_Speicher import Verlauf_Speicher
 
@@ -42,17 +42,18 @@ def prognose_eines_Szenarios():
         print(f"Szenario '{auswahl}' wurde ausgewählt und wird ausgegeben.")
         prognose_erzeugung = Prognose_erzeugung(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
         prognose_verbrauch = Prognose_Verbrauch(gewaehltes_szenario["Ziele 2030"]["Strombedarf"], gewaehltes_szenario["Ziele 2045"]["Strombedarf"])
+        prognose_speicher = Verlauf_Speicher(anteil_erneuerbare_df(prognose_erzeugung,prognose_verbrauch), 100, 100)
         if jahr.strip().isdigit():
             jahr_int = int(jahr)
-            gesamt = anteil_erneuerbare_Jahrx_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen", jahr_int)
+            gesamt = anteil_erneuerbare_df(prognose_erzeugung, prognose_verbrauch)
         else:
-            gesamt = anteil_erneuerbare_df(prognose_erzeugung, prognose_verbrauch, "Netzlast [MWh] Originalauflösungen")
-            prognose_speicher = Verlauf_Speicher(gesamt, 100, 100)
-            prognose_speicher.to_csv(DATA_DIR / 'Output' / 'speicherprognosetestALLES.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+            jahr_int = 0
+            gesamt = anteil_erneuerbare_df(prognose_erzeugung, prognose_verbrauch)
+            #prognose_speicher.to_csv(DATA_DIR / 'Output' / 'speicherprognosetestALLES.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
        
         prognose_kosten = Kosten_EE(gewaehltes_szenario)
         print(f"Die Gesamtkosten für das Szenario belaufen sich auf {round(prognose_kosten['Gesamtkosten_EE [€]'].sum()/1e12 ,2)} Billionen Euro.")
-        plot_ee_anteil_histogram_overflow(gesamt)
+        plot_ee_anteil_histogram_overflow(gesamt,jahr_int)
         plot_histogram_ausbauraten_EE(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
         plt.show()
         #TODO Speicherdaten einlesen
