@@ -1,4 +1,5 @@
 @startuml Szenarienwahl
+skinparam ActivityFontSize 30
 start
 
 :Einlesen der Szenarien
@@ -15,7 +16,7 @@ else (nein)
     :Berechnung des Anteils EE an Netzlast in den Jahren 2026-2045;
 endif
 
-:Graphischee Darstellung der Ergebnisse;
+:Graphische Darstellung der Ergebnisse;
 
 stop
 @enduml

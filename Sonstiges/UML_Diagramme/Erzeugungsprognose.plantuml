@@ -1,4 +1,5 @@
 @startuml Erzeugungsprognose
+skinparam ActivityFontSize 30
 start
 
 :Input Daten

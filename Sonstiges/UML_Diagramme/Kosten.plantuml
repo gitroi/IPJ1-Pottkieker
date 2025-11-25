@@ -1,5 +1,5 @@
 @startuml Capex und Opex des EE-Ausbaus
-
+skinparam ActivityFontSize 30
 start
 
 :Input Daten
@@ -19,8 +19,8 @@ repeat
     :Berechnung Opex;
 
     :Aktuelle Opex aus EE-Daten pro Monat
-    - Opex_aktuell = Aktueller Bestand * Kosten pro kW  / 12
-    - Opex ab 2030 = Zi_2030 * Kosten pro kW  / 12;
+    - Opex_aktuell = Aktueller Bestand * Kosten pro kW  
+    - Opex ab 2030 = Zi_2030 * Kosten pro kW;
 
     :Opex zunamhme pro Monat
     - Opex_Zunahme_2030 = jährliche_Zubau_2030 * Kosten pro kW  / 12 
