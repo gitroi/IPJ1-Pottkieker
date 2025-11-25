@@ -121,7 +121,7 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
                 elif lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= lademenge:
                     aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher/4)
                     lademenge -= (aktuelle_leistung_pumpspeicher/4)
-                    
+
             # Wasserstoff laden
             if aktuell_wasserstoff <= ((row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.obergrenze) - aktuelle_leistung_wasserstoff/4):
                 if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > lademenge:
@@ -230,10 +230,10 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
 
-    df_gesamtVerlauf["Speicherstand Batterie [MWh]"] = speicherstand_batterie
-    df_gesamtVerlauf["Speicherstand Schwungrad [MWh]"] = speicherstand_schwungrad
-    df_gesamtVerlauf["Speicherstand Wasserstoff [MWh]"] = speicherstand_wasserstoff
-    df_gesamtVerlauf["Speicherstand Pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
+    df_gesamtVerlauf["Ladestand Batterie [MWh]"] = speicherstand_batterie
+    df_gesamtVerlauf["Ladestand Schwungrad [MWh]"] = speicherstand_schwungrad
+    df_gesamtVerlauf["Ladestand Wasserstoff [MWh]"] = speicherstand_wasserstoff
+    df_gesamtVerlauf["Ladestand Pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_gesamtVerlauf["Energie aus Speicher [MWh]"] = zusatz_energie
 
     return df_gesamtVerlauf
