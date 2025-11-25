@@ -36,11 +36,12 @@ def prognose_eines_Szenarios():
     
     auswahl = input("Bitte geben Sie den Namen des gewünschten Szenarios ein: ")
     jahr = input("Bitte geben Sie das Jahr für die Analyse ein (z.B. 2026 oder nichts für alle Jahre): ")
+    ertragsart = input("Bitte geben Sie die Ertragsart ein (schlecht, mittel, gut): ")
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
     
     if gewaehltes_szenario:
         print(f"Szenario '{auswahl}' wurde ausgewählt und wird ausgegeben.")
-        prognose_erzeugung = Prognose_erzeugung(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
+        prognose_erzeugung = Prognose_erzeugung(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"], ertragsart)
         prognose_verbrauch = Prognose_Verbrauch(gewaehltes_szenario["Ziele 2030"]["Strombedarf"], gewaehltes_szenario["Ziele 2045"]["Strombedarf"])
         prognose_speicher = Verlauf_Speicher(anteil_erneuerbare_df(prognose_erzeugung,prognose_verbrauch), 100, 100)
         if jahr.strip().isdigit():

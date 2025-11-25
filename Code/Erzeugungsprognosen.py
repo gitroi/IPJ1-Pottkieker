@@ -32,7 +32,19 @@ def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
 
     return zuwachs_dict
 
-def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.DataFrame:
+""" Jahreswerte für PV und Wind leistung der letzen 5 Jahre: 
+    2020: PV: 10,387% Wind: 25,202%
+    2021: PV: 9,608% Wind: 20,860%
+    2022: PV: 10,319% Wind: 21,435%
+    2023: PV: 8,789% Wind: 23,325%
+    2024: PV: 8,459% Wind:22,022%
+    Bestes Jahr PV: 10,387% (2020)
+    Bestes Jahr Wind: 25,202% (2020)
+    Schlechtestes Jahr PV: 8,459% (2024)
+    Schlechtestes Jahr Wind: 20,860% (2021)
+"""
+
+def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertragsart: str) -> pd.DataFrame:
     """
     Funktion zur Prognose der Erneuerbaren Energieerzeugung von 2026 bis 2045 basierend auf dem Ausbaustand für verschiedene Energiequellen.
     Parameters:
@@ -68,7 +80,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
         zuwachsraten["zuwachs_2045"][key] = jahres_raten["zuwachsrate_2045"][key] / 12
     
     #==== Einlesen der Daten und anpassung ====
-    erzeugungpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten"/ "erzeugung_2021.csv"
+    erzeugungpfad = PROJECT_ROOT / "Daten" / "SMARD-Daten"/ "erzeugung_20_24.csv"
     erzeugung_df = pd.read_csv(erzeugungpfad,
     sep=';', low_memory=False
     )
@@ -83,7 +95,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
                 .astype(float),
                 errors='coerce'
             )
-            erzeugung_df[col]  = erzeugung_df[col].fillna(0)
+            erzeugung_df[col]  = erzeugung_df[col].fillna(0).interpolate(method='linear')
 
     erzeugung_df["Datum von"] = pd.to_datetime(erzeugung_df["Datum von"], format="%d.%m.%Y %H:%M")
 
@@ -99,25 +111,53 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
         "Sonstige Erneuerbare [MWh] Originalauflösungen": "Sonstige [MWh]"
     })
     
-    #=== Kapazitätsfaktoren berechnen ===
-    installierte_leistung_2024 = installierte_leistung_df[(installierte_leistung_df["Jahr"]==2024)][["Monat","pv","wind_onshore","wind_offshore","biomasse","wasser","sonstige"]].reset_index(drop=True)
-    installierte_leistung_df = installierte_leistung_df[(installierte_leistung_df["Jahr"]==2021)][["Monat","pv","wind_onshore","wind_offshore","biomasse","wasser","sonstige"]].reset_index(drop=True)
-    
+    erzeugung_df["Jahr"] = erzeugung_df["Datum von"].dt.year
     erzeugung_df["Monat"] = erzeugung_df["Datum von"].dt.month
     erzeugung_df["Tag"] = erzeugung_df["Datum von"].dt.day
     erzeugung_df["Stunde"] = erzeugung_df["Datum von"].dt.hour
     erzeugung_df["Minute"] = erzeugung_df["Datum von"].dt.minute
 
-    for i in range(1,13):
-        mask = erzeugung_df["Monat"] == i
-        leistung_mask =  installierte_leistung_df["Monat"] == i
+    #=== Kapazitätsfaktoren berechnen ===
+
+    for jahr in range(2020, 2025):
+        for monat in range(1,13):
+            mask = (erzeugung_df["Jahr"] == jahr) & (erzeugung_df["Monat"] == monat)
+            leistung_mask = (installierte_leistung_df["Jahr"] == jahr) & (installierte_leistung_df["Monat"] == monat)
+            
+            erzeugung_df.loc[mask, "Kapazitätsfaktor_PV"] = erzeugung_df.loc[mask, "PV [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "pv"].iloc[0] * 1000 * 0.25)  
+            erzeugung_df.loc[mask, "Kapazitätsfaktor_Wind_Onshore"] = erzeugung_df.loc[mask, "Wind Onshore [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wind_onshore"].iloc[0] * 1000 * 0.25)  
+            erzeugung_df.loc[mask, "Kapazitätsfaktor_Wind_Offshore"] = erzeugung_df.loc[mask, "Wind Offshore [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wind_offshore"].iloc[0] * 1000 * 0.25) 
+            erzeugung_df.loc[mask, "Kapazitätsfaktor_Biomasse"] = erzeugung_df.loc[mask, "Biomasse [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "biomasse"].iloc[0] * 1000 * 0.25)  
+            erzeugung_df.loc[mask, "Kapazitätsfaktor_Wasser"] = erzeugung_df.loc[mask, "Wasser [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wasser"].iloc[0] * 1000 * 0.25)  
+            erzeugung_df.loc[mask, "Kapazitätsfaktor_Sonstige"] = erzeugung_df.loc[mask, "Sonstige [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "sonstige"].iloc[0] * 1000 * 0.25) 
         
-        erzeugung_df.loc[mask, "Kapazitätsfaktor_PV"] = erzeugung_df.loc[mask, "PV [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "pv"].iloc[0] * 1000 * 0.25)  
-        erzeugung_df.loc[mask, "Kapazitätsfaktor_Wind_Onshore"] = erzeugung_df.loc[mask, "Wind Onshore [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wind_onshore"].iloc[0] * 1000 * 0.25)  
-        erzeugung_df.loc[mask, "Kapazitätsfaktor_Wind_Offshore"] = erzeugung_df.loc[mask, "Wind Offshore [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wind_offshore"].iloc[0] * 1000 * 0.25) 
-        erzeugung_df.loc[mask, "Kapazitätsfaktor_Biomasse"] = erzeugung_df.loc[mask, "Biomasse [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "biomasse"].iloc[0] * 1000 * 0.25)  
-        erzeugung_df.loc[mask, "Kapazitätsfaktor_Wasser"] = erzeugung_df.loc[mask, "Wasser [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wasser"].iloc[0] * 1000 * 0.25)  
-        erzeugung_df.loc[mask, "Kapazitätsfaktor_Sonstige"] = erzeugung_df.loc[mask, "Sonstige [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "sonstige"].iloc[0] * 1000 * 0.25) 
+    spalten_kapazitätsfaktoren = ["Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]
+
+    #=== kapazitäsfaktoren für gutes, schlechtes und mittleres Jahr speichern ===
+    if (ertragsart != "gut") and (ertragsart != "mittel") and (ertragsart != "schlecht"):
+            raise ValueError("Ungültige Ertragsart. Bitte 'gut', 'mittel' oder 'schlecht' angeben.")
+    
+    if ertragsart == "gut":
+        erzeugung_df = erzeugung_df[erzeugung_df["Jahr"] == 2020]
+    elif ertragsart == "mittel":
+        erzeugung_df_2020_2024 = erzeugung_df[erzeugung_df["Jahr"].between(2020, 2024)].copy()
+        
+        # Gruppiere nach Monat, Tag, Stunde, Minute und berechne Median
+        erzeugung_df = erzeugung_df_2020_2024.groupby(['Monat', 'Tag', 'Stunde', 'Minute'])[
+            ['Monat', 'Tag', 'Stunde', 'Minute'] + spalten_kapazitätsfaktoren
+        ].median().reset_index(drop=True)
+    elif ertragsart == "schlecht":
+        basis_2024 = erzeugung_df[erzeugung_df["Jahr"] == 2024].copy()
+        basis_2021 = erzeugung_df[erzeugung_df["Jahr"] == 2021].copy()
+
+        erzeugung_df = pd.merge(
+            basis_2024[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]],
+            basis_2021[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
+            on=["Monat","Tag","Stunde","Minute"],
+            how="inner"
+        )
+
+    erzeugung_df.to_excel(PROJECT_ROOT / "Daten" /"Kapazitätsfaktoren_EE.xlsx", index=False)
 
     kapazitätsfaktoren = erzeugung_df[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]]
     
@@ -213,6 +253,8 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict) -> pd.D
                "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
     prognose_export[spalten] = prognose_export[spalten].interpolate(method='linear') 
 
+    summe_spalten = prognose_export[prognose_export["Datum von"].dt.year == 2045][spalten].sum()
+    print(f"Summe der prognostizierten Erzeugung 2045 (in TWh): {summe_spalten / 1e6}")
     prognose_export = prognose_export[["Datum von"] + spalten]
 
     if(prognose_export.isna().any().any()):
