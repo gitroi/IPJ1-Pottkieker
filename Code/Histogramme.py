@@ -4,7 +4,7 @@ import pandas as pd
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 
 # ==============================
-# 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre
+# 1. Visualisierung: Anteil Erneuerbare Energien über die Jahre
 # ==============================
 def plot_ee_anteil_histogram(gesamt):
     """
