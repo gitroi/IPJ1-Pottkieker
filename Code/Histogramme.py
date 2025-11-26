@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from Erzeugungsprognosen import Jährlicher_Zuwachs_EE
+from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 
 # ==============================
 # 7. Visualisierung: Anteil Erneuerbare Energien über die Jahre

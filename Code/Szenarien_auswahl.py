@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from config import DATA_DIR
 from Analyse import analyse_erneuerbare_anteil
-from Erzeugungsprognosen import Prognose_erzeugung
+from Prognose_Erzeugung import Prognose_erzeugung
 from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
 from EE_Anteil_DataFrame import anteil_erneuerbare_df

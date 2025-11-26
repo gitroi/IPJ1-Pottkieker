@@ -1,4 +1,4 @@
-from Erzeugungsprognosen import Jährlicher_Zuwachs_EE
+from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from config import DATA_DIR
 # from Szenarien_auswahl import json_objekt_bearbeiten
 import pandas as pd
