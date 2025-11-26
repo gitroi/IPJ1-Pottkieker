@@ -163,9 +163,7 @@ def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045):
     """
     ausbauraten = Jährlicher_Zuwachs_EE(Zieldaten_2030, Zieldaten_2045)
 
-    jahre_2030 = list(range(2026, 2031))
-    jahre_2045 = list(range(2031, 2046))
-    jahre = jahre_2030 + jahre_2045
+    jahre = list(range(2026, 2046))
 
     energietraeger = ['pv_dach','pv_frei', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige']
     farben = {

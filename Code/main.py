@@ -1,7 +1,6 @@
 """
 Zentrales Programm der Gruppe Pottkieker.
 Nutz die anderen Module zur Analyse und Visualisierung.
-Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
 """
 
 import pandas as pd

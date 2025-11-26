@@ -157,8 +157,6 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
             how="inner"
         )
 
-    erzeugung_df.to_excel(PROJECT_ROOT / "Daten" /"Kapazitätsfaktoren_EE.xlsx", index=False)
-
     kapazitätsfaktoren = erzeugung_df[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]]
     
     # Erstelle Datumsbereich für 2026-2045
@@ -252,9 +250,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
                "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
                "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
     prognose_export[spalten] = prognose_export[spalten].interpolate(method='linear') 
-
-    summe_spalten = prognose_export[prognose_export["Datum von"].dt.year == 2045][spalten].sum()
-    print(f"Summe der prognostizierten Erzeugung 2045 (in TWh): {summe_spalten / 1e6}")
+    
     prognose_export = prognose_export[["Datum von"] + spalten]
 
     if(prognose_export.isna().any().any()):
