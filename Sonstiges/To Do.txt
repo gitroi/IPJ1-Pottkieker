@@ -7,6 +7,6 @@ Prio/was muss gemacht werden
 2/Stromverbruach aus einzelnen Sektoren berechnen
 1/Grafiken für Kosten und Excel erstellung für alle
 1/Kosten Speicher
-1/Analysefunktion für daten mit Speichern
+Fertig    1/Analysefunktion für daten mit Speichern
 1/Einlesen der Daten zu speichern aus Szenarien
 2-3/Gui (Streamlit ?)

@@ -111,6 +111,8 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
         "Sonstige Erneuerbare [MWh] Originalauflösungen": "Sonstige [MWh]"
     })
     
+    spalten_EE = ["PV [MWh]", "Wind Onshore [MWh]", "Wind Offshore [MWh]", "Biomasse [MWh]", "Wasser [MWh]", "Sonstige [MWh]"]
+
     erzeugung_df["Jahr"] = erzeugung_df["Datum von"].dt.year
     erzeugung_df["Monat"] = erzeugung_df["Datum von"].dt.month
     erzeugung_df["Tag"] = erzeugung_df["Datum von"].dt.day
@@ -119,18 +121,20 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
 
     #=== Kapazitätsfaktoren berechnen ===
 
-    for jahr in range(2020, 2025):
-        for monat in range(1,13):
-            mask = (erzeugung_df["Jahr"] == jahr) & (erzeugung_df["Monat"] == monat)
-            leistung_mask = (installierte_leistung_df["Jahr"] == jahr) & (installierte_leistung_df["Monat"] == monat)
-            
-            erzeugung_df.loc[mask, "Kapazitätsfaktor_PV"] = erzeugung_df.loc[mask, "PV [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "pv"].iloc[0] * 1000 * 0.25)  
-            erzeugung_df.loc[mask, "Kapazitätsfaktor_Wind_Onshore"] = erzeugung_df.loc[mask, "Wind Onshore [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wind_onshore"].iloc[0] * 1000 * 0.25)  
-            erzeugung_df.loc[mask, "Kapazitätsfaktor_Wind_Offshore"] = erzeugung_df.loc[mask, "Wind Offshore [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wind_offshore"].iloc[0] * 1000 * 0.25) 
-            erzeugung_df.loc[mask, "Kapazitätsfaktor_Biomasse"] = erzeugung_df.loc[mask, "Biomasse [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "biomasse"].iloc[0] * 1000 * 0.25)  
-            erzeugung_df.loc[mask, "Kapazitätsfaktor_Wasser"] = erzeugung_df.loc[mask, "Wasser [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "wasser"].iloc[0] * 1000 * 0.25)  
-            erzeugung_df.loc[mask, "Kapazitätsfaktor_Sonstige"] = erzeugung_df.loc[mask, "Sonstige [MWh]"] / (installierte_leistung_df.loc[leistung_mask, "sonstige"].iloc[0] * 1000 * 0.25) 
-        
+    #=== Installierte Leistungen in DataFrame der Erzeugung einfügen ===
+    erzeugung_df = pd.merge(
+        erzeugung_df[["Jahr", "Monat", "Tag", "Stunde", "Minute",]+ spalten_EE],
+        installierte_leistung_df,on=["Jahr", "Monat"], how="left"
+    )
+
+    #=== Kapazitätsfaktoren berechnen ===
+    erzeugung_df["Kapazitätsfaktor_PV"] = erzeugung_df["PV [MWh]"] / (erzeugung_df["pv"] * 1000 * 0.25)
+    erzeugung_df["Kapazitätsfaktor_Wind_Onshore"] = erzeugung_df["Wind Onshore [MWh]"] / (erzeugung_df["wind_onshore"] * 1000 * 0.25)
+    erzeugung_df["Kapazitätsfaktor_Wind_Offshore"] = erzeugung_df["Wind Offshore [MWh]"] / (erzeugung_df["wind_offshore"] * 1000 * 0.25)
+    erzeugung_df["Kapazitätsfaktor_Biomasse"] = erzeugung_df["Biomasse [MWh]"] / (erzeugung_df["biomasse"] * 1000 * 0.25)
+    erzeugung_df["Kapazitätsfaktor_Wasser"] = erzeugung_df["Wasser [MWh]"] / (erzeugung_df["wasser"] * 1000 * 0.25)
+    erzeugung_df["Kapazitätsfaktor_Sonstige"] = erzeugung_df["Sonstige [MWh]"] / (erzeugung_df["sonstige"] * 1000 * 0.25)
+   
     spalten_kapazitätsfaktoren = ["Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]
 
     #=== kapazitäsfaktoren für gutes, schlechtes und mittleres Jahr speichern ===
@@ -208,24 +212,24 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
             mask = (prognose['Jahr'] == jahr) & (prognose['Monat'] == monat)
             prognose.loc[mask, 'PV_Prognose_MWh'] = (
                 installierte_leistung_pv
-                * prognose.loc[mask, 'Kapazitätsfaktor_PV'] * 0.25 * erzeugerarten["pv_dach"]["wirkungsgrad"]
+                * prognose.loc[mask, 'Kapazitätsfaktor_PV'] * 0.25 
             )
             prognose.loc[mask, 'Wind_Onshore_Prognose_MWh'] = (
                 installierte_leistung_wind_onshore 
-                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Onshore'] * 0.25 * erzeugerarten["wind_onshore"]["wirkungsgrad"]
+                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Onshore'] * 0.25 
             )
             prognose.loc[mask, 'Wind_Offshore_Prognose_MWh'] = (
                 installierte_leistung_wind_offshore
-                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Offshore'] * 0.25 * erzeugerarten["wind_offshore"]["wirkungsgrad"]
+                * prognose.loc[mask, 'Kapazitätsfaktor_Wind_Offshore'] * 0.25 
             )
             prognose.loc[mask, 'Biomasse_Prognose_MWh'] = (
-                prognose.loc[mask, 'Kapazitätsfaktor_Biomasse'] * installierte_leistung_Biomasse * 0.25 * erzeugerarten["biomasse"]["wirkungsgrad"]
+                prognose.loc[mask, 'Kapazitätsfaktor_Biomasse'] * installierte_leistung_Biomasse * 0.25 
             )
             prognose.loc[mask, 'Wasser_Prognose_MWh'] = (
-                prognose.loc[mask, 'Kapazitätsfaktor_Wasser'] * installierte_leistung_Wasser * 0.25 *erzeugerarten["wasser"]["wirkungsgrad"]
+                prognose.loc[mask, 'Kapazitätsfaktor_Wasser'] * installierte_leistung_Wasser * 0.25
             )
             prognose.loc[mask, 'Sonstige_Prognose_MWh'] = (
-                prognose.loc[mask, 'Kapazitätsfaktor_Sonstige'] * installierte_leistung_Sonstige * 0.25 *erzeugerarten["sonstige"]["wirkungsgrad"]
+                prognose.loc[mask, 'Kapazitätsfaktor_Sonstige'] * installierte_leistung_Sonstige * 0.25 
             )
    
     prognose['PV_Prognose_MWh'] = prognose['PV_Prognose_MWh'].round(2)
