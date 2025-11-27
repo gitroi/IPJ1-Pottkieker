@@ -10,3 +10,6 @@ Prio/was muss gemacht werden
 Fertig    1/Analysefunktion für daten mit Speichern
 1/Einlesen der Daten zu speichern aus Szenarien
 2-3/Gui (Streamlit ?)
+
+
+Vorschlag reserve: Wenn x% bis y Tage --> Import, sonst Kraftwerke

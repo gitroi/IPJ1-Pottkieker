@@ -8,6 +8,4 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Szenarien_auswahl import prognose_eines_Szenarios
 
-
 prognose_eines_Szenarios()
-

@@ -35,7 +35,8 @@ def prognose_eines_Szenarios():
         print(f"- {szenario['Name']}")
     
     auswahl = input("Bitte geben Sie den Namen des gewünschten Szenarios ein: ")
-    jahr = input("Bitte geben Sie das Jahr für die Analyse ein (z.B. 2026 oder nichts für alle Jahre): ")
+    jahr = input("Bitte geben Sie das erste Jahr für die Analyse ein (z.B. 2026 oder nichts für alle Jahre): ")
+    jahr_2 = input("Bitte geben Sie das zweite Jahr für die Analyse ein (z.B. 2030 oder nichts für alle Jahre): ")
     ertragsart = input("Bitte geben Sie die Ertragsart ein (schlecht, mittel, gut): ")
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
     
@@ -44,20 +45,36 @@ def prognose_eines_Szenarios():
         prognose_erzeugung = Prognose_erzeugung(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"], ertragsart)
         prognose_verbrauch = Prognose_Verbrauch(gewaehltes_szenario["Ziele 2030"]["Strombedarf"], gewaehltes_szenario["Ziele 2045"]["Strombedarf"])
         prognose_speicher = Verlauf_Speicher(anteil_erneuerbare_df(prognose_erzeugung,prognose_verbrauch), 100, 100)
-        
+        gesamt = anteil_erneuerbare_speicher(prognose_speicher)
         # prognose_speicher.to_excel(DATA_DIR / f"szenario_{auswahl}_speicherverlauf.xlsx")
         
-        if jahr.strip().isdigit():
+        if (jahr.strip().isdigit()) and (jahr_2.strip().isdigit()) :
             jahr_int = int(jahr)
-            gesamt = anteil_erneuerbare_speicher(prognose_speicher)
+            jahr_int_2 = int(jahr_2)
+        elif (jahr.strip().isdigit()) and (not jahr_2.strip().isdigit()):
+            jahr_int = int(jahr)
+            jahr_int_2 = 0
+        elif (not jahr.strip().isdigit()) and (jahr_2.strip().isdigit()):
+            jahr_int = 0
+            jahr_int_2 = int(jahr_2)  
         else:
             jahr_int = 0
-            gesamt = anteil_erneuerbare_speicher(prognose_speicher)
+            jahr_int_2 = 0
         
         prognose_kosten = Kosten_EE(gewaehltes_szenario)
         print(f"Die Gesamtkosten für das Szenario belaufen sich auf {round(prognose_kosten['Gesamtkosten_EE [€]'].sum()/1e12 ,2)} Billionen Euro.")
-        plot_ee_anteil_histogram_overflow(gesamt,jahr_int)
-        plot_histogram_ausbauraten_EE(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"])
+        
+        #=== Visualisierungen ===#
+        fig, axs = plt.subplots(2, 2, figsize=(14, 12)) 
+        ee_gesamt_2045 = gesamt[pd.to_datetime(gesamt["Datum von"]).dt.year == 2045]["Erneuerbare [MWh]"].sum()
+        verbrauch_gesamt_2045 = gesamt[pd.to_datetime(gesamt["Datum von"]).dt.year == 2045]["Netzlast [MWh]"].sum()
+        print(f"Im Jahr 2045 beträgt der Anteil der Erneuerbaren Energien am Stromverbrauch {round((ee_gesamt_2045 / verbrauch_gesamt_2045)*100,2)}%.")
+        print(f"Die erzeugte Energiemenge aus Erneuerbaren Energien im Jahr 2045 beträgt {round(ee_gesamt_2045/1e6,2)} TWh.")
+        print(f"Der Stromverbrauch im Jahr 2045 beträgt {round(verbrauch_gesamt_2045/1e6,2)} TWh.")
+        plot_ee_anteil_histogram_overflow(gesamt,jahr_int,axs[0, 0])
+        plot_ee_anteil_histogram_overflow(gesamt,jahr_int_2,axs[1, 0])
+        plot_histogram_ausbauraten_EE(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"], axs[0, 1])
+        plt.tight_layout()
         plt.show()
         #TODO Speicherdaten einlesen
 
