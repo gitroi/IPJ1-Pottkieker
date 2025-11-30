@@ -26,9 +26,9 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
     
     #=== DataFrame für die Kosten erstellen ===
     date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min') 
-    kosten_df = pd.DataFrame({"Datum": date_range})
-    kosten_df["Jahr"] = kosten_df["Datum"].dt.year
-    kosten_df["Monat"]= kosten_df["Datum"].dt.month
+    kosten_df = pd.DataFrame({"Datum von": date_range})
+    kosten_df["Jahr"] = kosten_df["Datum von"].dt.year
+    kosten_df["Monat"]= kosten_df["Datum von"].dt.month
     kosten_df = kosten_df.drop_duplicates().reset_index(drop=True)
     
     #=== Capex Berechnung ===

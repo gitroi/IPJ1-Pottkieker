@@ -80,6 +80,7 @@ def anteil_erneuerbare_speicher(erzeugung: pd.DataFrame) -> pd.DataFrame:
     erzeugung = erzeugung[[
         "Datum von",
         "Erneuerbare [MWh]",
+        "Anteil Erneuerbare [%]",
         "Energie aus Speicher [MWh]",
         "Netzlast [MWh]"
     ]]  
@@ -91,6 +92,6 @@ def anteil_erneuerbare_speicher(erzeugung: pd.DataFrame) -> pd.DataFrame:
     erzeugung["Realisierte Erzeugung [MWh]"] = erzeugung["Erneuerbare [MWh]"] + erzeugung["Energie aus Speicher [MWh]"]
 
     den = erzeugung["Netzlast [MWh]"].replace(0, np.nan)
-    erzeugung["Anteil Erneuerbare [%]"] = (erzeugung["Realisierte Erzeugung [MWh]"] / den * 100).round(2)
+    erzeugung["Anteil Erneuerbare Speicher [%]"] = (erzeugung["Realisierte Erzeugung [MWh]"] / den * 100).round(2)
 
     return erzeugung

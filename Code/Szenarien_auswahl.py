@@ -10,6 +10,7 @@ from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbaur
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import Kosten_EE
 from Prognose_Speicher import Verlauf_Speicher
+from Auswertung import ausgabe
 
 def load_scenarios():
     """Lädt Szenarien aus einer JSON-Datei."""
@@ -66,17 +67,18 @@ def prognose_eines_Szenarios():
         
         #=== Visualisierungen ===#
         fig, axs = plt.subplots(2, 2, figsize=(14, 12)) 
-        ee_gesamt_2045 = gesamt[pd.to_datetime(gesamt["Datum von"]).dt.year == 2045]["Erneuerbare [MWh]"].sum()
-        verbrauch_gesamt_2045 = gesamt[pd.to_datetime(gesamt["Datum von"]).dt.year == 2045]["Netzlast [MWh]"].sum()
-        print(f"Im Jahr 2045 beträgt der Anteil der Erneuerbaren Energien am Stromverbrauch {round((ee_gesamt_2045 / verbrauch_gesamt_2045)*100,2)}%.")
-        print(f"Die erzeugte Energiemenge aus Erneuerbaren Energien im Jahr 2045 beträgt {round(ee_gesamt_2045/1e6,2)} TWh.")
-        print(f"Der Stromverbrauch im Jahr 2045 beträgt {round(verbrauch_gesamt_2045/1e6,2)} TWh.")
+        # ee_gesamt_2045 = gesamt[pd.to_datetime(gesamt["Datum von"]).dt.year == 2045]["Erneuerbare [MWh]"].sum()
+        # verbrauch_gesamt_2045 = gesamt[pd.to_datetime(gesamt["Datum von"]).dt.year == 2045]["Netzlast [MWh]"].sum()
+        # print(f"Im Jahr 2045 beträgt der Anteil der Erneuerbaren Energien am Stromverbrauch {round((ee_gesamt_2045 / verbrauch_gesamt_2045)*100,2)}%.")
+        # print(f"Die erzeugte Energiemenge aus Erneuerbaren Energien im Jahr 2045 beträgt {round(ee_gesamt_2045/1e6,2)} TWh.")
+        # print(f"Der Stromverbrauch im Jahr 2045 beträgt {round(verbrauch_gesamt_2045/1e6,2)} TWh.")
         plot_ee_anteil_histogram_overflow(gesamt,jahr_int,axs[0, 0])
         plot_ee_anteil_histogram_overflow(gesamt,jahr_int_2,axs[1, 0])
         plot_histogram_ausbauraten_EE(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"], axs[0, 1])
         plt.tight_layout()
         plt.show()
-        #TODO Speicherdaten einlesen
+        
+        ausgabe(prognose_kosten, gesamt, gewaehltes_szenario)
 
 
         return

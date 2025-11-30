@@ -25,7 +25,7 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
 
     plt.style.use('_mpl-gallery')
 
-    vals = pd.to_numeric(gesamt["Anteil Erneuerbare [%]"], errors="coerce")
+    vals = pd.to_numeric(gesamt["Anteil Erneuerbare Speicher [%]"], errors="coerce")
     vals = vals.replace([np.inf, -np.inf], np.nan).dropna()
 
     if len(vals) == 0:
@@ -50,7 +50,7 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
         ax.text(x, count + max(counts) * 0.01, f"{p:.1f}%", ha='center', va='bottom', fontsize=9)
 
     ax.set_title(title)
-    ax.set_xlabel('Anteil Erneuerbare [%]')
+    ax.set_xlabel('Anteil Erneuerbare Speicher [%]')
     ax.set_ylabel('Anzahl Viertelstunden')
 
     ax.set_xlim(0, 115)
