@@ -76,7 +76,10 @@ def prognose_eines_Szenarios():
         plot_ee_anteil_histogram_overflow(gesamt,jahr_int_2,axs[1, 0])
         plot_histogram_ausbauraten_EE(gewaehltes_szenario["Ziele 2030"]["Ausbau EE"], gewaehltes_szenario["Ziele 2045"]["Ausbau EE"], axs[0, 1])
         plt.tight_layout()
-        plt.show()
+        plt.pause(10)
+        plt.close(fig)
+
+        
         
         ausgabe(prognose_kosten, gesamt, gewaehltes_szenario)
 
