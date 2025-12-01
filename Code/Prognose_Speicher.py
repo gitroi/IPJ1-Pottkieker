@@ -11,6 +11,7 @@ from config import PROJECT_ROOT
 
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
+#TODO : EAuto und Schwungrad entfernen
 def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
     """
     Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
