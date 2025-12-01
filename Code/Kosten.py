@@ -25,7 +25,7 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         kostendaten = json.load(file)
     
     #=== DataFrame für die Kosten erstellen ===
-    date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min') 
+    date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min',tz='UTC') 
     kosten_df = pd.DataFrame({"Datum von": date_range})
     kosten_df["Jahr"] = kosten_df["Datum von"].dt.year
     kosten_df["Monat"]= kosten_df["Datum von"].dt.month

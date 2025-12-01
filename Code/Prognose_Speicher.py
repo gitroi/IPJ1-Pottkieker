@@ -277,7 +277,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     bestand2045 = bestand2045 * 1e3
 
     #=== Dataframe für die Jahre 2026 bis 2030 erstellen ===
-    date_range = pd.date_range(start='2026-01-01', end='2030-12-31 23:45', freq='15min')
+    date_range = pd.date_range(start='2026-01-01', end='2030-12-31 23:45', freq='15min',tz="UTC")
     df_2030 = pd.DataFrame({'Datum von': date_range})
 
     # df_2030["Jahr"] = df_2030["Datum von"].dt.year
@@ -297,7 +297,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     # df_2030.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     #=== Dataframe für die Jahre 2030 bis 2045 erstellen ===
-    date_range = pd.date_range(start='2031-01-01', end='2045-12-31 23:45', freq='15min')
+    date_range = pd.date_range(start='2031-01-01', end='2045-12-31 23:45', freq='15min',tz="UTC")
     df_2045 = pd.DataFrame({'Datum von': date_range})
 
     # df_2045["Jahr"] = df_2045["Datum von"].dt.year

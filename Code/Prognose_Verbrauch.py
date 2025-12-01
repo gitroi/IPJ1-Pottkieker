@@ -24,6 +24,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     sep=';', low_memory=False)
 
     verbrauch_df["Datum von"] = pd.to_datetime(verbrauch_df["Datum von"], format="%d.%m.%Y %H:%M")
+    verbrauch_df["Datum von"] = verbrauch_df["Datum von"].dt.tz_localize("Europe/Berlin", ambiguous='infer').dt.tz_convert('UTC')
 
     verbrauch_df = verbrauch_df[["Datum von", "Netzlast [MWh] Originalauflösungen"]]\
     .rename(columns={"Netzlast [MWh] Originalauflösungen": "Netzlast [MWh] origin"})
@@ -56,7 +57,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
 
     #=== Dataframe für die Jahre bis 2030 erstellen ===
 
-    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2030 23:45', freq='15min')
+    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2030 23:45', freq='15min',tz='UTC')
     df_gesamt = pd.DataFrame({"Datum von": date_range})
 
     df_gesamt["Jahr"]= df_gesamt["Datum von"].dt.year
@@ -80,7 +81,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
 
     #=== Erweitern bis 2045 ===
 
-    date_range_2045 = pd.date_range(start='01-01-2031 00:00', end='31-12-2045 23:45', freq='15min')
+    date_range_2045 = pd.date_range(start='01-01-2031 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC')
     df_2045 = pd.DataFrame({"Datum von": date_range_2045})
 
     df_2045["Jahr"]= df_2045["Datum von"].dt.year
@@ -119,5 +120,10 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
 
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
+    if(df_gesamt_2045.isna().any().any()):
+        print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
+        print(df_gesamt_2045.isna().sum())
+        mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
+        print(df_gesamt_2045[mask.any(axis=1)])
 
     return df_gesamt_2045

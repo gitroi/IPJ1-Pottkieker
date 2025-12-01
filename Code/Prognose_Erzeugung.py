@@ -97,6 +97,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
             )
 
     erzeugung_df["Datum von"] = pd.to_datetime(erzeugung_df["Datum von"], format="%d.%m.%Y %H:%M")
+    erzeugung_df["Datum von"] = erzeugung_df["Datum von"].dt.tz_localize("Europe/Berlin", ambiguous='infer').dt.tz_convert('UTC')
 
     erzeugung_df = erzeugung_df[["Datum von", "Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen","Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen","Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]]
 
@@ -163,7 +164,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
     kapazitätsfaktoren = erzeugung_df[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]]
     
     # Erstelle Datumsbereich für 2026-2045
-    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min')
+    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC')
     prognose = pd.DataFrame({'Datum von': date_range})
     
     prognose['Monat'] = prognose['Datum von'].dt.month
@@ -219,8 +220,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
     spalten = ["Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen",
                "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
                "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
-    prognose_export[spalten] = prognose_export[spalten].interpolate(method='linear') 
-    #TODO: Datetime in Index umwandeln und fehlende Werte auffüllen
+    
     prognose_export = prognose_export[["Datum von"] + spalten]
 
     if(prognose_export.isna().any().any()):
