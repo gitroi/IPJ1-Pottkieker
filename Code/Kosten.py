@@ -17,12 +17,14 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         pd.DataFrame: DataFrame mit den jährlichen Ausbaukosten.
     """
     
+    #((df_2030['Datum von'] - df_2030['Datum von'].min()).dt.days + 1)
     virtelstunden_pro_jahr = 365.25 * 24 * 4 
 
     #=== Einlesen der Kostendaten mit werten in €/KW ===
     kostendaten_pfad = DATA_DIR / "Feste_Parameter" / "erzeugerarten.json"
     with open(kostendaten_pfad, "r") as file:
         kostendaten = json.load(file)
+
     
     #=== DataFrame für die Kosten erstellen ===
     date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min',tz='UTC') 
@@ -38,44 +40,53 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
 
     for key in kostendaten.keys():
         #=== Baukosten pro Viertelstunde berechnen ===
-        baukosten_EE_virstellstündlich["2030"] = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / virtelstunden_pro_jahr
-        baukosten_EE_virstellstündlich["2045"] = 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten[key]["capex"] / virtelstunden_pro_jahr
+        if jährliche_raten["zuwachsrate_2030"][key] >= 0:
+            baukosten_EE_virstellstündlich["2030"] = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / virtelstunden_pro_jahr
+        else:
+            baukosten_EE_virstellstündlich["2030"] = 0
+        if jährliche_raten["zuwachsrate_2045"][key] >= 0:
+            baukosten_EE_virstellstündlich["2045"] = 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten[key]["capex"] / virtelstunden_pro_jahr
+        else:
+            baukosten_EE_virstellstündlich["2045"] = 0
 
         baukosten_EE_virstellstündlich["2030"] = round(baukosten_EE_virstellstündlich["2030"], 2)
         baukosten_EE_virstellstündlich["2045"] = round(baukosten_EE_virstellstündlich["2045"], 2)
 
-        for jahr in range(2026, 2046):
-            mask = kosten_df["Jahr"] == jahr
-            if jahr <= 2030:
-                kosten_df.loc[mask, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2030"]
-            else:
-                kosten_df.loc[mask, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2045"]
+        
+        mask1 = kosten_df["Jahr"] <= 2030 
+        mask2 = kosten_df["Jahr"] > 2030
+        
+        kosten_df.loc[mask1, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2030"]
+        kosten_df.loc[mask2, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2045"]
                 
         #=== OpEx Berechnung ===
         
-        #=== Opex bestand 2025 pro Monat berechnen ===
-        opex_bestand_2025_monatlich = kostendaten[key]["bestand"] * 1e6 * kostendaten[key]["opex"] / 12
-        opex_bestand_2030_monatlich = zieldaten["Ziele 2030"]["Ausbau EE"][key] * 1e6 * kostendaten[key]["opex"] / 12
+        #=== Opex Bestand in df berechnen ===
+        zuwachsraten = {"zuwachs_2030": {}, "zuwachs_2045": {}}
+        for key in jährliche_raten["zuwachsrate_2030"].keys():
+            zuwachsraten["zuwachs_2030"][key] = jährliche_raten["zuwachsrate_2030"][key] / 12
+            zuwachsraten["zuwachs_2045"][key] = jährliche_raten["zuwachsrate_2045"][key] / 12
+        
+        date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC')
+        prognose = pd.DataFrame({'Datum von': date_range})
+        
+        prognose['Monat'] = prognose['Datum von'].dt.month
+        prognose['Tag'] = prognose['Datum von'].dt.day
+        prognose['Stunde'] = prognose['Datum von'].dt.hour
+        prognose['Minute'] = prognose['Datum von'].dt.minute
+        prognose['Jahr'] = prognose['Datum von'].dt.year
 
-        #=== Opex zuname pro Monat berechnen === 
-        monatliche_opex_zunahme_2026_2030 = jährliche_raten["zuwachsrate_2030"][key] * 1e6 * kostendaten[key]["opex"] / 12
-        monatliche_opex_zunahme_2031_2045 = jährliche_raten["zuwachsrate_2045"][key] * 1e6 * kostendaten[key]["opex"] / 12
+        maske_2030 = prognose["Jahr"] <= 2030
+        maske_2045 = prognose["Jahr"] > 2030
+        
+        prognose.loc[maske_2030, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2030"][key] * ((prognose.loc[maske_2030, "Jahr"] - 2026) * 12 + prognose.loc[maske_2030, "Monat"]))
+        prognose.loc[maske_2045, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
 
-        #=== Opex pro Viertelstunde berechnen ===
-        for jahr in range(2026, 2046):
-            for monat in range(1, 13):
-                mask = (kosten_df["Jahr"] == jahr) & (kosten_df["Monat"] == monat)
-                if jahr <= 2030:
-                    monate_seit_start = (jahr - 2026) * 12 + monat
-                    kosten_df.loc[mask, f"Opex {key} [€]"] = (
-                        opex_bestand_2025_monatlich + monatliche_opex_zunahme_2026_2030 * monate_seit_start
-                ) / mask.sum()
-                else:
-                    monate_seit_start = (jahr - 2031) * 12 + monat
-                    kosten_df.loc[mask, f"Opex {key} [€]"] = (
-                        opex_bestand_2030_monatlich + monatliche_opex_zunahme_2031_2045 * monate_seit_start
-                    ) / mask.sum()
+        prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"]
 
+        kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
+
+        #=== Opex in kosten_df übernehmen ===
         kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Capex {key} [€]"] + kosten_df[f"Opex {key} [€]"]
         spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
         kosten_df[spalten_kosten] = kosten_df[spalten_kosten].round(2)
