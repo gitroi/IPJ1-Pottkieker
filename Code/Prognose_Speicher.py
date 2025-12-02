@@ -12,7 +12,7 @@ from config import PROJECT_ROOT
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
 #TODO : EAuto und Schwungrad entfernen
-def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
+def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict ) -> pd.DataFrame:
     """
     Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
     """
@@ -28,14 +28,15 @@ def Verlauf_Speicher(df_anteilEE, entladegrenze, ladegrenze):
     bestandSchwungrad = fixparameterSchwungrad.bestand
     bestandWasserstoff = fixparameterWasserstoff.bestand
     bestandPumpspeicher = fixparameterPumpspeicher.bestand
+    
+    # Ist in nicht mehr nötig, da die Bestände aus den Fixparametern gelesen werden in der Methode
+    # szenarioBatterie = 0 #TODO: Speicherdaten aus Szenario einfügen
+    # # szenarioEAuto = 0 #TODO: Speicherdaten aus Szenario einfügen
+    # szenarioSchwungrad = 0 #TODO: Speicherdaten aus Szenario einfügen
+    # szenarioWasserstoff = 0 #TODO: Speicherdaten aus Szenario einfügen
+    # szenarioPumpspeicher = 0 #TODO: Speicherdaten aus Szenario einfügen
 
-    szenarioBatterie = 0 #TODO: Speicherdaten aus Szenario einfügen
-    # szenarioEAuto = 0 #TODO: Speicherdaten aus Szenario einfügen
-    szenarioSchwungrad = 0 #TODO: Speicherdaten aus Szenario einfügen
-    szenarioWasserstoff = 0 #TODO: Speicherdaten aus Szenario einfügen
-    szenarioPumpspeicher = 0 #TODO: Speicherdaten aus Szenario einfügen
-
-    df_gesamtAusbau = Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, 100, 200, 100, 200, 100, 200, 100, 200, 100, 200)
+    df_gesamtAusbau = Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, ziele_2030["Ausbau Speicher"]["batteriespeicher"], ziele_2045["Ausbau Speicher"]["batteriespeicher"], ziele_2030["Ausbau Speicher"]["e-auto"], ziele_2045["Ausbau Speicher"]["e-auto"], ziele_2030["Ausbau Speicher"]["schwungrad"], ziele_2045["Ausbau Speicher"]["schwungrad"], ziele_2030["Ausbau Speicher"]["wasserstoff"], ziele_2045["Ausbau Speicher"]["wasserstoff"], ziele_2030["Ausbau Speicher"]["pumpspeicher"], ziele_2045["Ausbau Speicher"]["pumpspeicher"])
 
     dfs = [df_anteilEE, df_gesamtAusbau] 
 

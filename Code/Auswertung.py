@@ -4,20 +4,19 @@ from config import DATA_DIR
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from Feste_Variablen import Keys_Erzeugung
 
-def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json):
+def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: str ):
     """
     Gibt die Daten als Excel-Datei aus.
     Args:
         kosten_df (pd.DataFrame): DataFrame mit den Kosteninformationen
         ee_df (pd.DataFrame): DataFrame mit den Erneuerbaren-Anteil-Informationen
         szenario (json): Das Szenario, das analysiert wurde
+        pfad (str): Pfad zur Ausgabedatei
     """
 
     ausbauraten = Jährlicher_Zuwachs_EE(szenario["Ziele 2030"]["Ausbau EE"], szenario["Ziele 2045"]["Ausbau EE"])
 
     gesamt = pd.merge(ee_df, kosten_df, on="Datum von", how="inner")
-
-    pfad = DATA_DIR / f"szenario_{szenario['Name']}_auswertung.xlsx"
 
     gesamt["Jahr"] = gesamt["Datum von"].dt.year
 
