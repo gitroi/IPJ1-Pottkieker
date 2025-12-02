@@ -84,8 +84,7 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
 
         prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"] / virtelstunden_pro_jahr
         prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"].round(2)
-
-        print(prognose.sample(2))
+        
         kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
 
         #=== Opex in kosten_df übernehmen ===
