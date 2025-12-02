@@ -41,6 +41,7 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
     for key in kostendaten.keys():
         #=== Baukosten pro Viertelstunde berechnen ===
         if jährliche_raten["zuwachsrate_2030"][key] >= 0:
+<<<<<<< HEAD
             baukosten_EE_2030 = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr * 10)
         else:
             baukosten_EE_2030 = 0
@@ -48,6 +49,15 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
             baukosten_EE_2045 = 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr * 15 )
         else:
             baukosten_EE_2045 = 0
+=======
+            baukosten_EE_virstellstündlich["2030"] = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / virtelstunden_pro_jahr
+        else:
+            baukosten_EE_virstellstündlich["2030"] = 0
+        if jährliche_raten["zuwachsrate_2045"][key] >= 0:
+            baukosten_EE_virstellstündlich["2045"] = 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten[key]["capex"] / virtelstunden_pro_jahr
+        else:
+            baukosten_EE_virstellstündlich["2045"] = 0
+>>>>>>> 3c6a52cfbeec8fe12d7958b382ff8da1df267791
 
         baukosten_EE_2030 = round(baukosten_EE_2030, 2)
         baukosten_EE_2045 = round(baukosten_EE_2045, 2)
@@ -56,16 +66,27 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         mask1 = kosten_df["Jahr"] <= 2030 
         mask2 = kosten_df["Jahr"] > 2030
         
+<<<<<<< HEAD
         kosten_df.loc[mask1, f"Capex {key} [€]"] = baukosten_EE_2030
         kosten_df.loc[mask2, f"Capex {key} [€]"] = baukosten_EE_2045
+=======
+        kosten_df.loc[mask1, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2030"]
+        kosten_df.loc[mask2, f"Capex {key} [€]"] = baukosten_EE_virstellstündlich["2045"]
+>>>>>>> 3c6a52cfbeec8fe12d7958b382ff8da1df267791
                 
         #=== OpEx Berechnung ===
         
         #=== Opex Bestand in df berechnen ===
         zuwachsraten = {"zuwachs_2030": {}, "zuwachs_2045": {}}
+<<<<<<< HEAD
         
         zuwachsraten["zuwachs_2030"][key] = jährliche_raten["zuwachsrate_2030"][key] / 12
         zuwachsraten["zuwachs_2045"][key] = jährliche_raten["zuwachsrate_2045"][key] / 12
+=======
+        for key in jährliche_raten["zuwachsrate_2030"].keys():
+            zuwachsraten["zuwachs_2030"][key] = jährliche_raten["zuwachsrate_2030"][key] / 12
+            zuwachsraten["zuwachs_2045"][key] = jährliche_raten["zuwachsrate_2045"][key] / 12
+>>>>>>> 3c6a52cfbeec8fe12d7958b382ff8da1df267791
         
         date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC')
         prognose = pd.DataFrame({'Datum von': date_range})
@@ -82,11 +103,18 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         prognose.loc[maske_2030, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2030"][key] * ((prognose.loc[maske_2030, "Jahr"] - 2026) * 12 + prognose.loc[maske_2030, "Monat"]))
         prognose.loc[maske_2045, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
 
+<<<<<<< HEAD
         prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"] / virtelstunden_pro_jahr
         prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"].round(2)
         
         kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
 
+=======
+        prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"]
+
+        kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
+
+>>>>>>> 3c6a52cfbeec8fe12d7958b382ff8da1df267791
         #=== Opex in kosten_df übernehmen ===
         kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Capex {key} [€]"] + kosten_df[f"Opex {key} [€]"]
         spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
