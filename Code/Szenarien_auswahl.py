@@ -80,8 +80,11 @@ def prognose_eines_Szenarios():
         plt.close(fig)
 
         
+        excel = input("Möchten Sie die Ergebnisse in einer Excel-Datei speichern? (ja/nein): ")
+        if excel.lower() == "ja":
+            ausgabe(prognose_kosten, gesamt, gewaehltes_szenario)
+            print("Ergebnisse wurden in gespeichert.")
         
-        ausgabe(prognose_kosten, gesamt, gewaehltes_szenario)
 
 
         return
