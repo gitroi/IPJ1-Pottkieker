@@ -27,10 +27,10 @@ def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
         aktueller_wert_2024 = erzeugerarten[key]["bestand"]
         zuwachsrate_2030 = (zielwert_2030[key] - aktueller_wert_2024) / 6  
         zuwachsrate_2045 = (zielwert_2045[key] - zielwert_2030[key]) / 15  
-        zuwachs_dict["zuwachsrate_2030"][key] = zuwachsrate_2030
-        zuwachs_dict["zuwachsrate_2045"][key] = zuwachsrate_2045
+        zuwachs_dict["zuwachsrate_2030"][key] = round(zuwachsrate_2030, 3)
+        zuwachs_dict["zuwachsrate_2045"][key] = round(zuwachsrate_2045, 3)
 
-    return zuwachs_dict
+    return zuwachs_dict 
 
 """ Jahreswerte für PV und Wind leistung der letzen 5 Jahre: 
     2020: PV: 10,387% Wind: 25,202%

@@ -6,7 +6,7 @@ import pandas as pd
 from typing import Optional
 from config import DATA_DIR
 from Analyse import analyse_erneuerbare_anteil
-from Prognose_Erzeugung import Prognose_erzeugung
+from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
@@ -95,7 +95,7 @@ def get_scenario_by_name(szenarien, name):
 #         return None
 
 @dataclass
-class SzenarioErgebnis:
+class Szenario:
     """Speichert alle Daten und Ergebnisse für ein Szenario"""
     name: str
     beschreibung: str
@@ -155,6 +155,34 @@ class SzenarioErgebnis:
         plt.tight_layout()
         plt.pause(5)
         plt.close()
+    
+    def getErgebnisse(self) -> pd.DataFrame:
+        """Gibt die Ergebnisse als DataFrame zurück"""
+        ergebnisse = pd.DataFrame()
+        ergebnisse["Name"] = [self.name]
+        ausbauraten = Jährlicher_Zuwachs_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"])
+        for key in ausbauraten["zuwachsrate_2030"].keys():
+            ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
+            ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten["zuwachsrate_2045"][key]]
+            ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
+
+        ergebnisse["Gesamtkosten_EE [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE [€]"].sum() / 1e9]
+        
+       
+        ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher [%]"] = [
+            (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100).sum() / len(self.ee_anteil_ohne_speicher_df) * 100
+        ]
+        ergebnisse[f"Anteil virtel Stunden mit >=100% EE mit Speicher [%]"] = [
+            (self.gesamt_df["Anteil Erneuerbare Speicher [%]"] >= 100).sum() / len(self.gesamt_df) * 100
+        ]
+        mask = self.gesamt_df["Anteil Erneuerbare Speicher [%]"] < 100
+        nicht_ee_strom = (
+            self.gesamt_df.loc[mask, "Netzlast [MWh]"] - 
+            self.gesamt_df.loc[mask, "Realisierte Erzeugung [MWh]"]
+        ).sum() / 1e6
+        ergebnisse["Nicht durch EE gedeckter Strombedarf [TWh]"] = [nicht_ee_strom]
+
+        return ergebnisse
 
 
 def prognose_eines_Szenarios():
@@ -164,7 +192,6 @@ def prognose_eines_Szenarios():
     for szenario in szenarien:
         print(f"- {szenario['Name']}")
     
-    # Eingaben
     auswahl = input("Bitte geben Sie den Namen des gewünschten Szenarios ein: ")
     jahr = input("Erstes Jahr für Analyse (z.B. 2026, leer für alle): ")
     jahr_2 = input("Zweites Jahr für Analyse (z.B. 2030, leer für alle): ")
@@ -173,8 +200,7 @@ def prognose_eines_Szenarios():
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
     
     if gewaehltes_szenario:
-        # Szenario-Objekt erstellen
-        szenario_ergebnis = SzenarioErgebnis(
+        szenario_ergebnis = Szenario(
             name=auswahl,
             beschreibung=gewaehltes_szenario["Beschreibung"],
             szenario=gewaehltes_szenario,
@@ -183,10 +209,8 @@ def prognose_eines_Szenarios():
             ertragsart=ertragsart
         )
         
-        # Alle Berechnungen durchführen
         szenario_ergebnis.berechne_alle_prognosen()
         
-        # Jahre parsen
         if jahr.strip().isdigit() and jahr_2.strip().isdigit():
             jahr1 = int(jahr)
             jahr2 = int(jahr_2)
@@ -200,13 +224,38 @@ def prognose_eines_Szenarios():
             jahr1 = None
             jahr2 = None
         
-        # Plots anzeigen
         szenario_ergebnis.zeige_plots(jahr1, jahr2)
         
-        # Ergebnisse exportieren
         if (input("Möchten Sie die Ergebnisse in einer Excel-Datei speichern? (ja/nein): ").lower() == "ja"):
             szenario_ergebnis.exportiere_ergebnisse()
         
         print(f"✓ Szenario '{auswahl}' erfolgreich verarbeitet!")
     else:
         print(f"Szenario '{auswahl}' wurde nicht gefunden.")
+
+def prognose_alle_Szenarien():
+    szenarien = load_scenarios()
+    alle_ergebnisse = pd.DataFrame()
+    
+    ertragsart = input("Wie soll die Ertragsart für alle Szenarien sein? (schlecht, mittel, gut): ")
+
+    if ertragsart not in ["schlecht", "mittel", "gut"]:
+        raise ValueError("Ungültige Ertragsart. Bitte wählen Sie 'schlecht', 'mittel' oder 'gut'.")
+    
+    for szenario in szenarien:
+        szenario_ergebnis = Szenario(
+            name=szenario["Name"],
+            beschreibung=szenario["Beschreibung"],
+            szenario=szenario,
+            ziele_2030=szenario["Ziele 2030"],
+            ziele_2045=szenario["Ziele 2045"],
+            ertragsart=ertragsart
+        )
+        
+        szenario_ergebnis.berechne_alle_prognosen()
+        ergebnisse_df = szenario_ergebnis.getErgebnisse()
+        alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
+    
+    pfad = DATA_DIR / "auswertung_aller_szenarien.xlsx"
+    alle_ergebnisse.to_excel(pfad, index=False)
+    print(f"✓ Alle Szenarien wurden verarbeitet und in '{pfad}' gespeichert.")

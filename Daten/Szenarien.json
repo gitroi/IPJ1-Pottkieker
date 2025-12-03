@@ -42,43 +42,419 @@
         }
     },
      {
-        "Name": "Name Szenario 1",
-        "Beschreibung": "Beschreibung Szenario 1",
+        "Name": "Ist-Zustand",
+        "Beschreibung": "Ist-Zustandswerte werden verwendet. Es wird so weiter gemacht wie die letzten 10 Jahre.",
         "Ziele 2030": {
             "Ausbau EE": {
-                "pv_dach": 114.5,
-                "pv_frei": 55.1,  
-                "wind_onshore": 114,
-                "wind_offshore": 20.2,
-                "biomasse":12.4,
+                "pv_dach": 95.4,
+                "pv_frei": 45.9,
+                "wind_onshore": 76,
+                "wind_offshore": 13.4,
+                "biomasse": 10.3,
                 "wasser": 1.7,
-                "sonstige": 1
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 6,
+                "wasserstoff": 10,
+                "pumpspeicher": 40
+            },
+            "Strombedarf": 520
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 163.8,
+                "pv_frei": 78.9,
+                "wind_onshore": 109,
+                "wind_offshore": 23.9,
+                "biomasse": 13.6,
+                "wasser": 1.5,
+                "sonstige": 0
             },
             "Ausbau Speicher": {
                 "batteriespeicher": 20,
-                "e-auto": 10,
-                "schwungrad": 0.5,
+                "wasserstoff": 15,
+                "pumpspeicher": 45
+            },
+            "Strombedarf": 700
+        }
+    },
+    {
+        "Name": "Bundesklimaziele",
+        "Beschreibung": "Ausbauziele der Bundesregierung",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 145.1,
+                "pv_frei": 69.9,
+                "wind_onshore": 115,
+                "wind_offshore": 30,
+                "biomasse": 8.4,
+                "wasser": 1.8,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 15,
+                "wasserstoff": 80,
+                "pumpspeicher": 45
+            },
+            "Strombedarf": 700
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 270,
+                "pv_frei": 130,
+                "wind_onshore": 160,
+                "wind_offshore": 70,
+                "biomasse": 8.4,
+                "wasser": 1.8,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 80,
+                "wasserstoff": 800,
+                "pumpspeicher": 60
+            },
+            "Strombedarf": 1000
+        }
+    },
+    {
+        "Name": "Gleichmäßig",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 124,
+                "pv_frei": 59.7,
+                "wind_onshore": 98.8,
+                "wind_offshore": 17.4,
+                "biomasse": 13.4,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 20,
+                "wasserstoff": 60,
+                "pumpspeicher": 50
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 213,
+                "pv_frei": 102.5,
+                "wind_onshore": 141.7,
+                "wind_offshore": 31.1,
+                "biomasse": 17.7,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 150,
+                "wasserstoff": 600,
+                "pumpspeicher": 70
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "Solar+",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 143.1,
+                "pv_frei": 68.9,
+                "wind_onshore": 91.2,
+                "wind_offshore": 16.1,
+                "biomasse": 12.4,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 40,
                 "wasserstoff": 50,
-                "pumpspeicher": 30
+                "pumpspeicher": 55
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 245.7,
+                "pv_frei": 118.3,
+                "wind_onshore": 130.8,
+                "wind_offshore": 28.7,
+                "biomasse": 16.3,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 400,
+                "wasserstoff": 400,
+                "pumpspeicher": 80
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "Wind+",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 114.5,
+                "pv_frei": 55.1,
+                "wind_onshore": 114,
+                "wind_offshore": 20.1,
+                "biomasse": 12.4,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 18,
+                "wasserstoff": 150,
+                "pumpspeicher": 80
             },
             "Strombedarf": 628
         },
         "Ziele 2045": {
             "Ausbau EE": {
                 "pv_dach": 196.6,
-                "pv_frei": 94.7,  
+                "pv_frei": 94.7,
                 "wind_onshore": 163.5,
                 "wind_offshore": 35.9,
-                "biomasse": 13.6,
+                "biomasse": 16.3,
                 "wasser": 1.5,
-                "sonstige": 3
+                "sonstige": 0
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 20,
-                "e-auto": 10,
-                "schwungrad": 0.5,
-                "wasserstoff": 50,
-                "pumpspeicher": 30
+                "batteriespeicher": 120,
+                "wasserstoff": 1200,
+                "pumpspeicher": 140
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "Speicher+",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 124,
+                "pv_frei": 59.7,
+                "wind_onshore": 98.8,
+                "wind_offshore": 17.4,
+                "biomasse": 13.4,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 30,
+                "wasserstoff": 100,
+                "pumpspeicher": 70
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 213,
+                "pv_frei": 102.5,
+                "wind_onshore": 141.7,
+                "wind_offshore": 31.1,
+                "biomasse": 17.7,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 600,
+                "wasserstoff": 1000,
+                "pumpspeicher": 200
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "E-Autos++ Kurzzeitspeicher++",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 124,
+                "pv_frei": 59.7,
+                "wind_onshore": 98.8,
+                "wind_offshore": 17.4,
+                "biomasse": 13.4,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 25,
+                "wasserstoff": 40,
+                "pumpspeicher": 55
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 213,
+                "pv_frei": 102.5,
+                "wind_onshore": 141.7,
+                "wind_offshore": 31.1,
+                "biomasse": 17.7,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 200,
+                "wasserstoff": 300,
+                "pumpspeicher": 90
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "Solar++ BatterieSpeicher++",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 171.7,
+                "pv_frei": 82.7,
+                "wind_onshore": 83.6,
+                "wind_offshore": 14.7,
+                "biomasse": 11.3,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 60,
+                "wasserstoff": 80,
+                "pumpspeicher": 70
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 294.9,
+                "pv_frei": 142,
+                "wind_onshore": 119.9,
+                "wind_offshore": 26.3,
+                "biomasse": 15,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 1200,
+                "wasserstoff": 600,
+                "pumpspeicher": 160
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "Wind++ Speicher++",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 104.9,
+                "pv_frei": 50.5,
+                "wind_onshore": 136.8,
+                "wind_offshore": 24.1,
+                "biomasse": 11.3,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 40,
+                "wasserstoff": 300,
+                "pumpspeicher": 120
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 180.2,
+                "pv_frei": 86.8,
+                "wind_onshore": 196.2,
+                "wind_offshore": 43,
+                "biomasse": 15,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 700,
+                "wasserstoff": 2000,
+                "pumpspeicher": 300
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "H2-Speicher++ Solar+ Wind+",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 143.1,
+                "pv_frei": 68.9,
+                "wind_onshore": 114,
+                "wind_offshore": 20.1,
+                "biomasse": 12.4,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 35,
+                "wasserstoff": 800,
+                "pumpspeicher": 100
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 245.7,
+                "pv_frei": 118.3,
+                "wind_onshore": 163.5,
+                "wind_offshore": 35.9,
+                "biomasse": 16.3,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 500,
+                "wasserstoff": 6000,
+                "pumpspeicher": 250
+            },
+            "Strombedarf": 890
+        }
+    },
+    {
+        "Name": "H2-Speicher++ Solar++",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 171.7,
+                "pv_frei": 82.7,
+                "wind_onshore": 83.6,
+                "wind_offshore": 14.7,
+                "biomasse": 11.3,
+                "wasser": 1.7,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 50,
+                "wasserstoff": 1200,
+                "pumpspeicher": 110
+            },
+            "Strombedarf": 628
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 294.9,
+                "pv_frei": 142,
+                "wind_onshore": 119.9,
+                "wind_offshore": 26.3,
+                "biomasse": 15,
+                "wasser": 1.5,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 800,
+                "wasserstoff": 9000,
+                "pumpspeicher": 300
             },
             "Strombedarf": 890
         }
