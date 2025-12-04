@@ -44,7 +44,7 @@ def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
     Schlechtestes Jahr Wind: 20,860% (2021)
 """
 
-def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertragsart: str) -> pd.DataFrame:
+def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigerungsfaktoren: dict, ertragsart: str) -> pd.DataFrame:
     """
     Funktion zur Prognose der Erneuerbaren Energieerzeugung von 2026 bis 2045 basierend auf dem Ausbaustand für verschiedene Energiequellen.
     Parameters:
@@ -52,6 +52,11 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
         installierte_2045 (dict): Installierte Leistung für 2045 in GW. Schlüssel: 'pv', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige'.
 
     """
+
+    #=== Steigerungsfaktoren auf virtel Stunden werte umrechnen ===
+    virtelstunden_steigerungsfaktoren = {}
+    for key in steigerungsfaktoren.keys():
+        virtelstunden_steigerungsfaktoren[key] = steigerungsfaktoren[key] ** (1/(365.25*24*4))  
 
     #=== Installierte Leistung in GW einlesen ===
     pfad = PROJECT_ROOT / "Daten" / "Feste_Parameter" / "Netto_Installiert_GW.csv"  
@@ -192,12 +197,12 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict, ertrags
     prognose.loc[maske_2045, "Installierte Wasser_GW"] = installierte_2030["wasser"] + (zuwachsraten["zuwachs_2045"]["wasser"] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
     prognose.loc[maske_2045, "Installierte Sonstige_GW"] = installierte_2030["sonstige"] + (zuwachsraten["zuwachs_2045"]["sonstige"] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
 
-    prognose['PV_Prognose_MWh'] = prognose['Installierte PV_GW'] * 1000 * prognose['Kapazitätsfaktor_PV'] * 0.25
-    prognose['Wind_Onshore_Prognose_MWh'] = prognose['Installierte Wind_Onshore_GW'] * 1000 * prognose['Kapazitätsfaktor_Wind_Onshore'] * 0.25
-    prognose['Wind_Offshore_Prognose_MWh'] = prognose['Installierte Wind_Offshore_GW'] * 1000 * prognose['Kapazitätsfaktor_Wind_Offshore'] * 0.25
-    prognose['Biomasse_Prognose_MWh'] = prognose['Installierte Biomasse_GW'] * 1000 * prognose['Kapazitätsfaktor_Biomasse'] * 0.25
-    prognose['Wasser_Prognose_MWh'] = prognose['Installierte Wasser_GW'] * 1000 * prognose['Kapazitätsfaktor_Wasser'] * 0.25
-    prognose['Sonstige_Prognose_MWh'] = prognose['Installierte Sonstige_GW'] * 1000 * prognose['Kapazitätsfaktor_Sonstige'] * 0.25
+    prognose['PV_Prognose_MWh'] = prognose['Installierte PV_GW'] * 1000 * prognose['Kapazitätsfaktor_PV'] * 0.25 * (virtelstunden_steigerungsfaktoren['pv_dach']**(prognose['Jahr'] - 2025))
+    prognose['Wind_Onshore_Prognose_MWh'] = prognose['Installierte Wind_Onshore_GW'] * 1000 * prognose['Kapazitätsfaktor_Wind_Onshore'] * 0.25 * (virtelstunden_steigerungsfaktoren['wind_onshore']**(prognose['Jahr'] - 2025))
+    prognose['Wind_Offshore_Prognose_MWh'] = prognose['Installierte Wind_Offshore_GW'] * 1000 * prognose['Kapazitätsfaktor_Wind_Offshore'] * 0.25 * (virtelstunden_steigerungsfaktoren['wind_offshore']**(prognose['Jahr'] - 2025))
+    prognose['Biomasse_Prognose_MWh'] = prognose['Installierte Biomasse_GW'] * 1000 * prognose['Kapazitätsfaktor_Biomasse'] * 0.25 * (virtelstunden_steigerungsfaktoren['biomasse']**(prognose['Jahr'] - 2025))
+    prognose['Wasser_Prognose_MWh'] = prognose['Installierte Wasser_GW'] * 1000 * prognose['Kapazitätsfaktor_Wasser'] * 0.25 * (virtelstunden_steigerungsfaktoren['wasser']**(prognose['Jahr'] - 2025))
+    prognose['Sonstige_Prognose_MWh'] = prognose['Installierte Sonstige_GW'] * 1000 * prognose['Kapazitätsfaktor_Sonstige'] * 0.25 * (virtelstunden_steigerungsfaktoren['sonstige']**(prognose['Jahr'] - 2025)) 
    
     prognose['PV_Prognose_MWh'] = prognose['PV_Prognose_MWh'].round(2)
     prognose['Wind_Onshore_Prognose_MWh'] = prognose['Wind_Onshore_Prognose_MWh'].round(2)

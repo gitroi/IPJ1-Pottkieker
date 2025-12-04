@@ -39,7 +39,37 @@
                 "pumpspeicher": 35
             },
             "Strombedarf": 800
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
      {
         "Name": "Ist-Zustand",
