@@ -61,7 +61,7 @@
                     "wind_onshore": 1.0,
                     "wind_offshore": 1.0,
                     "biomasse": 1.0,
-                    "wasser": 1.0,
+                    "wasser": 0.6,
                     "sonstige": 1.0
 
                 }

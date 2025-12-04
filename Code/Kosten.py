@@ -20,6 +20,15 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
     #((df_2030['Datum von'] - df_2030['Datum von'].min()).dt.days + 1)
     virtelstunden_pro_jahr = 365.25 * 24 * 4 
 
+    capex_wachstum = zieldaten["Veränderungsfaktoren"]["Capex_EE"]
+    opex_wachstum = zieldaten["Veränderungsfaktoren"]["Opex_EE"]
+
+    virtelstunden_capex = {}
+    virtelstunden_opex = {}
+    for key in capex_wachstum.keys():
+        virtelstunden_capex[key] = capex_wachstum[key] ** (1 / virtelstunden_pro_jahr)
+        virtelstunden_opex[key] = opex_wachstum[key] ** (1 / virtelstunden_pro_jahr)
+
     #=== Einlesen der Kostendaten mit werten in €/KW ===
     kostendaten_pfad = DATA_DIR / "Feste_Parameter" / "erzeugerarten.json"
     with open(kostendaten_pfad, "r") as file:
@@ -83,8 +92,12 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         prognose.loc[maske_2045, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
 
         prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"] / virtelstunden_pro_jahr
+        
+        prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"] * (virtelstunden_opex[key] ** (prognose['Jahr'] - 2026))
+        prognose[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"] * (virtelstunden_capex[key] ** (prognose['Jahr'] - 2026))
         prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"].round(2)
-
+        prognose[f"Capex {key} [€]"] = prognose[f"Capex {key} [€]"].round(2)
+        
         kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
 
         #=== Opex in kosten_df übernehmen ===
