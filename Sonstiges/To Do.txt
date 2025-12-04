@@ -12,3 +12,8 @@ Prio/was muss gemacht werden
 
 
 Vorschlag reserve: Wenn x% bis y Tage --> Import, sonst Kraftwerke
+
+Äußerer Loop:
+Szenarien parameter als grundwert und dann, jenachdem ob Erezugung < oder > verbrauch 
+die werte erhöhren/senken.
+Dann schauen, ob speicher reichen

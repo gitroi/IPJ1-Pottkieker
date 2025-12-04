@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
-from config import DATA_DIR
+from config import DATA_DIR, PROJECT_ROOT
 from Klassen import Szenario
 
 def load_scenarios():
@@ -160,6 +160,6 @@ def prognose_alle_Szenarien():
         ergebnisse_df = szenario_ergebnis.getErgebnisse()
         alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
     
-    pfad = DATA_DIR / "auswertung_aller_szenarien.xlsx"
+    pfad = PROJECT_ROOT/ "Ergebnisse" / "auswertung_aller_szenarien.xlsx"
     alle_ergebnisse.to_excel(pfad, index=False)
     print(f"✓ Alle Szenarien wurden verarbeitet und in '{pfad}' gespeichert.")

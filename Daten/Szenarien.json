@@ -103,7 +103,37 @@
                 "pumpspeicher": 45
             },
             "Strombedarf": 700
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Bundesklimaziele",
@@ -141,7 +171,37 @@
                 "pumpspeicher": 60
             },
             "Strombedarf": 1000
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Gleichmäßig",
@@ -179,7 +239,37 @@
                 "pumpspeicher": 70
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Solar+",
@@ -217,7 +307,37 @@
                 "pumpspeicher": 80
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Wind+",
@@ -255,7 +375,37 @@
                 "pumpspeicher": 140
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Speicher+",
@@ -293,7 +443,37 @@
                 "pumpspeicher": 200
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "E-Autos++ Kurzzeitspeicher++",
@@ -331,7 +511,37 @@
                 "pumpspeicher": 90
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Solar++ BatterieSpeicher++",
@@ -369,7 +579,37 @@
                 "pumpspeicher": 160
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "Wind++ Speicher++",
@@ -407,7 +647,37 @@
                 "pumpspeicher": 300
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "H2-Speicher++ Solar+ Wind+",
@@ -445,7 +715,37 @@
                 "pumpspeicher": 250
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     },
     {
         "Name": "H2-Speicher++ Solar++",
@@ -483,7 +783,37 @@
                 "pumpspeicher": 300
             },
             "Strombedarf": 890
-        }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.2,
+                    "pv_frei": 1.2,
+                    "wind_onshore": 1.2,
+                    "wind_offshore": 1.2,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                }
+            }
     }
 ]
 

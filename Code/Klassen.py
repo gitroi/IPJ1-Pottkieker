@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
-from config import DATA_DIR
+from config import DATA_DIR, PROJECT_ROOT
 from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
@@ -62,7 +62,7 @@ class Szenario:
     
     def exportiere_ergebnisse(self):
         """Exportiert alle Ergebnisse nach Excel"""
-        pfad = DATA_DIR / f"szenario_{self.name}_auswertung.xlsx"
+        pfad = PROJECT_ROOT/ "Ergebnisse" / f"szenario_{self.name}_auswertung.xlsx"
         ausgabe(self.kosten_df, self.gesamt_df, self.szenario,pfad)
     
     def zeige_plots(self, jahr1=None, jahr2=None):
