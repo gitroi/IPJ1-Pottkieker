@@ -9,26 +9,6 @@
         "obergrenze": 1.0,
         "untergrenze": 0.0
     },
-    "e-auto": {
-        "bestand": 1,
-        "wirkungsgrad": 0.9,
-        "capex": 800,
-        "opex": 12,
-        "verluste": 0.556,
-        "leistung": 0.1,
-        "obergrenze": 1.0,
-        "untergrenze": 0.0
-    },
-    "schwungrad": {
-        "bestand": 1,
-        "wirkungsgrad": 0.9,
-        "capex": 1000,
-        "opex": 70,
-        "verluste": 1.0,
-        "leistung": 1.0,
-        "obergrenze": 1.0,
-        "untergrenze": 0.0
-    },
     "wasserstoff": {
         "bestand": 1,
         "wirkungsgrad": 0.3,

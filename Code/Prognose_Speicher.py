@@ -11,32 +11,25 @@ from config import PROJECT_ROOT
 
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
-#TODO : EAuto und Schwungrad entfernen
 def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict ) -> pd.DataFrame:
     """
     Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
     """
 
     fixparameterBatterie = Einlesen_Speicherdaten_fix("batterie")
-    fixparameterEAuto = Einlesen_Speicherdaten_fix("e-auto")
-    fixparameterSchwungrad = Einlesen_Speicherdaten_fix("schwungrad")
     fixparameterWasserstoff = Einlesen_Speicherdaten_fix("wasserstoff")
     fixparameterPumpspeicher = Einlesen_Speicherdaten_fix("pumpspeicher")
 
     bestandBatterie = fixparameterBatterie.bestand
-    bestandEAuto = fixparameterEAuto.bestand
-    bestandSchwungrad = fixparameterSchwungrad.bestand
     bestandWasserstoff = fixparameterWasserstoff.bestand
     bestandPumpspeicher = fixparameterPumpspeicher.bestand
     
     # Ist in nicht mehr nötig, da die Bestände aus den Fixparametern gelesen werden in der Methode
     # szenarioBatterie = 0 #TODO: Speicherdaten aus Szenario einfügen
-    # # szenarioEAuto = 0 #TODO: Speicherdaten aus Szenario einfügen
-    # szenarioSchwungrad = 0 #TODO: Speicherdaten aus Szenario einfügen
     # szenarioWasserstoff = 0 #TODO: Speicherdaten aus Szenario einfügen
     # szenarioPumpspeicher = 0 #TODO: Speicherdaten aus Szenario einfügen
 
-    df_gesamtAusbau = Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, ziele_2030["Ausbau Speicher"]["batteriespeicher"], ziele_2045["Ausbau Speicher"]["batteriespeicher"], ziele_2030["Ausbau Speicher"]["e-auto"], ziele_2045["Ausbau Speicher"]["e-auto"], ziele_2030["Ausbau Speicher"]["schwungrad"], ziele_2045["Ausbau Speicher"]["schwungrad"], ziele_2030["Ausbau Speicher"]["wasserstoff"], ziele_2045["Ausbau Speicher"]["wasserstoff"], ziele_2030["Ausbau Speicher"]["pumpspeicher"], ziele_2045["Ausbau Speicher"]["pumpspeicher"])
+    df_gesamtAusbau = Prognose_Gesamt_Ausbau_(bestandBatterie, bestandWasserstoff, bestandPumpspeicher, ziele_2030["Ausbau Speicher"]["batteriespeicher"], ziele_2045["Ausbau Speicher"]["batteriespeicher"], ziele_2030["Ausbau Speicher"]["wasserstoff"], ziele_2045["Ausbau Speicher"]["wasserstoff"], ziele_2030["Ausbau Speicher"]["pumpspeicher"], ziele_2045["Ausbau Speicher"]["pumpspeicher"])
 
     dfs = [df_anteilEE, df_gesamtAusbau] 
 
@@ -54,14 +47,12 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
     # Listen für Ergebnisse initialisieren
     speicherstand_batterie = []
-    speicherstand_schwungrad = []
     speicherstand_wasserstoff = []
     speicherstand_pumpspeicher = []
     zusatz_energie = [] # Energie, die von den Speichern geliefert wird, und somit die EE-Abdeckung erhöht
 
     # Anfangswerte Ladestand(Annahme: 25% geladen im Januar 2026)
     aktuell_batterie = bestandBatterie*0.25*1e3 
-    aktuell_schwungrad = bestandSchwungrad*0.25*1e3
     aktuell_wasserstoff = bestandWasserstoff*0.25*1e3
     aktuell_pumpspeicher = bestandPumpspeicher*0.25*1e3
     aktuell_zusatz_energie = 0 # Energie, die von den Speichern geliefert wird, und somit die EE-Abdeckung erhöht
@@ -75,11 +66,9 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     for idx, row in df_gesamtVerlauf.iterrows():
         
         aktuelle_leistung_batterie = fixparameterBatterie.leistung * row["Speicherkapazität Batterie [MWh]"]
-        aktuelle_leistung_schwungrad = fixparameterSchwungrad.leistung * row["Speicherkapazität Schwungrad [MWh]"]
         aktuelle_leistung_wasserstoff = fixparameterWasserstoff.leistung * row["Speicherkapazität Wasserstoff [MWh]"]
         aktuelle_leistung_pumpspeicher = fixparameterPumpspeicher.leistung * row["Speicherkapazität Pumpspeicher [MWh]"]
         aktuell_verfugbare_batterie = aktuell_batterie - (row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.untergrenze)
-        aktuell_verfugbare_schwungrad = aktuell_schwungrad - (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze)
         aktuell_verfugbare_wasserstoff = aktuell_wasserstoff - (row["Speicherkapazität Wasserstoff [MWh]"]*fixparameterWasserstoff.untergrenze)
         aktuell_verfugbare_pumpspeicher = aktuell_pumpspeicher - (row["Speicherkapazität Pumpspeicher [MWh]"]*fixparameterPumpspeicher.untergrenze)
         
@@ -96,15 +85,6 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         if row["Anteil Erneuerbare [%]"] > ladegrenze: #überschüssige Energie vorhanden
 
             lademenge = erzeugung - row["Netzlast [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
-
-            # Schwungrad laden
-            if aktuell_schwungrad <= ((row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.obergrenze) - aktuelle_leistung_schwungrad/4):
-                if lademenge > 0 and (aktuelle_leistung_schwungrad/4) > lademenge:
-                    aktuell_schwungrad += lademenge
-                    lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_schwungrad/4) <= lademenge:
-                    aktuell_schwungrad += (aktuelle_leistung_schwungrad/4)
-                    lademenge -= (aktuelle_leistung_schwungrad/4)
 
             # Batterie laden
             if aktuell_batterie <= ((row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.obergrenze) - aktuelle_leistung_batterie/4):
@@ -140,26 +120,6 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
             fehlmenge = row["Netzlast [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie
             aktuell_zusatz_energie = 0
-           
-            # Schwungrad entladen
-            if aktuell_schwungrad > (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze):
-                if fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) > fehlmenge and aktuell_verfugbare_schwungrad >= (fehlmenge/fixparameterSchwungrad.wirkungsgrad):
-                    aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
-                    aktuell_zusatz_energie += fehlmenge
-                    fehlmenge = 0
-                elif fehlmenge > 0 and ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad) <= fehlmenge and aktuell_verfugbare_schwungrad >= (aktuelle_leistung_schwungrad/4):
-                    aktuell_schwungrad -= (aktuelle_leistung_schwungrad/4)
-                    aktuell_zusatz_energie += (aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad
-                    fehlmenge -= ((aktuelle_leistung_schwungrad/4)*fixparameterSchwungrad.wirkungsgrad)
-                elif fehlmenge > 0 and aktuell_verfugbare_schwungrad < aktuelle_leistung_schwungrad/4:
-                    if fehlmenge < (aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad):
-                        aktuell_schwungrad -= (fehlmenge/fixparameterSchwungrad.wirkungsgrad)
-                        aktuell_zusatz_energie += fehlmenge
-                        fehlmenge = 0
-                    elif fehlmenge >= (aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad):
-                        fehlmenge -= aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad
-                        aktuell_zusatz_energie += aktuell_verfugbare_schwungrad*fixparameterSchwungrad.wirkungsgrad
-                        aktuell_schwungrad = (row["Speicherkapazität Schwungrad [MWh]"]*fixparameterSchwungrad.untergrenze)
 
             # Batterie entladen
             if aktuell_batterie > (row["Speicherkapazität Batterie [MWh]"]*fixparameterBatterie.untergrenze):
@@ -227,13 +187,11 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
                
         
         speicherstand_batterie.append(aktuell_batterie)
-        speicherstand_schwungrad.append(aktuell_schwungrad) 
         speicherstand_wasserstoff.append(aktuell_wasserstoff)   
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
 
     df_gesamtVerlauf["Ladestand Batterie [MWh]"] = speicherstand_batterie
-    df_gesamtVerlauf["Ladestand Schwungrad [MWh]"] = speicherstand_schwungrad
     df_gesamtVerlauf["Ladestand Wasserstoff [MWh]"] = speicherstand_wasserstoff
     df_gesamtVerlauf["Ladestand Pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_gesamtVerlauf["Energie aus Speicher [MWh]"] = zusatz_energie
@@ -320,29 +278,23 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
 
     return df_gesamt
 
-def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandEAuto, bestandSchwungrad, bestandWasserstoff, bestandPumpspeicher, Batterie30, Batterie45, EAuto30, EAuto45, Schwungrad30, Schwungrad45, Wasserstoff30, Wasserstoff45, Pumpspeicher30, Pumpspeicher45):
+def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandWasserstoff, bestandPumpspeicher, Batterie30, Batterie45, Wasserstoff30, Wasserstoff45, Pumpspeicher30, Pumpspeicher45):
     """
     Erstellt die Gesamtprognose für alle Speicherarten
     """
 
     #bestandBatterie30 = szenarioBatterie.bestand_2030
     #bestandBatterie45 = szenarioBatterie.bestand_2045
-    #bestandEAuto30 = szenarioEAuto.bestand_2030
-    #bestandEAuto45 = szenarioEAuto.bestand_2045
-    #bestandSchwungrad30 = szenarioSchwungrad.bestand_2030
-    #bestandSchwungrad45 = szenarioSchwungrad.bestand_
     #bestandWasserstoff30 = szenarioWasserstoff.bestand_2030
     #bestandWasserstoff45 = szenarioWasserstoff.bestand_2045
     #bestandPumpspeicher30 = szenarioPumpspeicher.bestand_2030
     #bestandPumpspeicher45 = szenarioPumpspeicher.bestand_2045
 
     df_batterie = Prognose_Speicher_Ausbau("Batterie", bestandBatterie, Batterie30, Batterie45)
-    # df_auto = Prognose_Speicher_Ausbau("E-Auto", bestandEAuto, EAuto30, EAuto45) erstmal rausgenommen, da unklar ist, wie hier gerechnet werden soll
-    df_schwungrad = Prognose_Speicher_Ausbau("Schwungrad", bestandSchwungrad, Schwungrad30, Schwungrad45)
     df_wasserstoff = Prognose_Speicher_Ausbau("Wasserstoff", bestandWasserstoff, Wasserstoff30, Wasserstoff45)
     df_pump = Prognose_Speicher_Ausbau("Pumpspeicher", bestandPumpspeicher, Pumpspeicher30, Pumpspeicher45)
 
-    dfs = [df_batterie, df_schwungrad, df_wasserstoff, df_pump] # Auto rausgenommen
+    dfs = [df_batterie, df_wasserstoff, df_pump]
 
     # Merge alle DataFrames auf gemeinsamen Spalten
     df_ausbau = reduce(

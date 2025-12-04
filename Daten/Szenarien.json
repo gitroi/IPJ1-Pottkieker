@@ -14,8 +14,6 @@
             },
             "Ausbau Speicher": {
                 "batteriespeicher": 20,
-                "e-auto": 10,
-                "schwungrad": 0.5,
                 "wasserstoff": 50,
                 "pumpspeicher": 30
             },
@@ -33,8 +31,6 @@
             },
             "Ausbau Speicher": {
                 "batteriespeicher": 60,
-                "e-auto": 10,
-                "schwungrad": 0.5,
                 "wasserstoff": 60,
                 "pumpspeicher": 35
             },
