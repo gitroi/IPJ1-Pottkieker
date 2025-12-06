@@ -15,7 +15,7 @@ from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbaur
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import Kosten_EE
 from Prognose_Speicher import Verlauf_Speicher
-from Auswertung import ausgabe
+from Auswertung import ausgabe, konventionelle_Leistung_Energie
 
 @dataclass
 class Szenario:
@@ -34,6 +34,7 @@ class Szenario:
     kosten_df: Optional[pd.DataFrame] = None
     speicher_df: Optional[pd.DataFrame] = None
     gesamt_df: Optional[pd.DataFrame] = None
+    konventionelle: Optional[dict] = None
     
     def berechne_alle_prognosen(self):
         """Führt alle Berechnungen durch"""
@@ -62,12 +63,14 @@ class Szenario:
         
         self.gesamt_df = anteil_erneuerbare_speicher(self.speicher_df)
         
+        self.konventionelle = konventionelle_Leistung_Energie(self.gesamt_df)
+        
         print(f"✓ Berechnungen für '{self.name}' abgeschlossen.")
     
     def exportiere_ergebnisse(self):
         """Exportiert alle Ergebnisse nach Excel"""
         pfad = PROJECT_ROOT/ "Ergebnisse" / f"szenario_{self.name}_auswertung.xlsx"
-        ausgabe(self.kosten_df, self.gesamt_df, self.szenario,pfad)
+        ausgabe(self.kosten_df, self.gesamt_df, self.szenario,pfad,self.konventionelle)
     
     def zeige_plots(self, jahr1=None, jahr2=None):
         """Zeigt Histogramme und Analysen"""
