@@ -1,3 +1,6 @@
+"""
+Programmiert von Joris Bürger
+"""
 import pandas as pd
 import json
 from config import DATA_DIR

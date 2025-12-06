@@ -1,4 +1,7 @@
-"Ünterstützt durch KI (GPT-4.1 Inline Suggestions)"
+"""
+Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
+Programmiert von Joris Bürger
+"""
 import json
 from dataclasses import dataclass
 import matplotlib.pyplot as plt

@@ -1,3 +1,7 @@
+"""
+Programmiert von Joris Bürger
+"""
+
 import json
 from dataclasses import dataclass
 import matplotlib.pyplot as plt

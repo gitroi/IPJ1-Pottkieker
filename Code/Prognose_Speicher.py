@@ -1,6 +1,7 @@
 """
 Zentrales Programm der Prognose vom Stromspeicher.
 Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
+Programmiert von Robin Matzke
 """
 import pandas as pd
 import numpy as np

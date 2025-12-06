@@ -1,3 +1,7 @@
+"""
+Programmiert von Joris Bürger
+"""
+
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from config import DATA_DIR
 # from Szenarien_auswahl import json_objekt_bearbeiten

@@ -2,6 +2,7 @@
 Zentrales Programm der Erzeugungsprognose von der Gruppe Pottkieker.
 Nutzt Daten aus 2024 um eine Prognose bis 2045 zu erstellen.
 Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
+Programmiert von Joris Bürger   
 """
 import json
 import pandas as pd

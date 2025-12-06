@@ -1,6 +1,7 @@
 """
 Zentrale Konfigurationsdatei für das IPJ1-Pottkieker Projekt.
 Enthält Pfade und gemeinsame Einstellungen. Erstellt per KI (Claude Sonnet 4.5)
+Programmiert von Robin Matzke
 """
 
 from pathlib import Path

@@ -1,3 +1,7 @@
+"""
+Programmiert von Joris Bürger
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from config import PROJECT_ROOT

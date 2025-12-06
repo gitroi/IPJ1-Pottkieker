@@ -1,6 +1,7 @@
 """
 Programm zur Analyse des Anteils der Erneuerbaren Energien am Stromverbrauch.
 Nutzt SMARD-Daten aus CSV-Dateien und berechnet den Anteil der Erneuerbaren Energien.
+Programmiert von Joris Bürger
 """
 
 import pandas as pd

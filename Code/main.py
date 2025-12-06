@@ -1,6 +1,7 @@
 """
 Zentrales Programm der Gruppe Pottkieker.
 Nutz die anderen Module zur Analyse und Visualisierung.
+Programmiert von Joris Bürger
 """
 
 import pandas as pd
