@@ -159,17 +159,41 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
     elif ertragsart == "schlecht":
         basis_2024 = erzeugung_df[erzeugung_df["Jahr"] == 2024].copy()
         basis_2021 = erzeugung_df[erzeugung_df["Jahr"] == 2021].copy()
+        
+        # 29. Februar für 2021 interpolieren: Durchschnitt von 28. Feb und 1. März
+        feb_28 = basis_2021[(basis_2021["Monat"] == 2) & (basis_2021["Tag"] == 28)].copy()
+        mar_01 = basis_2021[(basis_2021["Monat"] == 3) & (basis_2021["Tag"] == 1)].copy()
+        
+        # Einfache Interpolation für Wind-Kapazitätsfaktoren
+        feb_29_wind = pd.DataFrame()
+        feb_29_wind["Monat"] = 2
+        feb_29_wind["Tag"] = 29
+        feb_29_wind["Stunde"] = feb_28["Stunde"].values
+        feb_29_wind["Minute"] = feb_28["Minute"].values
+        feb_29_wind["Kapazitätsfaktor_Wind_Onshore"] = (
+            feb_28["Kapazitätsfaktor_Wind_Onshore"].values + 
+            mar_01["Kapazitätsfaktor_Wind_Onshore"].values
+        ) / 2
+        feb_29_wind["Kapazitätsfaktor_Wind_Offshore"] = (
+            feb_28["Kapazitätsfaktor_Wind_Offshore"].values + 
+            mar_01["Kapazitätsfaktor_Wind_Offshore"].values
+        ) / 2
+        
+        
+        basis_2021_erweitert = pd.concat([
+            basis_2021[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
+            feb_29_wind
+        ], ignore_index=True)
 
         erzeugung_df = pd.merge(
             basis_2024[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]],
-            basis_2021[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
+            basis_2021_erweitert,
             on=["Monat","Tag","Stunde","Minute"],
-            how="outer"
+            how="left"  
         )
 
     kapazitätsfaktoren = erzeugung_df[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]]
     
-    # Erstelle Datumsbereich für 2026-2045
     date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC')
     prognose = pd.DataFrame({'Datum von': date_range})
     

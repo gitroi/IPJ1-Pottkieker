@@ -117,3 +117,45 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
 
    
     return kosten_df
+
+def kosten_speicher(szenario: json) -> pd.DataFrame:
+    """
+    Berechnet die Kosten für Speicher basierend auf dem Szenario.
+    
+    Args:
+        szenario (json): Das Szenario mit den Speicherzielen und Veränderungsfaktoren.
+        
+    Returns:
+        pd.DataFrame: DataFrame mit den jährlichen Speicherkosten.
+    """
+    
+    #=== Einlesen der Kostendaten mit werten in €/KW bzw. €/KWh ===
+    kostendaten_pfad = DATA_DIR / "Feste_Parameter" / "speicherarten.json"
+    with open(kostendaten_pfad, "r") as file:
+        kostendaten = json.load(file)
+
+    date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min',tz='UTC') 
+    kosten_df = pd.DataFrame({"Datum von": date_range})
+    kosten_df["Jahr"] = kosten_df["Datum von"].dt.year
+    kosten_df["Monat"]= kosten_df["Datum von"].dt.month
+    kosten_df = kosten_df.drop_duplicates().reset_index(drop=True)
+
+    capex_wachstum  = szenario["Veränderungsfaktoren"]["Capex_Speicher"]
+    opex_wachstum = szenario["Veränderungsfaktoren"]["Opex_Speicher"]
+
+    virtelstunden_pro_jahr = 365.25 * 24 * 4 
+    virtelstunden_capex = {}
+    virtelstunden_opex = {}
+
+    for key in capex_wachstum.keys():
+        virtelstunden_capex[key] = capex_wachstum[key] ** (1 / virtelstunden_pro_jahr)
+        virtelstunden_opex[key] = opex_wachstum[key] ** (1 / virtelstunden_pro_jahr)
+
+    jährliche_raten = Jährlicher_Zuwachs_EE(szenario["Ziele 2030"]["Ausbau Speicher"], szenario["Ziele 2045"]["Ausbau Speicher"])
+
+    for key in kostendaten.keys():
+        #=== Baukosten pro Viertelstunde berechnen ===
+        if jährliche_raten["zuwachsrate_2030"][key] >= 0:
+            baukosten_speicher_2030 = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr *10)
+        else:
+            baukosten_speicher_2030
