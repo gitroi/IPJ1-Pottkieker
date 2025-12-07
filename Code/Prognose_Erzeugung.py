@@ -164,7 +164,7 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
             basis_2024[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]],
             basis_2021[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
             on=["Monat","Tag","Stunde","Minute"],
-            how="inner"
+            how="outer"
         )
 
     kapazitätsfaktoren = erzeugung_df[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_PV","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore","Kapazitätsfaktor_Biomasse","Kapazitätsfaktor_Wasser","Kapazitätsfaktor_Sonstige"]]
@@ -234,6 +234,11 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
         print(prognose_export.isna().sum())
         mask = prognose_export.isna() | prognose_export.isin([np.inf, -np.inf])
         print(prognose_export[mask.any(axis=1)])
+
+    #fehlerhafte
+    datei = prognose_export.loc[prognose_export.isna().any(axis=1)]
+    pfad_fehlende_datei = PROJECT_ROOT / "Daten" / "Fehlerhafte_Prognose_Erzeugung.csv"
+    datei.to_csv(pfad_fehlende_datei, index=False, sep=';', decimal=',')
 
 
     return prognose_export

@@ -122,7 +122,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
     if(df_gesamt_2045.isna().any().any()):
-        print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
+        print("Warnung: Es gibt fehlende Werte in der Verbrauchsprognose!"  )
         print(df_gesamt_2045.isna().sum())
         mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
         print(df_gesamt_2045[mask.any(axis=1)])

@@ -197,6 +197,12 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     df_gesamtVerlauf["Ladestand Pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_gesamtVerlauf["Energie aus Speicher [MWh]"] = zusatz_energie
 
+    if(df_gesamtVerlauf.isna().any().any()):
+        print("Warnung: Es gibt fehlende Werte in der Speicherprognose!"  )
+        print(df_gesamtVerlauf.isna().sum())
+        mask = df_gesamtVerlauf.isna() | df_gesamtVerlauf.isin([np.inf, -np.inf])
+        print(df_gesamtVerlauf[mask.any(axis=1)])
+
     return df_gesamtVerlauf
 
 def Einlesen_Speicherdaten_fix(speicherart):
