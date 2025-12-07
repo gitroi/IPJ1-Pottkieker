@@ -235,10 +235,4 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
         mask = prognose_export.isna() | prognose_export.isin([np.inf, -np.inf])
         print(prognose_export[mask.any(axis=1)])
 
-    #fehlerhafte
-    datei = prognose_export.loc[prognose_export.isna().any(axis=1)]
-    pfad_fehlende_datei = PROJECT_ROOT / "Daten" / "Fehlerhafte_Prognose_Erzeugung.csv"
-    datei.to_csv(pfad_fehlende_datei, index=False, sep=';', decimal=',')
-
-
     return prognose_export
