@@ -1,6 +1,6 @@
 """
 Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
-Programmiert von Joris Bürger
+Programmiert von Joris Bürger und Robin Matzke
 """
 import json
 from dataclasses import dataclass
