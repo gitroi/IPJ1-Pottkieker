@@ -2,6 +2,7 @@
 Programmiert von Joris Bürger
 """
 
+from Prognose_Speicher import Prognose_Gesamt_Ausbau_
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from config import DATA_DIR
 # from Szenarien_auswahl import json_objekt_bearbeiten
@@ -129,6 +130,10 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
         pd.DataFrame: DataFrame mit den jährlichen Speicherkosten.
     """
     
+    virtelstunden_pro_jahr = 365.25 * 24 * 4
+    ausbau_2030_GW = szenario["Ziele 2030"]["Ausbau Speicher"]
+    ausbau_2045_GW = szenario["Ziele 2045"]["Ausbau Speicher"]
+
     #=== Einlesen der Kostendaten mit werten in €/KW bzw. €/KWh ===
     kostendaten_pfad = DATA_DIR / "Feste_Parameter" / "speicherarten.json"
     with open(kostendaten_pfad, "r") as file:
@@ -136,6 +141,7 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
 
     date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min',tz='UTC') 
     kosten_df = pd.DataFrame({"Datum von": date_range})
+
     kosten_df["Jahr"] = kosten_df["Datum von"].dt.year
     kosten_df["Monat"]= kosten_df["Datum von"].dt.month
     kosten_df = kosten_df.drop_duplicates().reset_index(drop=True)
@@ -143,7 +149,6 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
     capex_wachstum  = szenario["Veränderungsfaktoren"]["Capex_Speicher"]
     opex_wachstum = szenario["Veränderungsfaktoren"]["Opex_Speicher"]
 
-    virtelstunden_pro_jahr = 365.25 * 24 * 4 
     virtelstunden_capex = {}
     virtelstunden_opex = {}
 
@@ -151,11 +156,50 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
         virtelstunden_capex[key] = capex_wachstum[key] ** (1 / virtelstunden_pro_jahr)
         virtelstunden_opex[key] = opex_wachstum[key] ** (1 / virtelstunden_pro_jahr)
 
-    jährliche_raten = Jährlicher_Zuwachs_EE(szenario["Ziele 2030"]["Ausbau Speicher"], szenario["Ziele 2045"]["Ausbau Speicher"])
+    for key in kostendaten.keys():
+        mask1 = kosten_df["Jahr"] <= 2030 
+        mask2 = kosten_df["Jahr"] > 2030
+        kosten_df.loc[mask1,f"Ausbaurate {key}"] = (ausbau_2030_GW[key]-kostendaten[key]["bestand"])  / len(kosten_df[mask1])
+        kosten_df.loc[mask2,f"Ausbaurate {key}"] = (ausbau_2045_GW[key]-ausbau_2030_GW[key])  / len(kosten_df[mask2])
+        mask3 = kosten_df[f"Ausbaurate {key}"] > 0
+        kosten_df.loc[mask3,f"Capex {key} [€]"] = 1e6 * kosten_df[f"Ausbaurate {key}"] * kostendaten[key]["capex"] 
+        kosten_df.loc[~mask3,f"Capex {key} [€]"] = 0
+        kosten_df[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"] * (virtelstunden_capex[key] ** (kosten_df['Jahr'] - 2025))
+        kosten_df[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"].round(2)
+
+    #=== OpEx Berechnung ===
+    installierte_speicher = Prognose_Gesamt_Ausbau_(kostendaten["batterie"]["bestand"], kostendaten["wasserstoff"]["bestand"],kostendaten["pumpspeicher"]["bestand"], ausbau_2030_GW["batterie"], ausbau_2045_GW[""])
+    kosten_df = pd.merge(kosten_df, installierte_speicher, on="Datum von", how="left")
 
     for key in kostendaten.keys():
-        #=== Baukosten pro Viertelstunde berechnen ===
-        if jährliche_raten["zuwachsrate_2030"][key] >= 0:
-            baukosten_speicher_2030 = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr *10)
-        else:
-            baukosten_speicher_2030
+        kosten_df[f"Opex {key} [€]"] = 1e3 * kostendaten[key]["opex"] * kosten_df[f"Speicherkapazität {key} [MWh]"] * kostendaten[key]["leistung"] / virtelstunden_pro_jahr
+        kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"] * (virtelstunden_opex[key] ** (kosten_df['Jahr'] - 2025))
+        kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"].round(2)
+
+        kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Capex {key} [€]"] + kosten_df[f"Opex {key} [€]"]
+        spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
+        kosten_df[spalten_kosten] = kosten_df[spalten_kosten].round(2)
+
+    kosten_df = kosten_df[["Datum von", "Opex batterie [€]", "Capex batterie [€]", "Gesamtkosten batterie [€]",
+                          "Opex wasserstoff [€]", "Capex wasserstoff [€]", "Gesamtkosten wasserstoff [€]",
+                          "Opex pumpspeicher [€]", "Capex pumpspeicher [€]", "Gesamtkosten pumpspeicher [€]"]]
+    return kosten_df
+    
+def kostenrechnung(szenario: json) -> pd.DataFrame:
+    """
+    Berechnet die Gesamtkosten für Erneuerbare Energien und Speicher basierend auf dem Szenario.
+    
+    Args:
+        szenario (json): Das Szenario mit den Zielwerten und Veränderungsfaktoren.
+        
+    Returns:
+        pd.DataFrame: DataFrame mit den jährlichen Gesamtkosten.
+    """
+    kosten_ee_df = Kosten_EE(szenario)
+    kosten_speicher_df = kosten_speicher(szenario)
+
+    gesamt_kosten_df = pd.merge(kosten_ee_df, kosten_speicher_df, on="Datum von", how="inner")
+
+    gesamt_kosten_df["Gesamtkosten_EE_und_Speicher [€]"] = gesamt_kosten_df["Gesamtkosten_EE [€]"] + gesamt_kosten_df[["Gesamtkosten batterie [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum(axis=1)
+
+    return gesamt_kosten_df

@@ -64,6 +64,16 @@
                     "wasser": 0.6,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -132,6 +142,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -200,6 +220,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -268,6 +298,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -336,6 +376,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -404,6 +454,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -472,6 +532,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -540,6 +610,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -608,6 +688,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -676,6 +766,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -744,6 +844,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     },
@@ -812,6 +922,16 @@
                     "wasser": 1.0,
                     "sonstige": 1.0
 
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
                 }
             }
     }

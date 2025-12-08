@@ -13,7 +13,7 @@ from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
-from Kosten import Kosten_EE
+from Kosten import kostenrechnung
 from Prognose_Speicher import Verlauf_Speicher
 from Auswertung import ausgabe, konventionelle_Leistung_Energie
 
@@ -57,7 +57,7 @@ class Szenario:
             self.verbrauch_df
         )
         
-        self.kosten_df = Kosten_EE(self.szenario)
+        self.kosten_df = kostenrechnung(self.szenario)
         
         self.speicher_df = Verlauf_Speicher(self.ee_anteil_ohne_speicher_df, 100, 100, self.ziele_2030, self.ziele_2045)
         
