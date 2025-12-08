@@ -91,7 +91,8 @@ def prognose_alle_Szenarien():
             szenario=szenario,
             ziele_2030=szenario["Ziele 2030"],
             ziele_2045=szenario["Ziele 2045"],
-            ertragsart=ertragsart
+            ertragsart=ertragsart,
+            veränderungsfaktoren=szenario["Veränderungsfaktoren"]["Erzeugung"]
         )
         
         szenario_ergebnis.berechne_alle_prognosen()

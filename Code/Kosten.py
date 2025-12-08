@@ -168,7 +168,7 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
         kosten_df[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"].round(2)
 
     #=== OpEx Berechnung ===
-    installierte_speicher = Prognose_Gesamt_Ausbau_(kostendaten["batterie"]["bestand"], kostendaten["wasserstoff"]["bestand"],kostendaten["pumpspeicher"]["bestand"], ausbau_2030_GW["batterie"], ausbau_2045_GW[""])
+    installierte_speicher = Prognose_Gesamt_Ausbau_(kostendaten["batteriespeicher"]["bestand"], kostendaten["wasserstoff"]["bestand"],kostendaten["pumpspeicher"]["bestand"], ausbau_2030_GW["batteriespeicher"], ausbau_2045_GW["batteriespeicher"], ausbau_2030_GW["wasserstoff"], ausbau_2045_GW["wasserstoff"], ausbau_2030_GW["pumpspeicher"], ausbau_2045_GW["pumpspeicher"])
     kosten_df = pd.merge(kosten_df, installierte_speicher, on="Datum von", how="left")
 
     for key in kostendaten.keys():
@@ -180,7 +180,7 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
         spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
         kosten_df[spalten_kosten] = kosten_df[spalten_kosten].round(2)
 
-    kosten_df = kosten_df[["Datum von", "Opex batterie [€]", "Capex batterie [€]", "Gesamtkosten batterie [€]",
+    kosten_df = kosten_df[["Datum von", "Opex batteriespeicher [€]", "Capex batteriespeicher [€]", "Gesamtkosten batteriespeicher [€]",
                           "Opex wasserstoff [€]", "Capex wasserstoff [€]", "Gesamtkosten wasserstoff [€]",
                           "Opex pumpspeicher [€]", "Capex pumpspeicher [€]", "Gesamtkosten pumpspeicher [€]"]]
     return kosten_df
@@ -200,6 +200,6 @@ def kostenrechnung(szenario: json) -> pd.DataFrame:
 
     gesamt_kosten_df = pd.merge(kosten_ee_df, kosten_speicher_df, on="Datum von", how="inner")
 
-    gesamt_kosten_df["Gesamtkosten_EE_und_Speicher [€]"] = gesamt_kosten_df["Gesamtkosten_EE [€]"] + gesamt_kosten_df[["Gesamtkosten batterie [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum(axis=1)
+    gesamt_kosten_df["Gesamtkosten_EE_und_Speicher [€]"] = gesamt_kosten_df["Gesamtkosten_EE [€]"] + gesamt_kosten_df[["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum(axis=1)
 
     return gesamt_kosten_df

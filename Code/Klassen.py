@@ -14,7 +14,7 @@ from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
-from Prognose_Speicher import Verlauf_Speicher
+from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GW_Jahr
 from Auswertung import ausgabe, konventionelle_Leistung_Energie
 
 @dataclass
@@ -89,14 +89,21 @@ class Szenario:
         ergebnisse = pd.DataFrame()
         ergebnisse["Name"] = [self.name]
         ausbauraten = Jährlicher_Zuwachs_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"])
+        ausbauraten_speicher = ausbaurate_GW_Jahr(self.szenario)
         for key in ausbauraten["zuwachsrate_2030"].keys():
             ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
             ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten["zuwachsrate_2045"][key]]
             ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
 
-        ergebnisse["Gesamtkosten_EE [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE [€]"].sum() / 1e9]
+        for key in ausbauraten_speicher["zuwachsrate_2030"].keys():
+            ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten_speicher["zuwachsrate_2030"][key]]
+            ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten_speicher["zuwachsrate_2045"][key]]
+            ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
         
-       
+        ergebnisse["Gesamtkosten_EE [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE [€]"].sum() / 1e9]
+        ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df[["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum().sum() / 1e9]
+        ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9]
+        
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher [%]"] = [
             (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100).sum() / len(self.ee_anteil_ohne_speicher_df) * 100
         ]
@@ -110,10 +117,10 @@ class Szenario:
         ).sum() / 1e6
         ergebnisse["Nicht durch EE gedeckter Strombedarf [TWh]"] = [nicht_ee_strom]
         ergebnisse["Benötigte Leistung Konventioennelle 2045 [GW]"] = [
-            self.konventionelle["2045"]["Leistung"] / 1e3
+            self.konventionelle[2045]["Leistung"] / 1e3
         ]
         ergebnisse["Benötigte Leistung Konventioennelle 2030 [GW]"] = [
-            self.konventionelle["2030"]["Energie"] / 1e3
+            self.konventionelle[2030]["Leistung"] / 1e3
         ]
 
         return ergebnisse

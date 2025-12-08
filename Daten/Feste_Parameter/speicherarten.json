@@ -1,5 +1,5 @@
 {
-    "batterie": {
+    "batteriespeicher": {
         "bestand": 22,
         "wirkungsgrad": 0.9,
         "capex": 900,

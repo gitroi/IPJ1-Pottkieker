@@ -5,8 +5,9 @@ import pandas as pd
 import json
 from config import DATA_DIR
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
-from Feste_Variablen import Keys_Erzeugung
+from Feste_Variablen import Keys_Erzeugung, Keys_Speicher
 import matplotlib.pyplot as plt
+from Prognose_Speicher import ausbaurate_GW_Jahr
 
 def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: str, konventionelle: dict):
     """
@@ -20,10 +21,10 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: s
 
     ausbauraten = Jährlicher_Zuwachs_EE(szenario["Ziele 2030"]["Ausbau EE"], szenario["Ziele 2045"]["Ausbau EE"])
     gesamt = pd.merge(ee_df, kosten_df, on="Datum von", how="inner")
+    ausbauraten_speicher = ausbaurate_GW_Jahr(szenario)
 
     gesamt["Jahr"] = gesamt["Datum von"].dt.year
 
-    end_df = pd.DataFrame()
     jahre = range(2026, 2046)
     end_df = pd.DataFrame({"Jahr": jahre})
 
@@ -51,7 +52,26 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: s
         kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e3
         end_df[f"Gesamtkosten {key} [Tsd. €]"] = kosten_summe.values
 
+    for key in Keys_Speicher:
+        kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e3
+        end_df[f"Gesamtkosten {key} [Tsd. €]"] = kosten_summe.values
+
     end_df["Gesamtkosten_EE [Tsd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE [€]"].sum() / 1e3).round(2).values
+    
+    speicher_spalten = ["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]
+    end_df["Gesamtkosten_Speicher [Tsd. €]"] = (gesamt.groupby('Jahr')[speicher_spalten].sum().sum(axis=1) / 1e3).round(2).values
+    
+    end_df["Gesamtkosten_EE_und_Speicher [Tsd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e3).round(2).values
+    
+    mask1 = end_df["Jahr"] <= 2030
+    mask2 = end_df["Jahr"] > 2030
+    for key in ausbauraten["zuwachsrate_2030"].keys():
+        end_df.loc[mask1, f"Ausbaurate {key} [GW/Jahr]"] = ausbauraten["zuwachsrate_2030"][key]
+        end_df.loc[mask2, f"Ausbaurate {key} [GW/Jahr]"] = ausbauraten["zuwachsrate_2045"][key]
+
+    for key in Keys_Speicher:
+        end_df.loc[mask1, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2030"][key]
+        end_df.loc[mask2, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2045"][key]
 
     with pd.ExcelWriter(pfad, engine='openpyxl') as writer:
         end_df.to_excel(writer, sheet_name="Jahresübersicht", index=False)
