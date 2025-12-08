@@ -163,26 +163,22 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
         # 29. Februar für 2021 interpolieren: Durchschnitt von 28. Feb und 1. März
         feb_28 = basis_2021[(basis_2021["Monat"] == 2) & (basis_2021["Tag"] == 28)].copy()
         mar_01 = basis_2021[(basis_2021["Monat"] == 3) & (basis_2021["Tag"] == 1)].copy()
-        
-        # Einfache Interpolation für Wind-Kapazitätsfaktoren
-        feb_29_wind = pd.DataFrame()
-        feb_29_wind["Monat"] = 2
-        feb_29_wind["Tag"] = 29
-        feb_29_wind["Stunde"] = feb_28["Stunde"].values
-        feb_29_wind["Minute"] = feb_28["Minute"].values
-        feb_29_wind["Kapazitätsfaktor_Wind_Onshore"] = (
-            feb_28["Kapazitätsfaktor_Wind_Onshore"].values + 
-            mar_01["Kapazitätsfaktor_Wind_Onshore"].values
-        ) / 2
-        feb_29_wind["Kapazitätsfaktor_Wind_Offshore"] = (
-            feb_28["Kapazitätsfaktor_Wind_Offshore"].values + 
-            mar_01["Kapazitätsfaktor_Wind_Offshore"].values
-        ) / 2
-        
+       
+        feb_29 = pd.merge(
+            feb_28[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
+            mar_01[["Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
+            on=["Stunde","Minute"], how="inner", suffixes=('_feb28', '_mar01')
+        )
+
+        feb_29["Kapazitätsfaktor_Wind_Onshore"] = (feb_29["Kapazitätsfaktor_Wind_Onshore_feb28"] + feb_29["Kapazitätsfaktor_Wind_Onshore_mar01"]) / 2
+        feb_29["Kapazitätsfaktor_Wind_Offshore"] = (feb_29["Kapazitätsfaktor_Wind_Offshore_feb28"] + feb_29["Kapazitätsfaktor_Wind_Offshore_mar01"]) / 2
+        feb_29["Tag"] = feb_28["Tag"].values + 1
+        feb_29["Monat"] = feb_28["Monat"].values
+        feb_29 = feb_29[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]]
         
         basis_2021_erweitert = pd.concat([
             basis_2021[["Monat","Tag","Stunde","Minute","Kapazitätsfaktor_Wind_Onshore","Kapazitätsfaktor_Wind_Offshore"]],
-            feb_29_wind
+            feb_29
         ], ignore_index=True)
 
         erzeugung_df = pd.merge(
