@@ -98,6 +98,6 @@ def prognose_alle_Szenarien():
         ergebnisse_df = szenario_ergebnis.getErgebnisse()
         alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
     
-    pfad = PROJECT_ROOT/ "Ergebnisse" / "auswertung_aller_szenarien.xlsx"
+    pfad = PROJECT_ROOT/ "Ergebnisse" / f"auswertung_aller_szenarien_erzeugung_{ertragsart}.xlsx"
     alle_ergebnisse.to_excel(pfad, index=False)
     print(f"✓ Alle Szenarien wurden verarbeitet und in '{pfad}' gespeichert.")

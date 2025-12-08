@@ -69,7 +69,7 @@ class Szenario:
     
     def exportiere_ergebnisse(self):
         """Exportiert alle Ergebnisse nach Excel"""
-        pfad = PROJECT_ROOT/ "Ergebnisse" / f"szenario_{self.name}_auswertung.xlsx"
+        pfad = PROJECT_ROOT/ "Ergebnisse" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}.xlsx"
         ausgabe(self.kosten_df, self.gesamt_df, self.szenario,pfad,self.konventionelle)
     
     def zeige_plots(self, jahr1=None, jahr2=None):
@@ -109,5 +109,11 @@ class Szenario:
             self.gesamt_df.loc[mask, "Realisierte Erzeugung [MWh]"]
         ).sum() / 1e6
         ergebnisse["Nicht durch EE gedeckter Strombedarf [TWh]"] = [nicht_ee_strom]
+        ergebnisse["Benötigte Leistung Konventioennelle 2045 [GW]"] = [
+            self.konventionelle["2045"]["Leistung"] / 1e3
+        ]
+        ergebnisse["Benötigte Leistung Konventioennelle 2030 [GW]"] = [
+            self.konventionelle["2030"]["Energie"] / 1e3
+        ]
 
         return ergebnisse

@@ -23,9 +23,9 @@
             "Ausbau EE": {
                 "pv_dach": 313,
                 "pv_frei": 156,  
-                "wind_onshore": 180,
-                "wind_offshore": 73,
-                "biomasse": 4,
+                "wind_onshore": 200,
+                "wind_offshore": 90,
+                "biomasse": 10,
                 "wasser": 6,
                 "sonstige": 0.1
             },
@@ -38,10 +38,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.5,
+                    "pv_frei": 1.5,
+                    "wind_onshore": 1.5,
+                    "wind_offshore": 1.5,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0

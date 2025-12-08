@@ -6,6 +6,7 @@ import json
 from config import DATA_DIR
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from Feste_Variablen import Keys_Erzeugung
+import matplotlib.pyplot as plt
 
 def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: str, konventionelle: dict):
     """
@@ -86,7 +87,6 @@ def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:
     reserven_dict = {}
     for jahr in erzeugung["Jahr"].unique():
         df_jahr = erzeugung[erzeugung["Jahr"] == jahr]
-        
         df_jahr = df_jahr[["Datum von","Netzlast [MWh]","Erneuerbare [MWh]","Realisierte Erzeugung [MWh]"]]
         
         df_jahr["Konventionelle Energie [MWh]"] = (df_jahr["Netzlast [MWh]"] - df_jahr["Erneuerbare [MWh]"]).clip(lower=0)
