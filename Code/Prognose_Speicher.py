@@ -8,7 +8,7 @@ import numpy as np
 import json
 from functools import reduce
 from dataclasses import dataclass
-from config import PROJECT_ROOT
+from config import DATA_DIR
 
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
@@ -43,8 +43,6 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         ), 
         dfs
     )
-    
-    # df_gesamtVerlauf.to_csv(PROJECT_ROOT / 'Daten' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     # Listen für Ergebnisse initialisieren
     speicherstand_batterie = []
@@ -192,7 +190,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
 
-        # Langzeitverluste der Speicher jede Stunde (type ignore, da pylance nicht erkennt, dass idx ein int ist)
+        # Langzeitverluste der Speicher jede Stunde, validiert (in CSV-Ausgabe mehrere Werte ausgerechnet)
+        # (type ignore, da pylance nicht erkennt, dass idx ein int ist)
         if idx % 4 == 0: # type: ignore
             aktuell_batterie -= ((fixparameterBatterie.verluste/100) * aktuell_batterie)
 
@@ -206,6 +205,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         print(df_gesamtVerlauf.isna().sum())
         mask = df_gesamtVerlauf.isna() | df_gesamtVerlauf.isin([np.inf, -np.inf])
         print(df_gesamtVerlauf[mask.any(axis=1)])
+
+    # df_gesamtVerlauf.to_csv(DATA_DIR / 'Output' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamtVerlauf
 
@@ -225,7 +226,7 @@ def Einlesen_Speicherdaten_fix(speicherart):
         obergrenze: float
         untergrenze: float
     
-    with open(PROJECT_ROOT / "Daten" / "Feste_Parameter" / "speicherarten.json", "r") as f:
+    with open(DATA_DIR / "Feste_Parameter" / "speicherarten.json", "r") as f:
         data = json.load(f)
 
     speicher_data = data.get(speicherart)
@@ -264,7 +265,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     
     df_2030[speichername] = bestand2025 + wachstumsrate_2030 * ((df_2030['Datum von'] - df_2030['Datum von'].min()).dt.days + 1)
 
-    # df_2030.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_2030.to_csv(DATA_DIR / 'Output' / 'speicherprognosetest2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     #=== Dataframe für die Jahre 2030 bis 2045 erstellen ===
     date_range = pd.date_range(start='2031-01-01', end='2045-12-31 23:45', freq='15min',tz="UTC")
@@ -285,7 +286,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True) # Bereich von 2026 bis 2030 und 2031 bis 2045 zusammenfügen
     df_gesamt[speichername] = df_gesamt[speichername].round(2)
 
-    # df_gesamt.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_gesamt.to_csv(DATA_DIR / 'Output' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamt
 
@@ -317,7 +318,7 @@ def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandWasserstoff, bestandPumpspei
         dfs
     )
 
-    # df_ausbau.to_csv(PROJECT_ROOT / 'Daten' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_ausbau.to_csv(DATA_DIR / 'Output' / 'speicherausbautestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_ausbau
 
@@ -326,7 +327,7 @@ def ausbaurate_GW_Jahr(szenario: json) -> dict:
     Berechnet die jährlichen Ausbauraten in GW/Jahr für jede Erzeugungsart und GWh/Jahr für jede Speicherart
     """
     
-    with open(PROJECT_ROOT / "Daten" / "Feste_Parameter" / "speicherarten.json", 'r', encoding='utf-8') as datei:
+    with open(DATA_DIR / "Feste_Parameter" / "speicherarten.json", 'r', encoding='utf-8') as datei:
         speicherarten = json.load(datei)
 
     ausbauraten = {
