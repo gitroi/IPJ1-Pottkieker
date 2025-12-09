@@ -69,7 +69,7 @@ class Szenario:
     
     def exportiere_ergebnisse(self):
         """Exportiert alle Ergebnisse nach Excel"""
-        pfad = PROJECT_ROOT/ "Ergebnisse" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}.xlsx"
+        pfad = DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}.xlsx"
         ausgabe(self.kosten_df, self.gesamt_df, self.szenario,pfad,self.konventionelle)
     
     def zeige_plots(self, jahr1=None, jahr2=None):

@@ -76,21 +76,6 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: s
     with pd.ExcelWriter(pfad, engine='openpyxl') as writer:
         end_df.to_excel(writer, sheet_name="Jahresübersicht", index=False)
 
-def ausgabe_alle(szenarien: json, pfad: str,jahr: int = 2045):
-    """
-    Gibt die Daten eines SzenarioErgebnis als Excel-Datei aus.
-    Args:
-        SzenarioErgebnis (SzenarioErgebnis): Das SzenarioErgebnis-Objekt
-        pfad (str): Pfad zur Ausgabedatei
-    """
-    Ergebnisse_df = pd.DataFrame()
-    
-    for szenario in szenarien:
-        if szenario.erzeugung_df is not None:
-            temp_df = szenario.erzeugung_df.copy()
-            temp_df["Szenario"] = szenario.name
-            Ergebnisse_df = pd.concat([Ergebnisse_df, temp_df], ignore_index=True)
-
 def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:
     """
     Analysiert die konventionelle Leistung und Energie basierend auf dem Dataframe 'erzeugung'.
