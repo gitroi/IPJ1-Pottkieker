@@ -192,6 +192,10 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
 
+        # Langzeitverluste der Speicher jede Stunde (type ignore, da pylance nicht erkennt, dass idx ein int ist)
+        if idx % 4 == 0: # type: ignore
+            aktuell_batterie -= ((fixparameterBatterie.verluste/100) * aktuell_batterie)
+
     df_gesamtVerlauf["Ladestand batteriespeicher [MWh]"] = speicherstand_batterie
     df_gesamtVerlauf["Ladestand wasserstoff [MWh]"] = speicherstand_wasserstoff
     df_gesamtVerlauf["Ladestand pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
