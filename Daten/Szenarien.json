@@ -13,9 +13,9 @@
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 10,
-                "wasserstoff": 10,
-                "pumpspeicher": 10
+                "batteriespeicher": 50,
+                "wasserstoff": 40,
+                "pumpspeicher": 20
             },
             "Strombedarf": 650
         },
