@@ -9,7 +9,9 @@ Prio/was muss gemacht werden
 1/Kosten Speicher
 1/Einlesen der Daten zu speichern aus Szenarien
 2-3/Gui (Streamlit ?)
-
+1/Digramm mit THW nocht ee pro Jahr
+1/1 und 2 als alle oder ein
+1/bis richtige eingabe oder nein bei szeanrio
 
 Vorschlag reserve: Wenn x% bis y Tage --> Import, sonst Kraftwerke
 

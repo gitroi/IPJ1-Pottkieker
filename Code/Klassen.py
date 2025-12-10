@@ -81,7 +81,6 @@ class Szenario:
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr2, axs[1, 0])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs[0, 1])
         plt.tight_layout()
-        plt.pause(5)
         plt.close()
     
     def getErgebnisse(self) -> pd.DataFrame:
