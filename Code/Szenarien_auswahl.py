@@ -33,7 +33,13 @@ def prognose_eines_Szenarios():
     for szenario in szenarien:
         print(f"- {szenario['Name']}")
     
-    auswahl = input("Bitte geben Sie den Namen des gewünschten Szenarios ein: ")
+    while(True):
+        auswahl = input("Bitte geben Sie den Namen des gewünschten Szenarios ein: ")
+        if get_scenario_by_name(szenarien, auswahl):
+            break
+        else:
+            print(f"Szenario '{auswahl}' nicht gefunden. Bitte versuchen Sie es erneut.")
+
     jahr = input("Erstes Jahr für Analyse (z.B. 2026, leer für alle): ")
     jahr_2 = input("Zweites Jahr für Analyse (z.B. 2030, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")

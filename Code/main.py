@@ -15,16 +15,16 @@ def main():
     """Hauptfunktion des Programms."""
     print("Starte Szenario-Prognose...")
     while(True):
-        auswahl = input("Was möchten Sie simulieren? Ein Szenario oder alle? ")
+        auswahl = input("Was möchten Sie simulieren? Ein (1) Szenario oder (2) alle? ")
 
-        if auswahl.lower() not in ("ein szenario", "alle"):
-            print("Ungültige Eingabe. Bitte 'Ein Szenario' oder 'salle' eingeben.")
+        if auswahl.lower() not in ("1", "2"):
+            print("Ungültige Eingabe. Bitte '1' oder '2' eingeben.")
             raise ValueError("Ungültige Eingabe.")
         
-        if auswahl.lower() == "ein szenario":
+        if auswahl.lower() == "1":
             start = time.time()
             prognose_eines_Szenarios()
-        elif auswahl.lower() == "alle":
+        elif auswahl.lower() == "2":
             start = time.time()
             prognose_alle_Szenarien()
 
