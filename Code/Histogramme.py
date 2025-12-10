@@ -115,4 +115,28 @@ def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax):
     ax.set_ylabel('Ausbaurate [GW]')
     ax.legend(title='Energieträger')
     ax.tick_params(axis='x', rotation=0)
+    
+    # Automatische y-Achsen-Skalierung mit Puffer
+    max_wert = bottom.max()  # Maximaler gestapelter Wert
+    ax.set_ylim(0, max_wert * 1.1)  # 10% Puffer oben
+    
+    # Schöne y-Achsen-Ticks
+    from matplotlib.ticker import MaxNLocator
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
 
+def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
+    """
+    Erstellt ein Histogramm der jährlichen Energieerzeugung aus nicht-erneuerbaren Quellen.
+    
+    Args:
+        jahreswerte (dict): Dictionary mit den jährlichen Energieerzeugungswerten.
+        ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
+    """
+    jahre = list(jahreswerte.keys())
+    werte = [jahreswerte[jahr]["Energie"] / 1e6 for jahr in jahre] 
+
+    ax.bar(jahre, werte, color='gray', label='Nicht-EE Energie')
+    ax.set_title('Jährliche Energieerzeugung aus nicht-erneuerbaren Quellen')
+    ax.set_xlabel('Jahr')
+    ax.set_ylabel('Energie [TWh]')
+    ax.legend()

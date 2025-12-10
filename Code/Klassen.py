@@ -11,7 +11,7 @@ from config import DATA_DIR, PROJECT_ROOT
 from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
-from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE
+from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
 from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GW_Jahr
@@ -74,14 +74,17 @@ class Szenario:
     
     def zeige_plots(self, jahr1=None, jahr2=None):
         """Zeigt Histogramme und Analysen"""
+        pfad = DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots.png"
         
         self.gesamt_df
         fig, axs = plt.subplots(2, 2, figsize=(14, 12)) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[0, 0])
-        plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr2, axs[1, 0])
-        plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs[0, 1])
+        plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr2, axs[0, 1])
+        plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs[1, 0])
+        plot_histogram_energie_nichtEE(self.konventionelle,axs[1, 1])
         plt.tight_layout()
-        plt.close()
+        fig.savefig(pfad, dpi=300, bbox_inches='tight', format='png')
+        plt.show()
     
     def getErgebnisse(self) -> pd.DataFrame:
         """Gibt die Ergebnisse als DataFrame zurück"""

@@ -13,11 +13,11 @@
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 50,
-                "wasserstoff": 40,
-                "pumpspeicher": 20
+                "batteriespeicher": 70,
+                "wasserstoff": 50,
+                "pumpspeicher": 30
             },
-            "Strombedarf": 650
+            "Strombedarf": 550
         },
         "Ziele 2045": {
             "Ausbau EE": {
