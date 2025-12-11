@@ -132,11 +132,16 @@ def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
         jahreswerte (dict): Dictionary mit den jährlichen Energieerzeugungswerten.
         ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
     """
-    jahre = list(jahreswerte.keys())
+    jahre = sorted(list(jahreswerte.keys()))  # Sortiert die Jahre
     werte = [jahreswerte[jahr]["Energie"] / 1e6 for jahr in jahre] 
-
-    ax.bar(jahre, werte, color='gray', label='Nicht-EE Energie')
+    
+    ax.bar(jahre, werte, width=0.8, color='gray', label='Nicht-EE Energie')
     ax.set_title('Jährliche Energieerzeugung aus nicht-erneuerbaren Quellen')
     ax.set_xlabel('Jahr')
     ax.set_ylabel('Energie [TWh]')
+    
+    # Setze x-Achsen-Ticks auf jedes Jahr
+    ax.set_xticks(jahre)
+    ax.set_xticklabels(jahre, rotation=45, ha='right')
+    
     ax.legend()
