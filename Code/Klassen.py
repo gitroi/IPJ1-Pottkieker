@@ -79,7 +79,7 @@ class Szenario:
 
         fig, axs = plt.subplots(2, 2, figsize=(14, 12)) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[0, 0])
-        plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs[1, 0])
+        plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs[1, 0],axs[1,1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0, 1])
         plt.tight_layout()
         fig.savefig(pfad, dpi=300, bbox_inches='tight', format='png')

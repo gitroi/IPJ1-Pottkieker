@@ -1,9 +1,11 @@
 """
 Programmiert von Joris Bürger
 """
+from config import DATA_DIR
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import json
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 
 # ==============================
@@ -73,7 +75,7 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
     plt.tight_layout()
 
 
-def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax):
+def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax,ax2):
     """ 
     Funktion zur Visualisierung der jährlichen Ausbauraten der Erneuerbaren Energien
     von 2026 bis 2045 basierend auf den Zieldaten für 2030 und 2045.
@@ -84,9 +86,33 @@ def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax):
     Unterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
     ausbauraten = Jährlicher_Zuwachs_EE(Zieldaten_2030, Zieldaten_2045)
+    
+    pfad = DATA_DIR / "Feste_Parameter" / "erzeugerarten.json"
+    with open(pfad, "r") as file:
+        erzeugerarten = json.load(file)
 
-    #jahre = list({2030, 2045}) 
-    #jahre = list(range(2026, 2046))
+    jahre_liste = list(range(2026, 2046))
+    ausbaustände = {et: [] for et in erzeugerarten.keys()}
+    for jahr in jahre_liste:
+        for et in erzeugerarten.keys():
+            if jahr <= 2030:
+                ausbaustände[et].append(ausbauraten['zuwachsrate_2030'][et]*(jahr-2025)+erzeugerarten[et]["bestand"])
+            else:
+                ausbaustände[et].append(ausbauraten['zuwachsrate_2045'][et]*(jahr-2030)+Zieldaten_2030[et])
+
+    technologie_mapping = {
+        'pv_dach': 'PV Dach',
+        'pv_frei': 'PV Frei',
+        'wind_onshore': 'Wind Onshore',
+        'wind_offshore': 'Wind Offshore',
+        'biomasse': 'Biomasse',
+        'wasser': 'Wasser',
+        'sonstige': 'Sonstige',
+        'batteriespeicher': 'Batteriespeicher',
+        'wasserstoff': 'Wasserstoffspeicher',
+        'pumpspeicher': 'Pumpspeicher'
+    }
+
     jahre = ["2026–2030", "2031–2045"]
 
     energietraeger = ['pv_dach','pv_frei', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige']
@@ -112,17 +138,37 @@ def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax):
 
     ax.set_title('Jährliche Ausbauraten der Erneuerbaren Energien (2026-2045)')
     ax.set_xlabel('')
-    ax.set_ylabel('Ausbaurate [GW]')
-    ax.legend(title='Energieträger')
+    ax.set_ylabel('Ausbaurate [GW/Jahr]')
+    ax.legend(title='Energieträger', loc='upper left', fontsize=8)
     ax.tick_params(axis='x', rotation=0)
     
-    # Automatische y-Achsen-Skalierung mit Puffer
-    max_wert = bottom.max()  # Maximaler gestapelter Wert
-    ax.set_ylim(0, max_wert * 1.1)  # 10% Puffer oben
+    max_wert = bottom.max() 
+    ax.set_ylim(0, max_wert * 1.1)  
     
-    # Schöne y-Achsen-Ticks
     from matplotlib.ticker import MaxNLocator
     ax.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
+    
+    # === Zweites Diagramm: Installierte Leistung pro Jahr ===
+    x_positions = np.arange(len(jahre_liste))
+    bar_width = 0.8 / len(energietraeger) 
+    
+    for i, et in enumerate(energietraeger):
+        offset = (i - len(energietraeger) / 2) * bar_width + bar_width / 2
+        ax2.bar(x_positions + offset, ausbaustände[et], width=bar_width, 
+                color=farben[et], label=et.replace('_', ' ').title(), edgecolor='white', linewidth=0.5)
+    
+    ax2.set_title('Installierte Leistung der Erneuerbaren Energien (2026-2045)')
+    ax2.set_xlabel('Jahr')
+    ax2.set_ylabel('Installierte Leistung [GW]')
+    ax2.set_xticks(x_positions)
+    ax2.set_xticklabels(jahre_liste, rotation=45, ha='right')
+    ax2.legend(title='Energieträger', loc='upper left', fontsize=8)
+    ax2.grid(axis='y', alpha=0.3)
+    
+    
+    max_installiert = max([max(ausbaustände[et]) for et in energietraeger])
+    ax2.set_ylim(0, max_installiert * 1.1)
+    ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
 
 def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
     """
@@ -154,7 +200,6 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
         kosten_df (pd.DataFrame): DataFrame mit den Kosteninformationen.
         ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
     """
-    # Mapping von Spaltennamen zu Anzeigenamen
     technologie_mapping = {
         'pv_dach': 'PV Dach',
         'pv_frei': 'PV Frei',
@@ -168,7 +213,6 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
         'pumpspeicher': 'Pumpspeicher'
     }
     
-    # Farben für Technologien
     farben = {
         'PV Dach': '#F9BF02',
         'PV Frei': '#FFFF00',
