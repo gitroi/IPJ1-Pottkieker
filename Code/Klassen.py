@@ -11,10 +11,10 @@ from config import DATA_DIR, PROJECT_ROOT
 from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
-from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,kosten
+from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,kosten
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
-from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GW_Jahr
+from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GWh_Jahr
 from Auswertung import ausgabe, konventionelle_Leistung_Energie
 
 @dataclass
@@ -75,17 +75,20 @@ class Szenario:
     
     def zeige_plots(self, jahr1=None,speichern: bool=False):
         """Zeigt Histogramme und Analysen"""
-        pfad = DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots.png"
+        pfad = DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots.png" #FIXME wozu steht der hier?
 
         fig, axs = plt.subplots(2,  figsize=(14, 12)) 
         fig2, axs2 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig4, axs4 = plt.subplots(2, figsize=(14, 12))
+
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
         kosten(self.kosten_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
+        plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) # Speicherausbaustände und Raten
         plt.tight_layout()
+        
         if(speichern):
             fig.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots1.png", dpi=300, bbox_inches='tight', format='png')
             fig2.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots2.png", dpi=300, bbox_inches='tight', format='png')
@@ -100,7 +103,7 @@ class Szenario:
         ergebnisse = pd.DataFrame()
         ergebnisse["Name"] = [self.name]
         ausbauraten = Jährlicher_Zuwachs_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"])
-        ausbauraten_speicher = ausbaurate_GW_Jahr(self.szenario)
+        ausbauraten_speicher = ausbaurate_GWh_Jahr(self.szenario)
         for key in ausbauraten["zuwachsrate_2030"].keys():
             ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
             ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten["zuwachsrate_2045"][key]]

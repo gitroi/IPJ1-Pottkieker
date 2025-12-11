@@ -7,6 +7,21 @@ import numpy as np
 import pandas as pd
 import json
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
+from Prognose_Speicher import ausbaurate_GWh_Jahr
+
+# Zentrale Definition der Technologie-Mappings
+TECHNOLOGIE_MAPPING = {
+    'pv_dach': 'PV Dach',
+    'pv_frei': 'PV Frei',
+    'wind_onshore': 'Wind Onshore',
+    'wind_offshore': 'Wind Offshore',
+    'biomasse': 'Biomasse',
+    'wasser': 'Wasser',
+    'sonstige': 'Sonstige',
+    'batteriespeicher': 'Batteriespeicher',
+    'wasserstoff': 'Wasserstoffspeicher',
+    'pumpspeicher': 'Pumpspeicher'
+}
 
 # ==============================
 # 1. Visualisierung: Anteil Erneuerbare Energien über die Jahre
@@ -99,19 +114,6 @@ def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax,ax2):
             else:
                 ausbaustände[et].append(ausbauraten['zuwachsrate_2045'][et]*(jahr-2030)+Zieldaten_2030[et])
 
-    technologie_mapping = {
-        'pv_dach': 'PV Dach',
-        'pv_frei': 'PV Frei',
-        'wind_onshore': 'Wind Onshore',
-        'wind_offshore': 'Wind Offshore',
-        'biomasse': 'Biomasse',
-        'wasser': 'Wasser',
-        'sonstige': 'Sonstige',
-        'batteriespeicher': 'Batteriespeicher',
-        'wasserstoff': 'Wasserstoffspeicher',
-        'pumpspeicher': 'Pumpspeicher'
-    }
-
     jahre = ["2026–2030", "2031–2045"]
 
     energietraeger = ['pv_dach','pv_frei', 'wind_onshore', 'wind_offshore', 'biomasse', 'wasser', 'sonstige']
@@ -199,18 +201,6 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
         kosten_df (pd.DataFrame): DataFrame mit den Kosteninformationen.
         ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
     """
-    technologie_mapping = {
-        'pv_dach': 'PV Dach',
-        'pv_frei': 'PV Frei',
-        'wind_onshore': 'Wind Onshore',
-        'wind_offshore': 'Wind Offshore',
-        'biomasse': 'Biomasse',
-        'wasser': 'Wasser',
-        'sonstige': 'Sonstige',
-        'batteriespeicher': 'Batteriespeicher',
-        'wasserstoff': 'Wasserstoffspeicher',
-        'pumpspeicher': 'Pumpspeicher'
-    }
     
     farben = {
         'PV Dach': '#F9BF02',
@@ -228,7 +218,7 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
     technologien = []
     kosten = []
     
-    for key, name in technologie_mapping.items():
+    for key, name in TECHNOLOGIE_MAPPING.items():
         spalte = f"Gesamtkosten {key} [€]"
         if spalte in kosten_df.columns:
             gesamt = kosten_df[spalte].sum() / 1e9  
@@ -256,4 +246,82 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
 
     ax2.pie(anteil_gesamtkosten, labels=technologien, autopct='%1.1f%%', startangle=140, colors=colors)
     ax2.set_title('Anteil der Gesamtkosten nach Technologie')
+
+def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
+    """ 
+    Funktion zur Visualisierung der jährlichen Ausbauraten der Speicher
+    von 2026 bis 2045 basierend auf den Zieldaten für 2030 und 2045.
+    Darstellung in zwei Balken als gestapeltes Balkendiagramm.
+    Args:
+        szenario: Szenario-Objekt mit den Speicherzieldaten.
+        ax: Achsenobjekt für das erste Diagramm.
+        ax2: Achsenobjekt für das zweite Diagramm.
+    Unterstützt durch KI (GPT-4.1 Inline Suggestions)
+    """
+    ausbauraten = ausbaurate_GWh_Jahr(szenario)
     
+    pfad = DATA_DIR / "Feste_Parameter" / "speicherarten.json"
+    with open(pfad, "r") as file:
+        speicherarten = json.load(file)
+
+    jahre_liste = list(range(2026, 2046))
+    ausbaustände = {et: [] for et in speicherarten.keys()}
+    for jahr in jahre_liste:
+        for et in speicherarten.keys():
+            if jahr <= 2030:
+                ausbaustände[et].append(ausbauraten['zuwachsrate_2030'][et]*(jahr-2025)+speicherarten[et]["bestand"])
+            else:
+                ausbaustände[et].append(ausbauraten['zuwachsrate_2045'][et]*(jahr-2030)+szenario["Ziele 2045"]["Ausbau Speicher"][et])
+
+    jahre = ["2026–2030", "2031–2045"]
+
+    speicherarten = ['batteriespeicher', 'wasserstoff', 'pumpspeicher']
+    farben = {
+        'batteriespeicher': "#F3CD25",
+        'wasserstoff': "#12E671",
+        'pumpspeicher': "#1633D8"
+    }
+
+    data = {et: [
+        ausbauraten['zuwachsrate_2030'][et],  
+        ausbauraten['zuwachsrate_2045'][et]    
+    ] for et in speicherarten}
+
+    bottom = np.zeros(len(jahre))
+    for et in speicherarten:
+        ax.bar(jahre, data[et], bottom=bottom, color=farben[et], label=et.replace('_', ' ').title())
+        bottom += np.array(data[et])
+
+    ax.set_title('Jährliche Ausbauraten der Speicher (2026-2045)')
+    ax.set_xlabel('')
+    ax.set_ylabel('Ausbaurate [GWh/Jahr]')
+    ax.legend(title='Speicherart', loc='upper left', fontsize=8)
+    ax.tick_params(axis='x', rotation=0)
+    
+    max_wert = bottom.max() 
+    ax.set_ylim(0, max_wert * 1.1)  
+    
+    from matplotlib.ticker import MaxNLocator
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
+    
+    # === Zweites Diagramm: Installierte Kapazität pro Jahr ===
+    x_positions = np.arange(len(jahre_liste))
+    bar_width = 0.8 / len(speicherarten) 
+    
+    for i, et in enumerate(speicherarten):
+        offset = (i - len(speicherarten) / 2) * bar_width + bar_width / 2
+        ax2.bar(x_positions + offset, ausbaustände[et], width=bar_width, 
+                color=farben[et], label=et.replace('_', ' ').title(), edgecolor='white', linewidth=0.5)
+    
+    ax2.set_title('Installierte Kapazität der Speicher (2026-2045)')
+    ax2.set_xlabel('Jahr')
+    ax2.set_ylabel('Installierte Kapazität [GWh]')
+    ax2.set_xticks(x_positions)
+    ax2.set_xticklabels(jahre_liste, rotation=45, ha='right')
+    ax2.legend(title='Speicherart', loc='upper left', fontsize=8)
+    ax2.grid(axis='y', alpha=0.3)
+    
+    
+    max_installiert = max([max(ausbaustände[et]) for et in speicherarten])
+    ax2.set_ylim(0, max_installiert * 1.1)
+    ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))

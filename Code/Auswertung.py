@@ -7,7 +7,7 @@ from config import DATA_DIR
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from Feste_Variablen import Keys_Erzeugung, Keys_Speicher
 import matplotlib.pyplot as plt
-from Prognose_Speicher import ausbaurate_GW_Jahr
+from Prognose_Speicher import ausbaurate_GWh_Jahr
 
 def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: str, konventionelle: dict):
     """
@@ -21,7 +21,7 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: s
 
     ausbauraten = Jährlicher_Zuwachs_EE(szenario["Ziele 2030"]["Ausbau EE"], szenario["Ziele 2045"]["Ausbau EE"])
     gesamt = pd.merge(ee_df, kosten_df, on="Datum von", how="inner")
-    ausbauraten_speicher = ausbaurate_GW_Jahr(szenario)
+    ausbauraten_speicher = ausbaurate_GWh_Jahr(szenario)
 
     gesamt["Jahr"] = gesamt["Datum von"].dt.year
 

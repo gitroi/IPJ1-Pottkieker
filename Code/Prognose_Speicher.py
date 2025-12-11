@@ -335,9 +335,9 @@ def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandWasserstoff, bestandPumpspei
 
     return df_ausbau
 
-def ausbaurate_GW_Jahr(szenario: json) -> dict:
+def ausbaurate_GWh_Jahr(szenario: json) -> dict:
     """
-    Berechnet die jährlichen Ausbauraten in GW/Jahr für jede Erzeugungsart und GWh/Jahr für jede Speicherart
+    Berechnet die jährlichen Ausbauraten in GWh/Jahr für jede Speicherart
     """
     
     with open(DATA_DIR / "Feste_Parameter" / "speicherarten.json", 'r', encoding='utf-8') as datei:
