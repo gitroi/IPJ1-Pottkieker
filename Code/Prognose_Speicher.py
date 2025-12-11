@@ -57,7 +57,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         dfs
     )
 
-    # Listen für Ergebnisse initialisieren
+    # Listen für Ergebnisse initialisieren TODO: Lademenge und Fehlmenge in Spalten speichern?
     speicherstand_batterie = []
     speicherstand_wasserstoff = []
     speicherstand_pumpspeicher = []
