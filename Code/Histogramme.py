@@ -145,3 +145,72 @@ def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
     ax.set_xticklabels(jahre, rotation=45, ha='right')
     
     ax.legend()
+
+def kosten(kosten_df: pd.DataFrame, ax1,ax2):
+    """
+    Erstellt ein Balkendiagramm der Gesamtkosten für jede Technologie.
+    
+    Args:
+        kosten_df (pd.DataFrame): DataFrame mit den Kosteninformationen.
+        ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
+    """
+    # Mapping von Spaltennamen zu Anzeigenamen
+    technologie_mapping = {
+        'pv_dach': 'PV Dach',
+        'pv_frei': 'PV Frei',
+        'wind_onshore': 'Wind Onshore',
+        'wind_offshore': 'Wind Offshore',
+        'biomasse': 'Biomasse',
+        'wasser': 'Wasser',
+        'sonstige': 'Sonstige',
+        'batteriespeicher': 'Batteriespeicher',
+        'wasserstoff': 'Wasserstoffspeicher',
+        'pumpspeicher': 'Pumpspeicher'
+    }
+    
+    # Farben für Technologien
+    farben = {
+        'PV Dach': '#F9BF02',
+        'PV Frei': '#FFFF00',
+        'Wind Onshore': '#87CEEB',
+        'Wind Offshore': '#4169E1',
+        'Biomasse': '#228B22',
+        'Wasser': '#00CED1',
+        'Sonstige': '#FF8C00',
+        'Batteriespeicher': '#9C27B0',
+        'Wasserstoffspeicher': '#E91E63',
+        'Pumpspeicher': '#3F51B5'
+    }
+    
+    technologien = []
+    kosten = []
+    
+    for key, name in technologie_mapping.items():
+        spalte = f"Gesamtkosten {key} [€]"
+        if spalte in kosten_df.columns:
+            gesamt = kosten_df[spalte].sum() / 1e9  
+            technologien.append(name)
+            kosten.append(gesamt)
+    
+    colors = [farben[tech] for tech in technologien]
+    ax1.bar(technologien, kosten, color=colors, edgecolor='white')
+    ax1.set_title('Gesamtkosten nach Technologie (2026-2045)')
+    ax1.set_ylabel('Kosten [Mrd. €]')
+    ax1.set_xlabel('Technologie')
+    
+    ax1.set_xticks(range(len(technologien)))
+    ax1.set_xticklabels(technologien, rotation=45, ha='right')
+    
+    for i, (tech, wert) in enumerate(zip(technologien, kosten)):
+        if wert > 0.01:  # Nur Werte > 10 Mio. € anzeigen
+            ax1.text(i, wert, f"{wert:.1f}", ha='center', va='bottom', fontsize=8)
+
+    anteil_gesamtkosten = []
+    gesamt_kosten = sum(kosten)
+    for wert in kosten:
+        anteil = (wert / gesamt_kosten) * 100 if gesamt_kosten > 0 else 0
+        anteil_gesamtkosten.append(anteil)
+
+    ax2.pie(anteil_gesamtkosten, labels=technologien, autopct='%1.1f%%', startangle=140, colors=colors)
+    ax2.set_title('Anteil der Gesamtkosten nach Technologie')
+    

@@ -69,7 +69,6 @@ def prognose_eines_Szenarios():
             print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
     
     jahr = input("Erstes Jahr für Analyse (z.B. 2026, leer für alle): ")
-    jahr_2 = input("Zweites Jahr für Analyse (z.B. 2030, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")
     
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
@@ -89,20 +88,12 @@ def prognose_eines_Szenarios():
         
         szenario_ergebnis.berechne_alle_prognosen()
         
-        if jahr.strip().isdigit() and jahr_2.strip().isdigit():
+        if jahr.strip().isdigit():
             jahr1 = int(jahr)
-            jahr2 = int(jahr_2)
-        elif jahr.strip().isdigit():
-            jahr1 = int(jahr)
-            jahr2 = None
-        elif jahr_2.strip().isdigit():
-            jahr1 = None
-            jahr2 = int(jahr_2)
         else:
             jahr1 = None
-            jahr2 = None
         
-        szenario_ergebnis.zeige_plots(jahr1, jahr2)
+        szenario_ergebnis.zeige_plots(jahr1)
         
         if (input("Möchten Sie die Ergebnisse in einer Excel-Datei speichern? (ja/nein): ").lower() == "ja"):
             szenario_ergebnis.exportiere_ergebnisse()
@@ -128,7 +119,7 @@ def prognose_alle_Szenarien():
             print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
 
     gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
-    
+
     ertragsart = input("Wie soll die Ertragsart für alle Szenarien sein? (schlecht, mittel, gut): ")
 
     if ertragsart not in ["schlecht", "mittel", "gut"]:
