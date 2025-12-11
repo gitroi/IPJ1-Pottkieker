@@ -26,6 +26,7 @@ class Szenario:
     ziele_2030: dict
     ziele_2045: dict
     ertragsart: str
+    verbrauchsprofile: json
     veränderungsfaktoren: dict
     
     erzeugung_df: Optional[pd.DataFrame] = None
@@ -48,8 +49,8 @@ class Szenario:
         )
         
         self.verbrauch_df = Prognose_Verbrauch(
-            self.ziele_2030["Strombedarf"], 
-            self.ziele_2045["Strombedarf"]
+            self.verbrauchsprofile["Verbrauch_2030"],
+            self.verbrauchsprofile["Verbrauch_2045"]
         )
         
         self.ee_anteil_ohne_speicher_df = anteil_erneuerbare_df(

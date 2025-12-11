@@ -19,6 +19,15 @@ def load_scenarios():
 
     return scenarios
 
+def load_verbrauchsprofile():
+    """Lädt Verbrauchsprofile aus einer JSON-Datei."""
+    pfad = DATA_DIR / "Verbrauchsprofile.json"
+
+    with open(pfad, 'r', encoding='utf-8') as datei:
+        verbrauchsprofile = json.load(datei)
+
+    return verbrauchsprofile
+
 def get_scenario_by_name(szenarien, name):
     """Gibt ein Szenario basierend auf dem Namen zurück."""
     for szenario in szenarien:
@@ -26,13 +35,21 @@ def get_scenario_by_name(szenarien, name):
             return szenario
     return None
 
+def get_verbrauchsprofil_by_name(verbrauchsprofile, name):
+    """Gibt ein Verbrauchsprofil basierend auf dem Namen zurück."""
+    for profil in verbrauchsprofile:
+        if profil["Name"].lower() == name.lower():
+            return profil
+    return None
+
 def prognose_eines_Szenarios():
     szenarien = load_scenarios()
+    verbrauchsprofile = load_verbrauchsprofile()
     
     print("Verfügbare Szenarien:")
     for szenario in szenarien:
         print(f"- {szenario['Name']}")
-    
+
     while(True):
         auswahl = input("Bitte geben Sie den Namen des gewünschten Szenarios ein: ")
         if get_scenario_by_name(szenarien, auswahl):
@@ -40,11 +57,23 @@ def prognose_eines_Szenarios():
         else:
             print(f"Szenario '{auswahl}' nicht gefunden. Bitte versuchen Sie es erneut.")
 
+    print("Verfügbare Verbrauchsprofile:")
+    for profil in verbrauchsprofile:
+        print(f"- {profil['Name']}")
+
+    while(True):
+        verbrauch = input("Bitte geben Sie den Namen des gewünschten Verbrauchsprofils ein: ")
+        if get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch):
+            break
+        else:
+            print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
+    
     jahr = input("Erstes Jahr für Analyse (z.B. 2026, leer für alle): ")
     jahr_2 = input("Zweites Jahr für Analyse (z.B. 2030, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")
     
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
+    gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
     
     if gewaehltes_szenario:
         szenario_ergebnis = Szenario(
@@ -54,6 +83,7 @@ def prognose_eines_Szenarios():
             ziele_2030=gewaehltes_szenario["Ziele 2030"],
             ziele_2045=gewaehltes_szenario["Ziele 2045"],
             ertragsart=ertragsart,
+            verbrauchsprofile=gewaehltes_profil,
             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"]
         )
         
@@ -84,6 +114,20 @@ def prognose_eines_Szenarios():
 def prognose_alle_Szenarien():
     szenarien = load_scenarios()
     alle_ergebnisse = pd.DataFrame()
+    verbrauchsprofile = load_verbrauchsprofile()
+
+    print("Verfügbare Verbrauchsprofile:")
+    for profil in verbrauchsprofile:
+        print(f"- {profil['Name']}")
+
+    while(True):
+        verbrauch = input("Bitte geben Sie den Namen des gewünschten Verbrauchsprofils ein: ")
+        if get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch):
+            break
+        else:
+            print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
+
+    gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
     
     ertragsart = input("Wie soll die Ertragsart für alle Szenarien sein? (schlecht, mittel, gut): ")
 

@@ -6,7 +6,6 @@ Prio/was muss gemacht werden
 3/Faktoren für besseren Ertrag einbauen
 2/Stromverbruach aus einzelnen Sektoren berechnen
 1/Grafiken für Kosten und Excel erstellung für alle
-1/Kosten Speicher
 1/Einlesen der Daten zu speichern aus Szenarien
 2-3/Gui (Streamlit ?)
 1/Digramm mit THW nocht ee pro Jahr
@@ -17,3 +16,23 @@ Vorschlag reserve: Wenn x% bis y Tage --> Import, sonst Kraftwerke
 Szenarien parameter als grundwert und dann, jenachdem ob Erezugung < oder > verbrauch 
 die werte erhöhren/senken.
 Dann schauen, ob speicher reichen
+
+Grafiken:
+- Kosten (zwei Balkendiagramme Erzeuger/Speicher, Kuchendiagramm prozentualer Anteil je Technologie)
+    - balken ist eine Technologe auf gesamtkosten und das nochmal als Kuche für gesamt
+- Ausbaurate (Balkendiagramm 2030,2045)
+    - so wie jetzt
+- Installierte Erzeuger (Balkendiagramm 2030, 2045)(Kuchendiagramm prozentualer Anteil 2030, 2045)
+    -  jede technologie ein Balken und dann für 2030 und 2045 (ODer dann variabel) Kuchen nur für ende
+- Installierte Speicher (Balkendiagramm 2030, 2045)(Kuchendiagramm prozentualer Anteil 2030, 2045)
+    -  jede technologie ein Balken und dann für 2030 und 2045 (ODer dann variabel) Kuchen nur für ende
+- Nicht gedeckter Strombedarf (Balkendiagramm jährlich)
+    - ist erledigt/ 
+- Anteil EE über 100% ohne Speicher (Balkendiagramm jährlich)
+- Anteil EE über 100% mit Speicher (Balkendiagramm jährlich)
+    Als prozenz mit über 100
+
+Vergleich:
+ 
+- Szenarien Gesamtkostenvergleich (Balkendiagramm)
+- gesamter nicht gedeckter Strombedarf je Szenario (Balkendiagramm)

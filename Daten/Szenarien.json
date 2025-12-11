@@ -16,8 +16,7 @@
                 "batteriespeicher": 70,
                 "wasserstoff": 50,
                 "pumpspeicher": 30
-            },
-            "Strombedarf": 550
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -33,8 +32,7 @@
                 "batteriespeicher": 700,
                 "wasserstoff": 300,
                 "pumpspeicher": 300
-            },
-            "Strombedarf": 800
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -94,8 +92,7 @@
                 "batteriespeicher": 6,
                 "wasserstoff": 10,
                 "pumpspeicher": 40
-            },
-            "Strombedarf": 520
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -111,15 +108,14 @@
                 "batteriespeicher": 20,
                 "wasserstoff": 15,
                 "pumpspeicher": 45
-            },
-            "Strombedarf": 700
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -172,8 +168,7 @@
                 "batteriespeicher": 15,
                 "wasserstoff": 80,
                 "pumpspeicher": 45
-            },
-            "Strombedarf": 700
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -189,15 +184,14 @@
                 "batteriespeicher": 80,
                 "wasserstoff": 800,
                 "pumpspeicher": 60
-            },
-            "Strombedarf": 1000
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -250,8 +244,7 @@
                 "batteriespeicher": 20,
                 "wasserstoff": 60,
                 "pumpspeicher": 50
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -267,15 +260,14 @@
                 "batteriespeicher": 150,
                 "wasserstoff": 600,
                 "pumpspeicher": 70
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -328,8 +320,7 @@
                 "batteriespeicher": 40,
                 "wasserstoff": 50,
                 "pumpspeicher": 55
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -345,8 +336,7 @@
                 "batteriespeicher": 400,
                 "wasserstoff": 400,
                 "pumpspeicher": 80
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -406,8 +396,7 @@
                 "batteriespeicher": 18,
                 "wasserstoff": 150,
                 "pumpspeicher": 80
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -423,8 +412,7 @@
                 "batteriespeicher": 120,
                 "wasserstoff": 1200,
                 "pumpspeicher": 140
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -484,8 +472,7 @@
                 "batteriespeicher": 30,
                 "wasserstoff": 100,
                 "pumpspeicher": 70
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -501,8 +488,7 @@
                 "batteriespeicher": 600,
                 "wasserstoff": 1000,
                 "pumpspeicher": 200
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -562,8 +548,7 @@
                 "batteriespeicher": 25,
                 "wasserstoff": 40,
                 "pumpspeicher": 55
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -579,8 +564,7 @@
                 "batteriespeicher": 200,
                 "wasserstoff": 300,
                 "pumpspeicher": 90
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -640,8 +624,7 @@
                 "batteriespeicher": 60,
                 "wasserstoff": 80,
                 "pumpspeicher": 70
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -657,8 +640,7 @@
                 "batteriespeicher": 1200,
                 "wasserstoff": 600,
                 "pumpspeicher": 160
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -718,8 +700,7 @@
                 "batteriespeicher": 40,
                 "wasserstoff": 300,
                 "pumpspeicher": 120
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -735,8 +716,7 @@
                 "batteriespeicher": 700,
                 "wasserstoff": 2000,
                 "pumpspeicher": 300
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -796,8 +776,7 @@
                 "batteriespeicher": 35,
                 "wasserstoff": 800,
                 "pumpspeicher": 100
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -813,8 +792,7 @@
                 "batteriespeicher": 500,
                 "wasserstoff": 6000,
                 "pumpspeicher": 250
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
@@ -874,8 +852,7 @@
                 "batteriespeicher": 50,
                 "wasserstoff": 1200,
                 "pumpspeicher": 110
-            },
-            "Strombedarf": 628
+            }
         },
         "Ziele 2045": {
             "Ausbau EE": {
@@ -891,8 +868,7 @@
                 "batteriespeicher": 800,
                 "wasserstoff": 9000,
                 "pumpspeicher": 300
-            },
-            "Strombedarf": 890
+            }
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
