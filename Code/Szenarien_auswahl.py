@@ -70,7 +70,8 @@ def prognose_eines_Szenarios():
     
     jahr = input("Erstes Jahr für Analyse (z.B. 2026, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")
-    
+    bilder = input("Möchten Sie die Plots speichern? (ja/nein): ").lower() == "ja"
+
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
     gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
     
@@ -93,7 +94,7 @@ def prognose_eines_Szenarios():
         else:
             jahr1 = None
         
-        szenario_ergebnis.zeige_plots(jahr1)
+        szenario_ergebnis.zeige_plots(jahr1,bilder)
         
         if (input("Möchten Sie die Ergebnisse in einer Excel-Datei speichern? (ja/nein): ").lower() == "ja"):
             szenario_ergebnis.exportiere_ergebnisse()

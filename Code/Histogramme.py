@@ -56,7 +56,6 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
 
     ax.set_title(title)
     ax.set_xlabel('Anteil Erneuerbare Speicher [%]')
-    ax.set_ylabel('Anzahl Viertelstunden')
 
     ax.set_xlim(0, 115)
 
@@ -70,7 +69,7 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
 
     ax.yaxis.set_major_locator(MultipleLocator(step))
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f"{int(x/1000)}"))
-    ax.set_ylabel('Anzahl (in 1.000)')
+    ax.set_ylabel('Anzahl Viertelstunden (in 1.000)')
 
     plt.tight_layout()
 
