@@ -130,10 +130,10 @@ class Szenario:
             self.gesamt_df.loc[mask, "Realisierte Erzeugung [MWh]"]
         ).sum() / 1e6
         ergebnisse["Nicht durch EE gedeckter Strombedarf [TWh]"] = [nicht_ee_strom]
-        ergebnisse["Benötigte Leistung Konventioennelle 2045 [GW]"] = [
+        ergebnisse["Benötigte Leistung Konventioenelle 2045 [GW]"] = [
             self.konventionelle[2045]["Leistung"] / 1e3
         ]
-        ergebnisse["Benötigte Leistung Konventioennelle 2030 [GW]"] = [
+        ergebnisse["Benötigte Leistung Konventioenelle 2030 [GW]"] = [
             self.konventionelle[2030]["Leistung"] / 1e3
         ]
 

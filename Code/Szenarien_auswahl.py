@@ -9,6 +9,7 @@ import pandas as pd
 from typing import Optional
 from config import DATA_DIR, PROJECT_ROOT
 from Klassen import Szenario
+from Histogramme import plot_histogram_gesamtauswertung
 
 def load_scenarios():
     """Lädt Szenarien aus einer JSON-Datei."""
@@ -134,6 +135,7 @@ def prognose_alle_Szenarien():
             ziele_2030=szenario["Ziele 2030"],
             ziele_2045=szenario["Ziele 2045"],
             ertragsart=ertragsart,
+            verbrauchsprofile=gewaehltes_profil,
             veränderungsfaktoren=szenario["Veränderungsfaktoren"]["Erzeugung"]
         )
         
@@ -141,6 +143,18 @@ def prognose_alle_Szenarien():
         ergebnisse_df = szenario_ergebnis.getErgebnisse()
         alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
     
+    fig1, ax1 = plt.subplots(1, 2, figsize=(12, 6))
+    fig2, ax2 = plt.subplots(1, 2, figsize=(12, 6))
+
+    plot_histogram_gesamtauswertung(alle_ergebnisse,  ax1[0],ax1[1], ax2[0],ax2[1])
+    plt.tight_layout()
+    if(input("Möchten Sie die Plots speichern? (ja/nein): ").lower() == "ja"):
+        pfad = DATA_DIR/ "Output" / f"auswertung_aller_szenarien_erzeugung_{ertragsart}.png"
+        fig1.savefig(pfad)
+        fig2.savefig(pfad.with_name(pfad.stem + "_2.png"))
+        print(f"✓ Plots wurden in '{pfad}' und '{pfad.with_name(pfad.stem + '_2.png')}' gespeichert.")
+    plt.show()
+
     pfad = DATA_DIR/ "Output" / f"auswertung_aller_szenarien_erzeugung_{ertragsart}.xlsx"
     alle_ergebnisse.to_excel(pfad, index=False)
     print(f"✓ Alle Szenarien wurden verarbeitet und in '{pfad}' gespeichert.")

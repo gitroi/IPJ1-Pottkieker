@@ -325,3 +325,61 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
     max_installiert = max([max(ausbaustände[et]) for et in speicherarten])
     ax2.set_ylim(0, max_installiert * 1.1)
     ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
+
+def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
+    """
+    Erstellt verschiedene Histogramme zur Gesamtauswertung eines Szenarios.
+    
+    Args:
+        gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
+        ax1 (matplotlib.axes.Axes): Achsenobjekt für das erste Diagramm.
+        ax2 (matplotlib.axes.Axes): Achsenobjekt für das zweite Diagramm.
+        ax3 (matplotlib.axes.Axes): Achsenobjekt für das dritte Diagramm.
+        ax4 (matplotlib.axes.Axes): Achsenobjekt für das vierte Diagramm.
+    """
+
+    #=== Histogramm gesamtkosten je Szenario (Zeile df) als Balkendiagramm ===
+    szenarien = gesamt_df["Name"].unique()
+    gesamtkosten = gesamt_df["Gesamtkosten_EE_und_Speicher [Miliarden €]"].values
+
+    ax1.bar(range(len(szenarien)), gesamtkosten, color='skyblue', edgecolor='white')
+    ax1.set_xticks(range(len(szenarien)))
+    ax1.set_xticklabels(szenarien, rotation=45, ha='right')
+    ax1.set_title('Gesamtkosten je Szenario')
+    ax1.set_ylabel('Gesamtkosten [Mrd. €]')
+
+    #=== Strom aus nicht EE als Balkendiagramm ===
+    nicht_ee_strom = gesamt_df["Nicht durch EE gedeckter Strombedarf [TWh]"].values
+
+    ax2.bar(range(len(szenarien)), nicht_ee_strom, color='salmon', edgecolor='white')
+    ax2.set_xticks(range(len(szenarien)))
+    ax2.set_xticklabels(szenarien, rotation=45, ha='right')
+    ax2.set_title('Nicht durch EE gedeckter Stromverbrauch je Szenario')
+    ax2.set_ylabel('Nicht-EE Stromverbrauch [TWh]')
+
+    #=== Anteil Viertelstunden mit >=100% EE ohne Speicher als Balkendiagramm ===
+    anteil_ee_ohne_speicher = gesamt_df[f"Anteil virtel Stunden mit >=100% EE ohne Speicher [%]"].values
+    anteil_mit_speicher = gesamt_df[f"Anteil virtel Stunden mit >=100% EE mit Speicher [%]"].values
+
+    x = np.arange(len(szenarien))
+    width = 0.35
+
+    ax3.bar(x - width/2, anteil_ee_ohne_speicher, width, label='Ohne Speicher', color='lightgreen', edgecolor='white')
+    ax3.bar(x + width/2, anteil_mit_speicher, width, label='Mit Speicher', color='green', edgecolor='white')
+    ax3.set_xticks(x)
+    ax3.set_xticklabels(szenarien, rotation=45, ha='right')
+    ax3.set_title('Anteil Viertelstunden mit >=100% EE je Szenario')
+    ax3.set_ylabel('Anteil [%]')
+    ax3.legend()
+
+    #=== Benötigte Leistung Konventionelle 2045 als Balkendiagramm ===
+    leistung_konventionelle_2030 = gesamt_df["Benötigte Leistung Konventioenelle 2030 [GW]"].values
+    leistung_konventionelle_2045 = gesamt_df["Benötigte Leistung Konventioenelle 2045 [GW]"].values
+
+    ax4.bar(x - width/2, leistung_konventionelle_2030, width, label='2030', color='orange', edgecolor='white')
+    ax4.bar(x + width/2, leistung_konventionelle_2045, width, label='2045', color='red', edgecolor='white')
+    ax4.set_xticks(x)
+    ax4.set_xticklabels(szenarien, rotation=45, ha='right')
+    ax4.set_title('Benötigte Leistung Konventionelle je Szenario')
+    ax4.set_ylabel('Leistung [GW]')
+    ax4.legend()
