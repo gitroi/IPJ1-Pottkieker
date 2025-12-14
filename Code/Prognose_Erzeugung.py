@@ -245,7 +245,9 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
 
     spalten = ["Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen",
                "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
-               "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
+               "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen","Installierte PV_GW",
+               "Installierte Wind_Onshore_GW","Installierte Wind_Offshore_GW","Installierte Biomasse_GW",
+               "Installierte Wasser_GW","Installierte Sonstige_GW"]
     
     prognose_export = prognose_export[["Datum von"] + spalten]
 
