@@ -1,7 +1,3 @@
-# Output folder (ignore all contents except .gitkeep)
-Daten/Output/*
-!Daten/Output/.gitkeep
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -220,10 +216,9 @@ __pycache__/
 # VS Code
 .vscode/
 
-# Projekt-spezifisch
-Daten/Output/
-Ergebnisse/*.xlsx
-*.csv
+# Output folder (ignore all contents except .gitkeep)
+Daten/Output/*
+!Daten/Output/.gitkeep
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
