@@ -11,6 +11,16 @@ from dataclasses import dataclass
 from fractions import Fraction
 from config import DATA_DIR
 
+@dataclass
+class Speicher:
+    bestand: float
+    wirkungsgrad: float
+    capex: float
+    opex: float
+    verluste: float
+    leistung: float
+    obergrenze: float
+    untergrenze: float
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
 def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict ) -> pd.DataFrame:
@@ -84,15 +94,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         aktuell_verfugbare_wasserstoff = aktuell_wasserstoff - (row["Speicherkapazität wasserstoff [MWh]"]*fixparameterWasserstoff.untergrenze)
         aktuell_verfugbare_pumpspeicher = aktuell_pumpspeicher - (row["Speicherkapazität pumpspeicher [MWh]"]*fixparameterPumpspeicher.untergrenze)
         
-        #Summe aller Erzeuger berechnen...
-        erzeugung = (
-            row["Biomasse [MWh] Originalauflösungen"] +
-            row["Wasserkraft [MWh] Originalauflösungen"] + 
-            row["Wind Offshore [MWh] Originalauflösungen"] +
-            row["Wind Onshore [MWh] Originalauflösungen"] +
-            row["Photovoltaik [MWh] Originalauflösungen"] +
-            row["Sonstige Erneuerbare [MWh] Originalauflösungen"]
-        )     
+        #Summe aller Erzeuger 
+        erzeugung = row["Erneuerbare [MWh]"]     
 
         if row["Anteil Erneuerbare [%]"] > ladegrenze: #überschüssige Energie vorhanden
 
@@ -223,28 +226,20 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
     return df_gesamtVerlauf
 
-def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, df_dunkelflaute: pd.DataFrame):
+def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     """
     Simuliert den Verlauf einer Dunkelflaute
     """
 
+    # Dunkelflauten-Daten einlesen
+    df_dunkelflaute = Einlesen_Dunkelflaute(jahr)
 
 
-def Einlesen_Speicherdaten_fix(speicherart):
+
+def Einlesen_Speicherdaten_fix(speicherart) -> Speicher:
     """
     Liest alle festen Parameter einer Speicherart aus einer JSON-Datei ein
     """
-
-    @dataclass
-    class Speicher:
-        bestand: float
-        wirkungsgrad: float
-        capex: float
-        opex: float
-        verluste: float
-        leistung: float
-        obergrenze: float
-        untergrenze: float
     
     with open(DATA_DIR / "Feste_Parameter" / "speicherarten.json", "r") as f:
         data = json.load(f)
@@ -257,17 +252,24 @@ def Einlesen_Speicherdaten_fix(speicherart):
 
     return speicher
 
-def Einlesen_Dunkelflaute() -> pd.DataFrame:
+def Einlesen_Dunkelflaute(jahr: int) -> pd.DataFrame:
     """
     Liest die Dunkelflauten-Daten aus einer CSV-Datei ein
     """
 
-    pfad = DATA_DIR / Variable_Parameter /"dunkelflaute.csv"  
-    df_dunkelflaute = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False)
+    pfad = DATA_DIR / "Variable_Parameter" /"dunkelflaute.csv"  
+    df_dunkelflaute = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False, names=["month","day","realisierte EE [Anteil]"], header=0)
+    df_dunkelflaute.insert(0, "year", jahr)
+    df_dunkelflaute.insert(0, "Datum von", pd.to_datetime(df_dunkelflaute[["year", "month", "day"]], format='%Y-%m-%d', utc=True))
+    df_dunkelflaute = df_dunkelflaute.drop(columns=["year","month","day"])
 
     return df_dunkelflaute
 
-def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045):
+# Debug Code
+df_test = Einlesen_Dunkelflaute(2030)
+df_test.to_csv(DATA_DIR / 'Output' / 'debug_dunkelflaute.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+
+def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045) -> pd.DataFrame:
     """
     Berechnet den Verlauf des Speicherausbaus einer Speicherart
     """
@@ -320,7 +322,7 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
 
     return df_gesamt
 
-def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandWasserstoff, bestandPumpspeicher, Batterie30, Batterie45, Wasserstoff30, Wasserstoff45, Pumpspeicher30, Pumpspeicher45):
+def Prognose_Gesamt_Ausbau_(bestandBatterie, bestandWasserstoff, bestandPumpspeicher, Batterie30, Batterie45, Wasserstoff30, Wasserstoff45, Pumpspeicher30, Pumpspeicher45) -> pd.DataFrame:
     """
     Erstellt die Gesamtprognose für alle Speicherarten
     """
