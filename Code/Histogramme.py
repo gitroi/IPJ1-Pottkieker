@@ -277,7 +277,7 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
 
     speicherarten = ['batteriespeicher', 'wasserstoff', 'pumpspeicher']
     farben = {
-        'batteriespeicher': "#F3CD25",
+        'batteriespeicher': "#A52ACA",
         'wasserstoff': "#12E671",
         'pumpspeicher': "#1633D8"
     }

@@ -233,7 +233,10 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
     prognose['Sonstige_Prognose_MWh'] = prognose['Sonstige_Prognose_MWh'].round(2)
    
     # Speichere Prognose
-    prognose_export = prognose[['Datum von', 'PV_Prognose_MWh', 'Wind_Onshore_Prognose_MWh', 'Wind_Offshore_Prognose_MWh','Biomasse_Prognose_MWh', 'Wasser_Prognose_MWh', 'Sonstige_Prognose_MWh']]
+    prognose_export = prognose[['Datum von', 'PV_Prognose_MWh', 'Wind_Onshore_Prognose_MWh', 'Wind_Offshore_Prognose_MWh',
+                                 'Biomasse_Prognose_MWh', 'Wasser_Prognose_MWh', 'Sonstige_Prognose_MWh',
+                                 'Installierte PV_GW', 'Installierte Wind_Onshore_GW', 'Installierte Wind_Offshore_GW',
+                                 'Installierte Biomasse_GW', 'Installierte Wasser_GW', 'Installierte Sonstige_GW']]
     prognose_export = prognose_export.rename(columns={
         'PV_Prognose_MWh': 'Photovoltaik [MWh] Originalauflösungen',
         'Wind_Onshore_Prognose_MWh': 'Wind Onshore [MWh] Originalauflösungen',
@@ -242,14 +245,6 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
         'Wasser_Prognose_MWh': 'Wasserkraft [MWh] Originalauflösungen',
         'Sonstige_Prognose_MWh': 'Sonstige Erneuerbare [MWh] Originalauflösungen'
     })
-
-    spalten = ["Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen",
-               "Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen",
-               "Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen","Installierte PV_GW",
-               "Installierte Wind_Onshore_GW","Installierte Wind_Offshore_GW","Installierte Biomasse_GW",
-               "Installierte Wasser_GW","Installierte Sonstige_GW"]
-    
-    prognose_export = prognose_export[["Datum von"] + spalten]
 
     if(prognose_export.isna().any().any()):
         print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )

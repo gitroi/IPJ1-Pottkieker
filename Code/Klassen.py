@@ -14,7 +14,8 @@ from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,kosten, plot_Anteil_EE_mit_ohne_Speicher
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
-from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GWh_Jahr
+# from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GWh_Jahr
+import Prognose_Speicher as speicher
 from Auswertung import ausgabe, konventionelle_Leistung_Energie
 
 @dataclass
@@ -34,6 +35,8 @@ class Szenario:
     ee_anteil_ohne_speicher_df: Optional[pd.DataFrame] = None
     kosten_df: Optional[pd.DataFrame] = None
     speicher_df: Optional[pd.DataFrame] = None
+    dunkelflaute_2030_df: Optional[pd.DataFrame] = None
+    dunkelflaute_2045_df: Optional[pd.DataFrame] = None
     gesamt_df: Optional[pd.DataFrame] = None
     konventionelle: Optional[dict] = None
     
@@ -60,8 +63,16 @@ class Szenario:
         
         self.kosten_df = kostenrechnung(self.szenario)
         
-        self.speicher_df = Verlauf_Speicher(self.ee_anteil_ohne_speicher_df, 100, 100, self.ziele_2030, self.ziele_2045)
-        
+        self.speicher_df = speicher.Verlauf_Speicher(self.ee_anteil_ohne_speicher_df, 100, 100, self.ziele_2030, self.ziele_2045)
+
+        self.dunkelflaute_2030_df = speicher.Simulation_Dunkelflaute(self.speicher_df, 2030)
+        self.dunkelflaute_2045_df = speicher.Simulation_Dunkelflaute(self.speicher_df, 2045)
+
+        # --FIXME: in Auswertung einpflegen?--
+        self.dunkelflaute_2030_df.to_csv(DATA_DIR / 'Output' / 'dunkelflaute_2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+        self.dunkelflaute_2045_df.to_csv(DATA_DIR / 'Output' / 'dunkelflaute_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+        # ------------------------------------
+
         self.gesamt_df = anteil_erneuerbare_speicher(self.speicher_df)
         
         self.konventionelle = konventionelle_Leistung_Energie(self.gesamt_df)
@@ -105,7 +116,7 @@ class Szenario:
         ergebnisse = pd.DataFrame()
         ergebnisse["Name"] = [self.name]
         ausbauraten = Jährlicher_Zuwachs_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"])
-        ausbauraten_speicher = ausbaurate_GWh_Jahr(self.szenario)
+        ausbauraten_speicher = speicher.ausbaurate_GWh_Jahr(self.szenario)
         for key in ausbauraten["zuwachsrate_2030"].keys():
             ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
             ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten["zuwachsrate_2045"][key]]
