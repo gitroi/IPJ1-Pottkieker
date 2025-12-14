@@ -11,7 +11,7 @@ from config import DATA_DIR, PROJECT_ROOT
 from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
-from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,kosten
+from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,kosten, plot_Anteil_EE_mit_ohne_Speicher
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
 from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GWh_Jahr
@@ -81,7 +81,9 @@ class Szenario:
         fig2, axs2 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig4, axs4 = plt.subplots(2, figsize=(14, 12))
+        fig5, axs5 = plt.subplots(1, figsize=(14, 12))
 
+        plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
         kosten(self.kosten_df, axs2[0], axs2[1])

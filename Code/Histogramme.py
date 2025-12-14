@@ -326,6 +326,40 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
     ax2.set_ylim(0, max_installiert * 1.1)
     ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
 
+def plot_Anteil_EE_mit_ohne_Speicher(gesamt_df: pd.DataFrame, ax):
+    """
+    Erstellt ein Histogramm zum Vergleich des Anteils der Erneuerbaren Energien
+    mit und ohne Speicher für jedes Jahr von 2026 bis 2045.
+    
+    Args:
+        gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
+        ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
+    """
+
+    jahre = list(range(2026, 2046))
+    anteile_mit_speicher = []
+    anteile_ohne_speicher = []
+
+    for jahr in jahre:
+        df_jahr = gesamt_df[gesamt_df["Datum von"].dt.year == jahr]
+        anteil_mit = df_jahr[df_jahr["Anteil Erneuerbare Speicher [%]"]>= 100].count()
+        anteil_ohne = df_jahr[df_jahr["Anteil Erneuerbare [%]"]>= 100].count()
+        anteil_mit = (anteil_mit["Anteil Erneuerbare Speicher [%]"] / len(df_jahr)) * 100 if len(df_jahr) > 0 else 0
+        anteil_ohne = (anteil_ohne["Anteil Erneuerbare [%]"] / len(df_jahr)) * 100 if len(df_jahr) > 0 else 0
+        anteile_mit_speicher.append(anteil_mit)
+        anteile_ohne_speicher.append(anteil_ohne)
+
+    x = np.arange(len(jahre))
+    width = 0.35
+
+    ax.bar(x - width/2, anteile_ohne_speicher, width, label='Ohne Speicher', color='lightgreen', edgecolor='white')
+    ax.bar(x + width/2, anteile_mit_speicher, width, label='Mit Speicher', color='green', edgecolor='white')
+    ax.set_xticks(x)
+    ax.set_xticklabels(jahre, rotation=45, ha='right')
+    ax.set_title('Anteil der Erneuerbaren Energien (2026-2045)')
+    ax.set_ylabel('Anteil [%]')
+    ax.legend()
+
 def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
     """
     Erstellt verschiedene Histogramme zur Gesamtauswertung eines Szenarios.
