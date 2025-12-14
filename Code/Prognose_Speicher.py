@@ -223,6 +223,13 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
     return df_gesamtVerlauf
 
+def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, df_dunkelflaute: pd.DataFrame):
+    """
+    Simuliert den Verlauf einer Dunkelflaute
+    """
+
+
+
 def Einlesen_Speicherdaten_fix(speicherart):
     """
     Liest alle festen Parameter einer Speicherart aus einer JSON-Datei ein
@@ -249,6 +256,16 @@ def Einlesen_Speicherdaten_fix(speicherart):
     speicher = Speicher(**speicher_data)
 
     return speicher
+
+def Einlesen_Dunkelflaute() -> pd.DataFrame:
+    """
+    Liest die Dunkelflauten-Daten aus einer CSV-Datei ein
+    """
+
+    pfad = DATA_DIR / Variable_Parameter /"dunkelflaute.csv"  
+    df_dunkelflaute = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False)
+
+    return df_dunkelflaute
 
 def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045):
     """
