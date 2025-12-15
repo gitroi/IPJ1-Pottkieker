@@ -366,7 +366,10 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
         aktuell_verfugbare_pumpspeicher = aktuell_pumpspeicher - (row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.untergrenze)
         
         #Summe aller Erzeuger 
-        erzeugung = row["Erneuerbare [MWh]"]     
+        erzeugung = row["Erneuerbare [MWh]"]
+        
+        # Variable immer zu Beginn der Iteration initialisieren
+        aktuell_zusatz_energie = 0
 
         if row["Anteil Erneuerbare [%]"] > ladegrenze: #überschüssige Energie vorhanden
 

@@ -10,6 +10,7 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from io import BytesIO
 
 # Pfade setzen
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -82,7 +83,6 @@ with st.sidebar:
 if modus == "🎯 Einzelnes Szenario":
     st.header("🎯 Einzelnes Szenario simulieren")
     
-    # Zwei Spalten für die Auswahl
     col1, col2 = st.columns(2)
     
     with col1:
@@ -111,9 +111,8 @@ if modus == "🎯 Einzelnes Szenario":
         if gewaehltes_profil:
             st.info(f"📝 {gewaehltes_profil.get('Beschreibung', 'Verbrauchsprofil für die Simulation')}")
     
-    # Weitere Parameter
     st.subheader("⚙️ Simulationsparameter")
-    col3, col4, col5 = st.columns(3)
+    col3, col4 = st.columns(2)
     
     with col3:
         ertragsart = st.selectbox(
@@ -132,14 +131,6 @@ if modus == "🎯 Einzelnes Szenario":
         )
         jahr = None if jahr_auswahl == "Alle Jahre" else int(jahr_auswahl)
     
-    with col5:
-        bilder_speichern = st.checkbox(
-            "Plots speichern",
-            value=False,
-            help="Plots als PNG-Dateien speichern"
-        )
-    
-    # Simulation starten
     st.markdown("---")
     if st.button("🚀 Simulation starten", type="primary", use_container_width=True):
         if gewaehltes_szenario and gewaehltes_profil:
@@ -162,7 +153,6 @@ if modus == "🎯 Einzelnes Szenario":
                     
                     st.session_state['letztes_szenario'] = szenario_ergebnis
                     st.session_state['jahr'] = jahr
-                    st.session_state['bilder_speichern'] = bilder_speichern
                     
                 except Exception as e:
                     st.error(f"❌ Fehler bei der Simulation: {str(e)}")
@@ -197,8 +187,8 @@ if modus == "🎯 Einzelnes Szenario":
             if szenario.konventionelle:
                 try:
                     konv = szenario.konventionelle
-                    wert2030 = konv["2030"]["Energie"]/1e3
-                    wert2045 = konv["2045"]["Energie"]/1e3
+                    wert2030 = konv[2030]["Energie"]/1e3
+                    wert2045 = konv[2045]["Energie"]/1e3
                     col3.metric("Konv. Energie 2030", f"{wert2030:.1f} GWh")
                     col4.metric("Konv. Energie 2045", f"{wert2045:.1f} GWh")
                 except Exception as e:
@@ -206,34 +196,97 @@ if modus == "🎯 Einzelnes Szenario":
     
         
         with tab2:
-            st.subheader("Plots")
+            st.subheader("📊 Visualisierungen")
             
-            # Plots anzeigen
             if hasattr(szenario, 'gebe_plots'):
                 try:
-                    st.subheader("Visualisierungen")
-                    szenario.gebe_plots(jahr, st.session_state.get('bilder_speichern', False))
+                    figures = szenario.gebe_plots(jahr)
+                    
+                    st.markdown("### 🔋 EE-Anteil mit/ohne Speicher")
+                    st.pyplot(figures['fig5'])
+                    buf5 = BytesIO()
+                    figures['fig5'].savefig(buf5, format='png', dpi=300, bbox_inches='tight')
+                    buf5.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf5,
+                        file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_jahr_{jahr if jahr else 'alle'}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+
+                    st.markdown("---")
+                    st.markdown("### 📊 EE-Anteil & Konventionelle Energie")
+                    st.pyplot(figures['fig1'])
+                    buf1 = BytesIO()
+                    figures['fig1'].savefig(buf1, format='png', dpi=300, bbox_inches='tight')
+                    buf1.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf1,
+                        file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+                    
+                    st.markdown("---")
+                    st.markdown("### 💰 Kosten-Analyse")
+                    st.pyplot(figures['fig2'])
+                    buf2 = BytesIO()
+                    figures['fig2'].savefig(buf2, format='png', dpi=300, bbox_inches='tight')
+                    buf2.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf2,
+                        file_name=f"szenario_{szenario.name}_kosten_ertragsart_{szenario.ertragsart}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+                    
+                    st.markdown("---")
+                    st.markdown("### 📈 Ausbauraten Übersicht")
+                    st.pyplot(figures['fig3'])
+                    buf3 = BytesIO()
+                    figures['fig3'].savefig(buf3, format='png', dpi=300, bbox_inches='tight')
+                    buf3.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf3,
+                        file_name=f"szenario_{szenario.name}_ausbauraten_ertragsart_{szenario.ertragsart}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+                    
+                    st.markdown("---")
+                    st.markdown("### 📊 Installierte Leistungen/Kapazitäten")
+                    st.pyplot(figures['fig4'])
+                    buf4 = BytesIO()
+                    figures['fig4'].savefig(buf4, format='png', dpi=300, bbox_inches='tight')
+                    buf4.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf4,
+                        file_name=f"szenario_{szenario.name}_installierte_leistungen_ertragsart_{szenario.ertragsart}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+                    
                 except Exception as e:
-                    st.warning(f"Plots konnten nicht angezeigt werden: {str(e)}")
-
-                # Download-Button
-                csv = szenario.erzeugung_df.to_csv(index=False).encode('utf-8')
-                st.download_button(
-                    label="📥 Erzeugungsdaten herunterladen (CSV)",
-                    data=csv,
-                    file_name=f"{szenario.name}_erzeugung_{szenario.ertragsart}.csv",
-                    mime="text/csv"
-                )
+                    st.error(f"❌ Fehler beim Erstellen der Plots: {str(e)}")
+                    st.exception(e)
+                
         
-
-        # Excel-Export
         st.markdown("---")
-        if st.button("💾 Ergebnisse als Excel exportieren"):
-            try:
-                szenario.exportiere_ergebnisse()
-                st.success(f"✅ Ergebnisse wurden exportiert!")
-            except Exception as e:
-                st.error(f"❌ Fehler beim Export: {str(e)}")
+        excel_buffer = BytesIO()
+        szenario.getErgebnisse().to_excel(excel_buffer, index=False, engine='openpyxl')
+        excel_buffer.seek(0)
+        
+        st.download_button(
+            label="💾 Gesamtergebnis als Excel herunterladen",
+            data=excel_buffer,
+            file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_ergebnisse.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
 # ============================================================================
 # MODUS 2: ALLE SZENARIEN
@@ -243,7 +296,6 @@ elif modus == "📈 Alle Szenarien vergleichen":
     
     st.info("Dieser Modus berechnet alle verfügbaren Szenarien und vergleicht die Ergebnisse.")
     
-    # Parameter
     col1, col2 = st.columns(2)
     
     with col1:
@@ -259,9 +311,7 @@ elif modus == "📈 Alle Szenarien vergleichen":
             ["mittel", "schlecht", "gut"]
         )
     
-    bilder_speichern = st.checkbox("Vergleichsplots speichern", value=False)
     
-    # Simulation starten
     if st.button("🚀 Alle Szenarien simulieren", type="primary", use_container_width=True):
         gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, ausgewähltes_profil_name)
         
@@ -297,7 +347,6 @@ elif modus == "📈 Alle Szenarien vergleichen":
             
             status_text.text("Erstelle Vergleichsvisualisierungen...")
             
-            # Histogramme erstellen
             fig1, ax1 = plt.subplots(1, 2, figsize=(12, 6))
             fig2, ax2 = plt.subplots(1, 2, figsize=(12, 6))
             
@@ -307,26 +356,37 @@ elif modus == "📈 Alle Szenarien vergleichen":
                 
                 st.success("✅ Alle Szenarien erfolgreich berechnet!")
                 
-                # Plots anzeigen
                 st.pyplot(fig1)
+                st.download_button(
+                    label="💾 Plot herunterladen",
+                    data=BytesIO(fig1.savefig(format='png', dpi=300, bbox_inches='tight')),
+                    file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots1.png",
+                    mime="image/png",
+                    on_click="ignore"
+                )
                 st.pyplot(fig2)
+                st.download_button(
+                    label="💾 Plot herunterladen",
+                    data=BytesIO(fig2.savefig(format='png', dpi=300, bbox_inches='tight')),
+                    file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots2.png",
+                    mime="image/png",
+                    on_click="ignore"
+                )
                 
-                # Plots speichern
-                if bilder_speichern:
-                    pfad = DATA_DIR / "Output" / f"auswertung_aller_szenarien_erzeugung_{ertragsart}.png"
-                    fig1.savefig(pfad)
-                    fig2.savefig(pfad.with_name(pfad.stem + "_2.png"))
-                    st.success(f"✅ Plots gespeichert in {pfad}")
-                
-                # Excel Export
-                pfad_excel = DATA_DIR / "Output" / f"auswertung_aller_szenarien_erzeugung_{ertragsart}.xlsx"
-                alle_ergebnisse.to_excel(pfad_excel, index=False)
-                st.success(f"✅ Excel-Datei gespeichert: {pfad_excel}")
-                
-                # Ergebnisse anzeigen
                 st.subheader("📊 Vergleichstabelle")
                 st.dataframe(alle_ergebnisse, use_container_width=True)
+                st.markdown("---")
+                excel_buffer = BytesIO()
+                alle_ergebnisse.to_excel(excel_buffer, index=False, engine='openpyxl')
+                excel_buffer.seek(0)
                 
+                st.download_button(
+                    label="💾 Gesamtergebnis als Excel herunterladen",
+                    data=excel_buffer,
+                    file_name=f"gesamtergebnisse_ertragsart_{ertragsart}_ergebnisse.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
             except Exception as e:
                 st.error(f"Fehler bei der Visualisierung: {str(e)}")
                 st.exception(e)
@@ -361,16 +421,19 @@ elif modus == "ℹ️ Über das Projekt":
         with st.expander(f"📁 {szenario['Name']}"):
             st.write(f"**Beschreibung:** {szenario['Beschreibung']}")
             
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 st.write("**Ziele 2030:**")
                 st.json(szenario['Ziele 2030'])
             with col2:
                 st.write("**Ziele 2045:**")
                 st.json(szenario['Ziele 2045'])
+            with col3:
+                st.write("**Veränderungsfaktoren:**")
+                st.json(szenario['Veränderungsfaktoren'])
     
     st.markdown("""
-    ### 👥 Team
+    ### 👥 Softwareteam
     - Joris Bürger
     - Robin Matzke
     
