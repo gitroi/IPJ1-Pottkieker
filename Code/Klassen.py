@@ -116,7 +116,30 @@ class Szenario:
             fig4.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots4.png", dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
+    def gebe_plots(self, jahr1=None,speichern: bool=False):
+        """Zeigt Histogramme und Analysen"""
+        pfad = DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots.png" #FIXME wozu steht der hier?
 
+        fig, axs = plt.subplots(2,  figsize=(14, 12)) 
+        fig2, axs2 = plt.subplots(1, 2, figsize=(14, 12)) 
+        fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
+        fig4, axs4 = plt.subplots(2, figsize=(14, 12))
+        fig5, axs5 = plt.subplots(1, figsize=(14, 12))
+
+        plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
+        plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
+        plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
+        kosten(self.kosten_df, axs2[0], axs2[1])
+        plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
+        plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) # Speicherausbaustände und Raten
+        plt.tight_layout()
+        
+        if(speichern):
+            fig.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots1.png", dpi=300, bbox_inches='tight', format='png')
+            fig2.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots2.png", dpi=300, bbox_inches='tight', format='png')
+            fig3.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots3.png", dpi=300, bbox_inches='tight', format='png')
+            fig4.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots4.png", dpi=300, bbox_inches='tight', format='png')
+        plt.show()
     
     def getErgebnisse(self) -> pd.DataFrame:
         """Gibt die Ergebnisse als DataFrame zurück"""
