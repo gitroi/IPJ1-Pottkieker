@@ -12,17 +12,13 @@ import matplotlib.pyplot as plt
 import os
 from io import BytesIO
 
-# Pfade setzen
 PROJECT_ROOT = Path(__file__).resolve().parent
 CODE_DIR = PROJECT_ROOT / "Code"
 
-# Code-Ordner zum Python-Pfad hinzufügen
 sys.path.insert(0, str(CODE_DIR))
 
-# Arbeitsverzeichnis auf Projekt-Root setzen (nicht Code-Ordner!)
 os.chdir(str(PROJECT_ROOT))
 
-# Imports aus dem bestehenden Code
 try:
     from config import DATA_DIR, PROJECT_ROOT as PR
     from Klassen import Szenario
@@ -37,7 +33,6 @@ except ImportError as e:
     st.error(f"sys.path: {sys.path}")
     st.stop()
 
-# Seitenkonfiguration
 st.set_page_config(
     page_title="Simulation der Stromversorgung mit Erneuerbaren Energien in Deutschland",
     page_icon="⚡",
@@ -45,12 +40,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Titel und Header
 st.title("⚡ Simulation der Stromversorgung mit Erneuerbaren Energien in Deutschland")
 st.markdown("**Simulation des Erneuerbare-Energien-Ausbaus bis 2030/2045**")
 st.markdown("---")
 
-# Daten laden
 @st.cache_data
 def lade_szenarien():
     """Lädt Szenarien aus JSON-Datei (cached)"""
@@ -64,7 +57,6 @@ def lade_verbrauchsprofile():
 szenarien = lade_szenarien()
 verbrauchsprofile = lade_verbrauchsprofile()
 
-# Sidebar - Navigation
 with st.sidebar:
     st.header("📊 Navigation")
     modus = st.radio(
