@@ -12,11 +12,17 @@ import matplotlib.pyplot as plt
 import os
 from io import BytesIO
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-CODE_DIR = PROJECT_ROOT / "Code"
+# Pfad-Setup für Deployment
+if Path(__file__).parent.name == "Code":
+    # Lokale Entwicklung: streamlit_app.py liegt in Code/
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent
+    CODE_DIR = PROJECT_ROOT / "Code"
+else:
+    # Deployment: streamlit_app.py liegt im Root
+    PROJECT_ROOT = Path(__file__).resolve().parent
+    CODE_DIR = PROJECT_ROOT / "Code"
 
 sys.path.insert(0, str(CODE_DIR))
-
 os.chdir(str(PROJECT_ROOT))
 
 try:
