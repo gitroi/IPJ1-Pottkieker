@@ -9,7 +9,7 @@ from Feste_Variablen import Keys_Erzeugung, Keys_Speicher
 import matplotlib.pyplot as plt
 from Prognose_Speicher import ausbaurate_GWh_Jahr
 
-def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: str, konventionelle: dict):
+def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konventionelle: dict) -> pd.DataFrame:
     """
     Gibt die Daten als Excel-Datei aus.
     Args:
@@ -73,8 +73,7 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, pfad: s
         end_df.loc[mask1, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2030"][key]
         end_df.loc[mask2, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2045"][key]
 
-    with pd.ExcelWriter(pfad, engine='openpyxl') as writer:
-        end_df.to_excel(writer, sheet_name="Jahresübersicht", index=False)
+    return end_df
 
 def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:
     """

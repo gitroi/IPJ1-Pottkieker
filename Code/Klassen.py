@@ -79,10 +79,17 @@ class Szenario:
         
         print(f"✓ Berechnungen für '{self.name}' abgeschlossen.")
     
+    def auswertungsdaten_generieren(self):
+        """Generiert die Auswertungsdaten"""
+        return ausgabe(self.kosten_df, self.gesamt_df, self.szenario,self.konventionelle)
+
     def exportiere_ergebnisse(self):
         """Exportiert alle Ergebnisse nach Excel"""
         pfad = DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}.xlsx"
-        ausgabe(self.kosten_df, self.gesamt_df, self.szenario,pfad,self.konventionelle)
+        df = ausgabe(self.kosten_df, self.gesamt_df, self.szenario,self.konventionelle)
+        with pd.ExcelWriter(pfad, engine='openpyxl') as writer:
+            df.to_excel(writer, sheet_name="Jahresübersicht", index=False)
+        
     
     def zeige_plots(self, jahr1=None,speichern: bool=False):
         """Zeigt Histogramme und Analysen"""

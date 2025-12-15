@@ -3,7 +3,6 @@
 Programmiert von Joris Bürger und Robin Matzke
 """
 import json
-from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional

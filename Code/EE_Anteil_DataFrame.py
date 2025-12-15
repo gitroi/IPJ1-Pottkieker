@@ -4,7 +4,6 @@ Programmiert von Joris Bürger
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import config
 
 def anteil_erneuerbare_df(erzeugung: pd.DataFrame, verbrauch: pd.DataFrame) -> pd.DataFrame:
     """

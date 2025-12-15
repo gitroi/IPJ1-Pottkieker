@@ -8,7 +8,6 @@ Programmiert von Joris Bürger
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from config import PROJECT_ROOT 
 
 def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
