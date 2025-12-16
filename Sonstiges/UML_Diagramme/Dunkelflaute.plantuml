@@ -1,0 +1,72 @@
+@startuml Dunkelflaute
+
+<style>
+activity {
+    HorizontalAlignment center
+}
+</style>
+
+start
+
+:Dunkelflaute aus CSV einlesen;
+
+note right
+Tabelle mit Tagen:
+-Monat
+-Tag
+-Anteil realisierte Erneuerbare Energien
+end note
+
+
+:Normativen Speicherverlauf aus Speicher-Prognose kopieren;
+
+
+:Erzeugungsdaten an Dunkelflauten-Tagen neu berechnen anhand Faktoren aus CSV\n MWh = M;
+
+:Anfangs-Ladestand setzen;
+
+partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
+    
+    :Momentanleistungen und verfügbare Ladung berechnen;
+    
+    :Summe EE-Erzeuger berechnen;
+    
+    if (Anteil EE > Ladegrenze?) then (ja)
+        :Überschüssige Energie berechnen;
+        
+        :Speicher nacheinander laden\n(Schwungrad → Batterie → Pumpspeicher → Wasserstoff);
+        
+        note right
+            Pro Speicher:
+            - Prüfe Ladestand
+            - Lade max. Leistung/4 (15min)
+            - Lade max. bis Obergrenze
+            - Restenergie → "Export"
+        end note
+        
+    elseif (Anteil EE ≤ Entladegrenze?) then (ja)
+        :Fehlende Energie berechnen;
+        
+        :Speicher nacheinander entladen\n(Schwungrad → Batterie → Pumpspeicher → Wasserstoff);
+        
+        note right
+            Pro Speicher:
+            - Prüfe Ladestand
+            - Entlade max. Leistung/4 (15min)
+            - Entlade max. bis Untergrenze
+            - Berücksichtige Wirkungsgrad
+            - Restbedarf → "Import"
+        end note
+        
+    endif
+    
+    :Speicherstände und "extra" Energie in Listen speichern;
+    
+}
+
+:Listen als neue Spalten dem Dataframe hinzufügen;
+
+:Return Dataframe;
+
+stop
+@enduml
