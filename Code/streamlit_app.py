@@ -276,7 +276,7 @@ if modus == "🎯 Einzelnes Szenario":
         
         st.markdown("---")
         excel_buffer = BytesIO()
-        szenario.getErgebnisse().to_excel(excel_buffer, index=False, engine='openpyxl')
+        szenario.auswertungsdaten_generieren().to_excel(excel_buffer, index=False, engine='openpyxl')
         excel_buffer.seek(0)
         
         st.download_button(
