@@ -3,5 +3,6 @@ pandas
 numpy
 matplotlib
 plotly
+openpyxl
 pathlib
 path
