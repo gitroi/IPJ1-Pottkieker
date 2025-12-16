@@ -105,7 +105,7 @@ class Szenario:
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
         kosten(self.kosten_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
-        plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) # Speicherausbaustände und Raten
+        plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
         plt.tight_layout()
         
         if(speichern):

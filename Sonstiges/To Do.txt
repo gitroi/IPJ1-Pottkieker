@@ -15,3 +15,5 @@ Dann schauen, ob speicher reichen
 - Anteil EE über 100% ohne Speicher (Balkendiagramm jährlich)
 - Anteil EE über 100% mit Speicher (Balkendiagramm jährlich)
     Als prozenz mit über 100
+
+In klassen: Virtel stunden auf 2030 und 2045 beziehen
