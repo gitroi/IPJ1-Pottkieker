@@ -313,15 +313,15 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     df_verlauf_dunkelflaute.loc[mask, "Anteil Erneuerbare [%]"] = (df_verlauf_dunkelflaute.loc[mask, "Erneuerbare [MWh]"] / df_verlauf_dunkelflaute.loc[mask, "Netzlast [MWh]"] * 100).round(2)
     
     # Erweitere Dunkelflaute-Daten um +/- 1 Tag für Simulation
-    dunkelflaute_dates = set(df_dunkelflaute['Datum von'].dt.date)
-    erweiterte_dates = set()
-    for date in dunkelflaute_dates:
-        erweiterte_dates.add(date - pd.Timedelta(days=1))  # Tag davor
-        erweiterte_dates.add(date)  # Dunkelflaute-Tag selbst
-        erweiterte_dates.add(date + pd.Timedelta(days=1))  # Tag danach
+    dunkelflaute_tage = set(df_dunkelflaute['Datum von'].dt.date)
+    extra_tage = set()
+    for date in dunkelflaute_tage:
+        extra_tage.add(date - pd.Timedelta(days=1))  # Tag davor
+        extra_tage.add(date)  # Dunkelflaute-Tag selbst
+        extra_tage.add(date + pd.Timedelta(days=1))  # Tag danach
     
     # Maske für Dunkelflaute-Tage +/- 1 Tag
-    mask_simulation = df_verlauf_dunkelflaute['Datum von'].dt.date.isin(erweiterte_dates)
+    mask_simulation = df_verlauf_dunkelflaute['Datum von'].dt.date.isin(extra_tage)
     
     # Hole Speicherstände vom letzten Zeitpunkt vor der Simulation
     idx_start = df_verlauf_dunkelflaute.loc[mask_simulation].index[0]
