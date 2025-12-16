@@ -204,5 +204,10 @@ def kostenrechnung(szenario: json) -> pd.DataFrame:
     gesamt_kosten_df = pd.merge(kosten_ee_df, kosten_speicher_df, on="Datum von", how="inner")
 
     gesamt_kosten_df["Gesamtkosten_EE_und_Speicher [€]"] = gesamt_kosten_df["Gesamtkosten_EE [€]"] + gesamt_kosten_df["Gesamtkosten_Speicher [€]"]
-
+    if(gesamt_kosten_df.isna().any().any()):
+        print("Warnung: Es gibt fehlende Werte in der Verbrauchsprognose!"  )
+        print(gesamt_kosten_df.isna().sum())
+        mask = gesamt_kosten_df.isna() | gesamt_kosten_df.isin([np.inf, -np.inf])
+        print(gesamt_kosten_df[mask.any(axis=1)])
+        
     return gesamt_kosten_df
