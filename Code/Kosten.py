@@ -102,7 +102,6 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         prognose[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"] * (virtelstunden_capex[key] ** (prognose['Jahr'] - 2026))
         prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"].round(2)
         prognose[f"Capex {key} [€]"] = prognose[f"Capex {key} [€]"].round(2)
-        print(key + str(prognose[f"Opex {key} [€]"].sum()/1e6) + " Mio €")
     
         kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
 
@@ -184,6 +183,9 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
     kosten_df = kosten_df[["Datum von", "Opex batteriespeicher [€]", "Capex batteriespeicher [€]", "Gesamtkosten batteriespeicher [€]",
                           "Opex wasserstoff [€]", "Capex wasserstoff [€]", "Gesamtkosten wasserstoff [€]",
                           "Opex pumpspeicher [€]", "Capex pumpspeicher [€]", "Gesamtkosten pumpspeicher [€]"]]
+    kosten_df["Opex_Speicher [€]"] = kosten_df[["Opex batteriespeicher [€]", "Opex wasserstoff [€]", "Opex pumpspeicher [€]"]].sum(axis=1).round(2)
+    kosten_df["Capex_Speicher [€]"] = kosten_df[["Capex batteriespeicher [€]", "Capex wasserstoff [€]", "Capex pumpspeicher [€]"]].sum(axis=1).round(2)
+    kosten_df["Gesamtkosten_Speicher [€]"] = kosten_df[["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum(axis=1).round(2)
     return kosten_df
     
 def kostenrechnung(szenario: json) -> pd.DataFrame:
@@ -201,6 +203,6 @@ def kostenrechnung(szenario: json) -> pd.DataFrame:
 
     gesamt_kosten_df = pd.merge(kosten_ee_df, kosten_speicher_df, on="Datum von", how="inner")
 
-    gesamt_kosten_df["Gesamtkosten_EE_und_Speicher [€]"] = gesamt_kosten_df["Gesamtkosten_EE [€]"] + gesamt_kosten_df[["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum(axis=1)
+    gesamt_kosten_df["Gesamtkosten_EE_und_Speicher [€]"] = gesamt_kosten_df["Gesamtkosten_EE [€]"] + gesamt_kosten_df["Gesamtkosten_Speicher [€]"]
 
     return gesamt_kosten_df

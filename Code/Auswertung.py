@@ -41,17 +41,23 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
     nur_100_ohne = gesamt[gesamt["Anteil Erneuerbare [%]"] >= 100]
     nur_100_mit = gesamt[gesamt["Anteil Erneuerbare Speicher [%]"] >= 100]
 
-    anzahl_100_ohne = nur_100_ohne.groupby('Jahr').size()
-    anzahl_100_mit = nur_100_mit.groupby('Jahr').size()
-    anzahl_gesamt = gesamt.groupby('Jahr').size()
+    anzahl_100_ohne_30 = nur_100_ohne[nur_100_ohne["Jahr"]==2030].groupby('Jahr').size()
+    anzahl_100_mit_30 = nur_100_mit[nur_100_mit["Jahr"]==2030].groupby('Jahr').size()
+    anzahl_gesamt_30 = gesamt[gesamt["Jahr"]==2030]["Jahr"].groupby('Jahr').size()
+    
+    end_df['Anteil ohne Speicher mit 100% 2030 [%]'] = (anzahl_100_ohne_30 / anzahl_gesamt_30 * 100).round(2).values
+    end_df['Anteil mit Speicher mit 100% 2030 [%]'] = (anzahl_100_mit_30 / anzahl_gesamt_30 * 100).round(2).values
 
-    end_df['Anteil ohne Speicher mit 100% [%]'] = (anzahl_100_ohne / anzahl_gesamt * 100).round(2).values
-    end_df['Anteil mit Speicher mit 100% [%]'] = (anzahl_100_mit / anzahl_gesamt * 100).round(2).values
+    anzahl_100_ohne_45 = nur_100_ohne[nur_100_ohne["Jahr"]==2045].groupby('Jahr').size()
+    anzahl_100_mit_45 = nur_100_mit[nur_100_mit["Jahr"]==2045].groupby('Jahr').size()
+    anzahl_gesamt_45 = gesamt[gesamt["Jahr"]==2045]["Jahr"].groupby('Jahr').size()
+
+    end_df['Anteil ohne Speicher mit 100% 2045 [%]'] = (anzahl_100_ohne_45 / anzahl_gesamt_45 * 100).round(2).values
+    end_df['Anteil mit Speicher mit 100% 2045 [%]'] = (anzahl_100_mit_45 / anzahl_gesamt_45 * 100).round(2).values
 
     end_df["Gesamtkosten_EE [Mrd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE [€]"].sum() / 1e9).round(2).values
     
-    speicher_spalten = ["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]
-    end_df["Gesamtkosten_Speicher [Mrd. €]"] = (gesamt.groupby('Jahr')[speicher_spalten].sum().sum(axis=1) / 1e9).round(2).values
+    end_df["Gesamtkosten_Speicher [Mrd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_Speicher [€]"].sum() / 1e9).round(2).values
     
     end_df["Gesamtkosten_EE_und_Speicher [Mrd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9).round(2).values
     

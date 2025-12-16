@@ -161,18 +161,9 @@ class Szenario:
         ergebnisse["Name"] = [self.name]
         ausbauraten = Jährlicher_Zuwachs_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"])
         ausbauraten_speicher = speicher.ausbaurate_GWh_Jahr(self.szenario)
-        for key in ausbauraten["zuwachsrate_2030"].keys():
-            ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
-            ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten["zuwachsrate_2045"][key]]
-            ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
-
-        for key in ausbauraten_speicher["zuwachsrate_2030"].keys():
-            ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten_speicher["zuwachsrate_2030"][key]]
-            ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten_speicher["zuwachsrate_2045"][key]]
-            ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
         
         ergebnisse["Gesamtkosten_EE [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE [€]"].sum() / 1e9]
-        ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df[["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum().sum() / 1e9]
+        ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_Speicher [€]"].sum() / 1e9]
         ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9]
         
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher [%]"] = [
@@ -193,5 +184,15 @@ class Szenario:
         ergebnisse["Benötigte Leistung Konventioenelle 2030 [GW]"] = [
             self.konventionelle[2030]["Leistung"] / 1e3
         ]
+
+        for key in ausbauraten["zuwachsrate_2030"].keys():
+            ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
+            ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten["zuwachsrate_2045"][key]]
+            ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
+
+        for key in ausbauraten_speicher["zuwachsrate_2030"].keys():
+            ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten_speicher["zuwachsrate_2030"][key]]
+            ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten_speicher["zuwachsrate_2045"][key]]
+            ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
 
         return ergebnisse
