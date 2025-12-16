@@ -168,7 +168,7 @@ if modus == "🎯 Einzelnes Szenario":
         with tab1:
             st.subheader("Zusammenfassung")
             
-            col1, col2 = st.columns(2)
+            col1, col2,col3,col4 = st.columns(4)
             
             ergebnisse = szenario.auswertungsdaten_generieren()
             if ergebnisse is not None:
