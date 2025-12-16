@@ -393,7 +393,17 @@ elif modus == "📈 Alle Szenarien vergleichen":
             status_text.empty()
 
 # ============================================================================
-# MODUS 3: ÜBER DAS PROJEKT
+# Modus 3: Szenario hinzufügen
+# ============================================================================
+
+elif modus == "➕ Szenario hinzufügen":
+    st.header("➕ Szenario hinzufügen")
+    st.info("Diese Funktion ist derzeit nicht verfügbar.")
+    # Platzhalter für zukünftige Implementierung zum Hinzufügen von Szenarien
+
+
+# ============================================================================
+# MODUS 4: ÜBER DAS PROJEKT
 # ============================================================================
 elif modus == "ℹ️ Über das Projekt":
     st.header("ℹ️ Über das Projekt")

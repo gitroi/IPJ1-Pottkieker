@@ -48,23 +48,24 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
     end_df['Anteil ohne Speicher mit 100% [%]'] = (anzahl_100_ohne / anzahl_gesamt * 100).round(2).values
     end_df['Anteil mit Speicher mit 100% [%]'] = (anzahl_100_mit / anzahl_gesamt * 100).round(2).values
 
-    for key in Keys_Erzeugung:
-        kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e3
-        end_df[f"Gesamtkosten {key} [Tsd. €]"] = kosten_summe.values
-
-    for key in Keys_Speicher:
-        kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e3
-        end_df[f"Gesamtkosten {key} [Tsd. €]"] = kosten_summe.values
-
-    end_df["Gesamtkosten_EE [Tsd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE [€]"].sum() / 1e3).round(2).values
+    end_df["Gesamtkosten_EE [Mrd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE [€]"].sum() / 1e9).round(2).values
     
     speicher_spalten = ["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]
-    end_df["Gesamtkosten_Speicher [Tsd. €]"] = (gesamt.groupby('Jahr')[speicher_spalten].sum().sum(axis=1) / 1e3).round(2).values
+    end_df["Gesamtkosten_Speicher [Mrd. €]"] = (gesamt.groupby('Jahr')[speicher_spalten].sum().sum(axis=1) / 1e9).round(2).values
     
-    end_df["Gesamtkosten_EE_und_Speicher [Tsd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e3).round(2).values
+    end_df["Gesamtkosten_EE_und_Speicher [Mrd. €]"] = (gesamt.groupby('Jahr')["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9).round(2).values
     
     mask1 = end_df["Jahr"] <= 2030
     mask2 = end_df["Jahr"] > 2030
+
+    for key in Keys_Erzeugung:
+        kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e9
+        end_df[f"Gesamtkosten {key} [Mird. €]"] = kosten_summe.values
+
+    for key in Keys_Speicher:
+        kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e9
+        end_df[f"Gesamtkosten {key} [Mird. €]"] = kosten_summe.values
+
     for key in ausbauraten["zuwachsrate_2030"].keys():
         end_df.loc[mask1, f"Ausbaurate {key} [GW/Jahr]"] = ausbauraten["zuwachsrate_2030"][key]
         end_df.loc[mask2, f"Ausbaurate {key} [GW/Jahr]"] = ausbauraten["zuwachsrate_2045"][key]
