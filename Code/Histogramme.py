@@ -392,8 +392,8 @@ def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
     ax2.set_ylabel('Nicht-EE Stromverbrauch [TWh]')
 
     #=== Anteil Viertelstunden mit >=100% EE ohne Speicher als Balkendiagramm ===
-    anteil_ee_ohne_speicher = gesamt_df[f"Anteil virtel Stunden mit >=100% EE ohne Speicher [%]"].values
-    anteil_mit_speicher = gesamt_df[f"Anteil virtel Stunden mit >=100% EE mit Speicher [%]"].values
+    anteil_ee_ohne_speicher = gesamt_df[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2045 [%]"].values
+    anteil_mit_speicher = gesamt_df[f"Anteil virtel Stunden mit >=100% EE mit Speicher 2045 [%]"].values
 
     x = np.arange(len(szenarien))
     width = 0.35
@@ -402,7 +402,7 @@ def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
     ax3.bar(x + width/2, anteil_mit_speicher, width, label='Mit Speicher', color='green', edgecolor='white')
     ax3.set_xticks(x)
     ax3.set_xticklabels(szenarien, rotation=45, ha='right')
-    ax3.set_title('Anteil Viertelstunden mit >=100% EE je Szenario')
+    ax3.set_title('Anteil Viertelstunden mit >=100% EE je Szenario in 2045')
     ax3.set_ylabel('Anteil [%]')
     ax3.legend()
 

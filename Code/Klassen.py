@@ -166,12 +166,20 @@ class Szenario:
         ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_Speicher [€]"].sum() / 1e9]
         ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9]
         
-        ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher [%]"] = [
-            (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100).sum() / len(self.ee_anteil_ohne_speicher_df) * 100
+        ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2030 [%]"] = [
+            (len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2030]["Anteil Erneuerbare [%]"] >= 100)) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2030]) * 100
         ]
-        ergebnisse[f"Anteil virtel Stunden mit >=100% EE mit Speicher [%]"] = [
-            (self.gesamt_df["Anteil Erneuerbare Speicher [%]"] >= 100).sum() / len(self.gesamt_df) * 100
+        ergebnisse[f"Anteil virtel Stunden mit >=100% EE mit Speicher 2030 [%]"] = [
+            (len(self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Anteil Erneuerbare Speicher [%]"] >= 100)) / len(self.gesamt_df[self.gesamt_df["Jahr"]==2030]) * 100
         ]
+
+        ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2045 [%]"] = [
+            (len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2045]["Anteil Erneuerbare [%]"] >= 100)) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2045]) * 100
+        ]
+        ergebnisse[f"Anteil virtel Stunden mit >=100% EE mit Speicher 2045 [%]"] = [
+            (len(self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Anteil Erneuerbare Speicher [%]"] >= 100)) / len(self.gesamt_df[self.gesamt_df["Jahr"]==2045]) * 100
+        ]
+
         mask = self.gesamt_df["Anteil Erneuerbare Speicher [%]"] < 100
         nicht_ee_strom = (
             self.gesamt_df.loc[mask, "Netzlast [MWh]"] - 
