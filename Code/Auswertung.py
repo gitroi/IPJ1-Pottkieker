@@ -43,14 +43,14 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
 
     anzahl_100_ohne_30 = nur_100_ohne[nur_100_ohne["Jahr"]==2030].groupby('Jahr').size()
     anzahl_100_mit_30 = nur_100_mit[nur_100_mit["Jahr"]==2030].groupby('Jahr').size()
-    anzahl_gesamt_30 = gesamt[gesamt["Jahr"]==2030]["Jahr"].groupby('Jahr').size()
-    
+    anzahl_gesamt_30 = gesamt[gesamt["Jahr"]==2030].groupby('Jahr').size()
+
     end_df['Anteil ohne Speicher mit 100% 2030 [%]'] = (anzahl_100_ohne_30 / anzahl_gesamt_30 * 100).round(2).values
     end_df['Anteil mit Speicher mit 100% 2030 [%]'] = (anzahl_100_mit_30 / anzahl_gesamt_30 * 100).round(2).values
 
     anzahl_100_ohne_45 = nur_100_ohne[nur_100_ohne["Jahr"]==2045].groupby('Jahr').size()
     anzahl_100_mit_45 = nur_100_mit[nur_100_mit["Jahr"]==2045].groupby('Jahr').size()
-    anzahl_gesamt_45 = gesamt[gesamt["Jahr"]==2045]["Jahr"].groupby('Jahr').size()
+    anzahl_gesamt_45 = gesamt[gesamt["Jahr"]==2045].groupby('Jahr').size()
 
     end_df['Anteil ohne Speicher mit 100% 2045 [%]'] = (anzahl_100_ohne_45 / anzahl_gesamt_45 * 100).round(2).values
     end_df['Anteil mit Speicher mit 100% 2045 [%]'] = (anzahl_100_mit_45 / anzahl_gesamt_45 * 100).round(2).values

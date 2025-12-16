@@ -12,6 +12,7 @@ file "Netto_Installierte_GW.csv" as installed #LightBlue
 file "erzeugung_2021.csv" as erzeugung #LightBlue
 file "verbrauch_2024.csv" as verbrauch #LightBlue
 
+component "Streamlit App" as app
 component "Prognose Erzeugung" as prognose_erzeugung
 component "Prognose Verbrauch" as prognose_verbrauch
 component "Prognose Speicher" as prognose_speicher 
