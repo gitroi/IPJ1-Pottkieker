@@ -25,8 +25,8 @@ def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
     #=== Zuwachs pro Jahr berechnen ===#
     zuwachs_dict = {"zuwachsrate_2030": {}, "zuwachsrate_2045": {}}
     for key in zielwert_2030.keys():
-        aktueller_wert_2024 = erzeugerarten[key]["bestand"]
-        zuwachsrate_2030 = (zielwert_2030[key] - aktueller_wert_2024) / 5  
+        aktueller_wert_2025 = erzeugerarten[key]["bestand"]
+        zuwachsrate_2030 = (zielwert_2030[key] - aktueller_wert_2025) / 5  
         zuwachsrate_2045 = (zielwert_2045[key] - zielwert_2030[key]) / 15  
         zuwachs_dict["zuwachsrate_2030"][key] = round(zuwachsrate_2030, 3)
         zuwachs_dict["zuwachsrate_2045"][key] = round(zuwachsrate_2045, 3)

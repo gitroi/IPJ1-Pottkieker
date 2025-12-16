@@ -55,11 +55,11 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
     for key in kostendaten.keys():
         #=== Baukosten pro Viertelstunde berechnen ===
         if jährliche_raten["zuwachsrate_2030"][key] >= 0:
-            baukosten_EE_2030 = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr * 10)
+            baukosten_EE_2030 = 1e6 * jährliche_raten["zuwachsrate_2030"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr )
         else:
             baukosten_EE_2030 = 0
         if jährliche_raten["zuwachsrate_2045"][key] >= 0:
-            baukosten_EE_2045 = 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr * 15 )
+            baukosten_EE_2045 = 1e6 * jährliche_raten["zuwachsrate_2045"][key] * kostendaten[key]["capex"] / (virtelstunden_pro_jahr )
         else:
             baukosten_EE_2045 = 0
 
@@ -94,7 +94,7 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         maske_2045 = prognose["Jahr"] > 2030
         
         prognose.loc[maske_2030, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2030"][key] * ((prognose.loc[maske_2030, "Jahr"] - 2026) * 12 + prognose.loc[maske_2030, "Monat"]))
-        prognose.loc[maske_2045, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
+        prognose.loc[maske_2045, f"Installierte {key}"] = zieldaten["Ziele 2030"]["Ausbau EE"][key]+ (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
 
         prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"] / virtelstunden_pro_jahr
         
@@ -102,7 +102,8 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         prognose[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"] * (virtelstunden_capex[key] ** (prognose['Jahr'] - 2026))
         prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"].round(2)
         prognose[f"Capex {key} [€]"] = prognose[f"Capex {key} [€]"].round(2)
-        
+        print(key + str(prognose[f"Opex {key} [€]"].sum()/1e6) + " Mio €")
+    
         kosten_df = pd.merge(kosten_df, prognose[["Datum von", f"Opex {key} [€]"]], on="Datum von", how="left")
 
         #=== Opex in kosten_df übernehmen ===
