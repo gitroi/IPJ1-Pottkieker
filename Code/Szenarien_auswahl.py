@@ -12,7 +12,7 @@ from Histogramme import plot_histogram_gesamtauswertung
 
 def load_scenarios():
     """Lädt Szenarien aus einer JSON-Datei."""
-    pfad = DATA_DIR / "szenarien.json"
+    pfad = DATA_DIR / "Szenarien.json"
 
     with open(pfad, 'r', encoding='utf-8') as datei:
         scenarios = json.load(datei)
