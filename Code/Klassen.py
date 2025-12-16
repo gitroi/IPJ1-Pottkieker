@@ -166,6 +166,11 @@ class Szenario:
         ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_Speicher [€]"].sum() / 1e9]
         ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9]
         
+        if "Jahr" not in self.ee_anteil_ohne_speicher_df.columns:
+            self.ee_anteil_ohne_speicher_df["Jahr"] = self.ee_anteil_ohne_speicher_df["Datum von"].dt.year
+        if "Jahr" not in self.gesamt_df.columns:
+            self.gesamt_df["Jahr"] = self.gesamt_df["Datum von"].dt.year
+        
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2030 [%]"] = [
             (len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2030]["Anteil Erneuerbare [%]"] >= 100)) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2030]) * 100
         ]
