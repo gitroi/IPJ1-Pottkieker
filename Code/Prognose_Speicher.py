@@ -291,11 +291,8 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     df_verlauf_dunkelflaute.loc[mask, 'faktor'] = df_verlauf_dunkelflaute.loc[mask, 'Datum von'].dt.date.map(dunkelflaute_dict)
     
     # Alle Erzeugungsspalten multiplizieren
-    df_verlauf_dunkelflaute.loc[mask, 'Biomasse [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Biomasse_GW'] * df_verlauf_dunkelflaute.loc[mask, 'faktor']
-    df_verlauf_dunkelflaute.loc[mask, 'Wasserkraft [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wasser_GW'] * df_verlauf_dunkelflaute.loc[mask, 'faktor']
     df_verlauf_dunkelflaute.loc[mask, 'Wind Offshore [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wind_Offshore_GW'] * df_verlauf_dunkelflaute.loc[mask, 'faktor']
     df_verlauf_dunkelflaute.loc[mask, 'Wind Onshore [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wind_Onshore_GW'] * df_verlauf_dunkelflaute.loc[mask, 'faktor']
-    df_verlauf_dunkelflaute.loc[mask, 'Sonstige Erneuerbare [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Sonstige_GW'] * df_verlauf_dunkelflaute.loc[mask, 'faktor']
     df_verlauf_dunkelflaute.loc[mask, 'Photovoltaik [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte PV_GW'] * df_verlauf_dunkelflaute.loc[mask, 'faktor']
 
     # Faktor-Spalte wieder entfernen
