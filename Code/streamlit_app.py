@@ -173,11 +173,11 @@ if modus == "🎯 Einzelnes Szenario":
             ergebnisse = szenario.auswertungsdaten_generieren()
             if ergebnisse is not None:
                 try:         
-                    tromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
-                    gesamtkosten = ergebnisse["Gesamtkosten_EE_und_Speicher [Tsd. €]"].sum()   
+                    stromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
+                    gesamtkosten = ergebnisse["Gesamtkosten_EE_und_Speicher [Mrd. €]"].sum()   
                     st.dataframe(ergebnisse, use_container_width=True)
-                    col1.metric("Erzeugung Erneuerbare 2026-2045", f"{tromerzeugung:.1f} TWh")
-                    col2.metric("Gesamtkosten 2026-2045", f"{gesamtkosten/1e6:.2f} Mrd. €")
+                    col1.metric("Erzeugung Erneuerbare 2026-2045", f"{stromerzeugung:.1f} TWh")
+                    col2.metric("Gesamtkosten 2026-2045", f"{gesamtkosten:.2f} Mrd. €")
                 except Exception as e:
                     st.warning(f"Fehler bei Metriken: {str(e)}")
 

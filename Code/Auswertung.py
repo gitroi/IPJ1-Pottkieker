@@ -60,11 +60,11 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
 
     for key in Keys_Erzeugung:
         kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e9
-        end_df[f"Gesamtkosten {key} [Mird. €]"] = kosten_summe.values
+        end_df[f"Gesamtkosten {key} [Mrd. €]"] = kosten_summe.values
 
     for key in Keys_Speicher:
         kosten_summe = gesamt.groupby('Jahr')[f"Gesamtkosten {key} [€]"].sum() / 1e9
-        end_df[f"Gesamtkosten {key} [Mird. €]"] = kosten_summe.values
+        end_df[f"Gesamtkosten {key} [Mrd. €]"] = kosten_summe.values
 
     for key in ausbauraten["zuwachsrate_2030"].keys():
         end_df.loc[mask1, f"Ausbaurate {key} [GW/Jahr]"] = ausbauraten["zuwachsrate_2030"][key]
