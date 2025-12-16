@@ -212,7 +212,7 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
         'Sonstige': '#FF8C00',
         'Batteriespeicher': '#9C27B0',
         'Wasserstoffspeicher': '#E91E63',
-        'Pumpspeicher': '#3F51B5'
+        'Pumpspeicher': '#1633D8'
     }
     
     technologien = []
@@ -277,8 +277,8 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
 
     speicherarten = ['batteriespeicher', 'wasserstoff', 'pumpspeicher']
     farben = {
-        'batteriespeicher': "#A52ACA",
-        'wasserstoff': "#12E671",
+        'batteriespeicher': "#9C27B0",
+        'wasserstoff': "#E91E63",
         'pumpspeicher': "#1633D8"
     }
 
