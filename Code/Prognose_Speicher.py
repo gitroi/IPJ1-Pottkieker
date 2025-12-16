@@ -291,9 +291,9 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     df_verlauf_dunkelflaute.loc[mask, 'faktor'] = df_verlauf_dunkelflaute.loc[mask, 'Datum von'].dt.date.map(dunkelflaute_dict)
     
     # Alle Erzeugungsspalten multiplizieren
-    df_verlauf_dunkelflaute.loc[mask, 'Wind Offshore [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wind_Offshore_GW'] * 1000 * df_verlauf_dunkelflaute.loc[mask, 'faktor']
-    df_verlauf_dunkelflaute.loc[mask, 'Wind Onshore [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wind_Onshore_GW'] * 1000 * df_verlauf_dunkelflaute.loc[mask, 'faktor']
-    df_verlauf_dunkelflaute.loc[mask, 'Photovoltaik [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte PV_GW'] * 1000 * df_verlauf_dunkelflaute.loc[mask, 'faktor']
+    df_verlauf_dunkelflaute.loc[mask, 'Wind Offshore [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wind_Offshore_GW'] * 1000 * 0.25 * df_verlauf_dunkelflaute.loc[mask, 'faktor']
+    df_verlauf_dunkelflaute.loc[mask, 'Wind Onshore [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte Wind_Onshore_GW'] * 1000 * 0.25 * df_verlauf_dunkelflaute.loc[mask, 'faktor']
+    df_verlauf_dunkelflaute.loc[mask, 'Photovoltaik [MWh] Originalauflösungen'] = df_verlauf_dunkelflaute.loc[mask, 'Installierte PV_GW'] * 1000 * 0.25 * df_verlauf_dunkelflaute.loc[mask, 'faktor']
 
     # Faktor-Spalte wieder entfernen
     df_verlauf_dunkelflaute.drop('faktor', axis=1, inplace=True)
