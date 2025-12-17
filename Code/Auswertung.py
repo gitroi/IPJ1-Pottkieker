@@ -93,7 +93,7 @@ def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:
         df_jahr = erzeugung[erzeugung["Jahr"] == jahr]
         df_jahr = df_jahr[["Datum von","Netzlast [MWh]","Erneuerbare [MWh]","Realisierte Erzeugung [MWh]"]]
         
-        df_jahr["Konventionelle Energie [MWh]"] = (df_jahr["Netzlast [MWh]"] - df_jahr["Erneuerbare [MWh]"]).clip(lower=0)
+        df_jahr["Konventionelle Energie [MWh]"] = (df_jahr["Netzlast [MWh]"] - df_jahr["Realisierte Erzeugung [MWh]"]).clip(lower=0)
         
         max_energie_viertelstunde = df_jahr["Konventionelle Energie [MWh]"].max()
         
