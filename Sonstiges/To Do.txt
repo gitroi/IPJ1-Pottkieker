@@ -19,3 +19,4 @@ Dann schauen, ob speicher reichen
 In klassen: Virtel stunden auf 2030 und 2045 beziehen
 
 Gesamtauswertung überprüfen
+Ausgabe Energie nicht EE überprüfen
