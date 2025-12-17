@@ -362,17 +362,23 @@ elif modus == "📈 Alle Szenarien vergleichen":
                 st.success("✅ Alle Szenarien erfolgreich berechnet!")
                 
                 st.pyplot(fig1)
+                buf1 = BytesIO()
+                fig1.savefig(buf1, format='png', dpi=300, bbox_inches='tight')
+                buf1.seek(0)
                 st.download_button(
                     label="💾 Plot herunterladen",
-                    data=BytesIO(fig1.savefig(format='png', dpi=300, bbox_inches='tight')),
+                    data=buf1,
                     file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots1.png",
                     mime="image/png",
                     on_click="ignore"
                 )
                 st.pyplot(fig2)
+                buf2 = BytesIO()
+                fig2.savefig(buf2, format='png', dpi=300, bbox_inches='tight')
+                buf2.seek(0)
                 st.download_button(
                     label="💾 Plot herunterladen",
-                    data=BytesIO(fig2.savefig(format='png', dpi=300, bbox_inches='tight')),
+                    data=buf2,
                     file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots2.png",
                     mime="image/png",
                     on_click="ignore"
