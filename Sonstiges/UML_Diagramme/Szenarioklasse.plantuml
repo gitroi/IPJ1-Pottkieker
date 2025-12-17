@@ -1,0 +1,27 @@
+@startuml Klassendiagramm Szenarioklasse
+!pragma layout smetana
+skinparam ranksep 60
+skinparam nodesep 40
+
+class Szenario {
+    - name: String
+    - beschreibung: String
+    - ertragsart: String
+    - verbrauchsprofil: String
+    - veränederungsfaktoren: Map<String, Float>
+    - ausbauraten_erzeuger: Map<String, Float>
+    - ausbauraten_speicher: Map<String, Float>
+    - erzeugung: pd.DataFrame
+    - verbrauch: pd.DataFrame
+    - speicher: pd.DataFrame
+    - kosten: pd.DataFrame
+    - dunkelaute: pd.DataFrame
+    - konventionelle: Map<String, Float>
+    - gesamt: pd.DataFrame
+    + berechne_prognosen(): void
+    + getJahresAuswertung(): pd.DataFrame
+    + getDiagramme(): Map<String, plt.Figure>
+    + getGesamtErgebnisse(): pd.DataFrame
+}
+
+@enduml

@@ -13,25 +13,25 @@
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 70,
+                "batteriespeicher": 96.8,
                 "wasserstoff": 50,
                 "pumpspeicher": 50
             }
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv_dach": 350,
-                "pv_frei": 170,  
-                "wind_onshore": 250,
-                "wind_offshore": 110,
-                "biomasse": 10,
+                "pv_dach": 325,
+                "pv_frei": 150,  
+                "wind_onshore": 260,
+                "wind_offshore": 100,
+                "biomasse": 29,
                 "wasser": 6,
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 250,
-                "wasserstoff": 250,
-                "pumpspeicher": 100
+                "batteriespeicher":413,
+                "wasserstoff": 100,
+                "pumpspeicher": 43.8
             }
         },
         "Veränderungsfaktoren":{

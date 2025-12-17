@@ -149,7 +149,7 @@ if modus == "🎯 Einzelnes Szenario":
                         veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"]
                     )
                     
-                    szenario_ergebnis.berechne_alle_prognosen()
+                    #szenario_ergebnis.berechne_alle_prognosen()
                     
                     st.success(f"✅ Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
                     
@@ -338,7 +338,7 @@ elif modus == "📈 Alle Szenarien vergleichen":
                         veränderungsfaktoren=szenario_data["Veränderungsfaktoren"]["Erzeugung"]
                     )
                     
-                    szenario_ergebnis.berechne_alle_prognosen()
+                    #szenario_ergebnis.berechne_alle_prognosen()
                     ergebnisse_df = szenario_ergebnis.getErgebnisse()
                     alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
                     

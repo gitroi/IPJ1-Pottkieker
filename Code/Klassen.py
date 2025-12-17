@@ -40,6 +40,10 @@ class Szenario:
     gesamt_df: Optional[pd.DataFrame] = None
     konventionelle: Optional[dict] = None
     
+    def __post_init__(self):
+        """Wird automatisch nach __init__ aufgerufen, um Prognosen zu berechnen"""
+        self.berechne_alle_prognosen()
+    
     def berechne_alle_prognosen(self):
         """Führt alle Berechnungen durch"""
         print(f"Berechne Prognosen für Szenario '{self.name}'...")
@@ -79,7 +83,7 @@ class Szenario:
         
         print(f"✓ Berechnungen für '{self.name}' abgeschlossen.")
     
-    def auswertungsdaten_generieren(self):
+    def auswertungsdaten_generieren(self)-> pd.DataFrame:
         """Generiert die Auswertungsdaten"""
         return ausgabe(self.kosten_df, self.gesamt_df, self.szenario,self.konventionelle)
 

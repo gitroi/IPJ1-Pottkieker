@@ -87,7 +87,7 @@ def prognose_eines_Szenarios():
             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"]
         )
         
-        szenario_ergebnis.berechne_alle_prognosen()
+        #szenario_ergebnis.berechne_alle_prognosen()
         
         if jahr.strip().isdigit():
             jahr1 = int(jahr)
@@ -138,7 +138,7 @@ def prognose_alle_Szenarien():
             veränderungsfaktoren=szenario["Veränderungsfaktoren"]["Erzeugung"]
         )
         
-        szenario_ergebnis.berechne_alle_prognosen()
+        #szenario_ergebnis.berechne_alle_prognosen()
         ergebnisse_df = szenario_ergebnis.getErgebnisse()
         alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
     
