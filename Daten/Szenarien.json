@@ -340,10 +340,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -416,10 +416,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -492,10 +492,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -568,10 +568,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -644,10 +644,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -720,10 +720,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -796,10 +796,10 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
@@ -872,10 +872,86 @@
         },
         "Veränderungsfaktoren":{
                 "Erzeugung":{
-                    "pv_dach": 1.2,
-                    "pv_frei": 1.2,
-                    "wind_onshore": 1.2,
-                    "wind_offshore": 1.2,
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                }
+            }
+    },
+    {
+        "Name": "best5 100 batterie",
+        "Beschreibung": "",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 79.1,
+                "pv_frei":101.2,
+                "wind_onshore": 76.3,
+                "wind_offshore": 54.9,
+                "biomasse": 9.4,
+                "wasser": 1.9,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 41.5,
+                "wasserstoff": 1.25,
+                "pumpspeicher":42.5
+            }
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 100,
+                "pv_frei": 300,
+                "wind_onshore": 110,
+                "wind_offshore": 190,
+                "biomasse": 10,
+                "wasser": 2,
+                "sonstige": 0
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 100,
+                "wasserstoff": 2,
+                "pumpspeicher": 50
+            }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
                     "sonstige": 1.0
