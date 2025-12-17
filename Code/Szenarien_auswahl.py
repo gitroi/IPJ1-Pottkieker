@@ -68,7 +68,7 @@ def prognose_eines_Szenarios():
         else:
             print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
     
-    jahr = input("Erstes Jahr für Analyse (z.B. 2026, leer für alle): ")
+    jahr = input("Jahr für die Grafik 'Ist-Analyse' (z.B. 2026, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")
     bilder = input("Möchten Sie die Plots speichern? (ja/nein): ").lower() == "ja"
 
