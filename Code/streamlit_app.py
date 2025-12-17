@@ -137,7 +137,7 @@ if modus == "🎯 Einzelnes Szenario":
         jahr = None if jahr_auswahl == "Alle Jahre" else int(jahr_auswahl)
     
     st.markdown("---")
-    if st.button("🚀 Simulation starten", type="primary", use_container_width=True):
+    if st.button("🚀 Simulation starten", type="primary", width='stretch'):
         if gewaehltes_szenario and gewaehltes_profil:
             with st.spinner(f"🔄 Berechne Prognosen für '{ausgewähltes_szenario_name}'..."):
                 try:
