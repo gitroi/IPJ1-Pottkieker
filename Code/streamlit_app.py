@@ -50,22 +50,25 @@ st.title("⚡ Simulation der Stromversorgung mit Erneuerbaren Energien in Deutsc
 st.markdown("**Simulation des Erneuerbare-Energien-Ausbaus bis 2030/2045**")
 st.markdown("---")
 
+def get_file_mtime(filepath):
+    """Hilfsfunktion: Gibt die letzte Änderungszeit einer Datei zurück"""
+    return filepath.stat().st_mtime
+
 @st.cache_data
-def lade_szenarien():
+def lade_szenarien(_mtime):
     """Lädt Szenarien aus JSON-Datei (cached mit Auto-Reload bei Dateiänderung)"""
-    pfad = DATA_DIR / "Szenarien.json"
-    mtime = pfad.stat().st_mtime
-    return load_scenarios(), mtime
+    return load_scenarios()
 
 @st.cache_data
-def lade_verbrauchsprofile():
+def lade_verbrauchsprofile(_mtime):
     """Lädt Verbrauchsprofile aus JSON-Datei (cached mit Auto-Reload bei Dateiänderung)"""
-    pfad = DATA_DIR / "Verbrauchsprofile.json"
-    mtime = pfad.stat().st_mtime
-    return load_verbrauchsprofile(), mtime
+    return load_verbrauchsprofile()
 
-szenarien, _ = lade_szenarien()
-verbrauchsprofile, _ = lade_verbrauchsprofile()
+szenarien_pfad = DATA_DIR / "Szenarien.json"
+verbrauchsprofile_pfad = DATA_DIR / "Verbrauchsprofile.json"
+
+szenarien = lade_szenarien(get_file_mtime(szenarien_pfad))
+verbrauchsprofile = lade_verbrauchsprofile(get_file_mtime(verbrauchsprofile_pfad))
 
 with st.sidebar:
     st.header("📊 Navigation")
