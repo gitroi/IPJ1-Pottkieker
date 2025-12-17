@@ -4,7 +4,7 @@
         "Beschreibung": "Szenario zum Testen der Implementierung",
         "Ziele 2030": {
             "Ausbau EE": {
-                "pv_dach": 143,
+                "pv_dach": 145,
                 "pv_frei": 72,  
                 "wind_onshore": 98,
                 "wind_offshore": 26,
@@ -20,17 +20,17 @@
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv_dach": 325,
-                "pv_frei": 150,  
-                "wind_onshore": 260,
-                "wind_offshore": 100,
-                "biomasse": 29,
+                "pv_dach": 145,
+                "pv_frei": 100,  
+                "wind_onshore": 180,
+                "wind_offshore": 50,
+                "biomasse": 10,
                 "wasser": 6,
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher":413,
-                "wasserstoff": 100,
+                "batteriespeicher":100,
+                "wasserstoff": 50,
                 "pumpspeicher": 43.8
             }
         },
