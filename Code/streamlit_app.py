@@ -74,7 +74,7 @@ with st.sidebar:
     st.header("📊 Navigation")
     modus = st.radio(
         "Simulationsmodus wählen:",
-        ["🎯 Einzelnes Szenario", "📈 Alle Szenarien vergleichen", "ℹ️ Über das Projekt"],
+        ["🎯 Einzelnes Szenario", "📈 Alle Szenarien vergleichen", "➕ Szenario hinzufügen","ℹ️ Über das Projekt"],
         index=0
     )
     
