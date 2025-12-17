@@ -52,16 +52,20 @@ st.markdown("---")
 
 @st.cache_data
 def lade_szenarien():
-    """Lädt Szenarien aus JSON-Datei (cached)"""
-    return load_scenarios()
+    """Lädt Szenarien aus JSON-Datei (cached mit Auto-Reload bei Dateiänderung)"""
+    pfad = DATA_DIR / "Szenarien.json"
+    mtime = pfad.stat().st_mtime
+    return load_scenarios(), mtime
 
 @st.cache_data
 def lade_verbrauchsprofile():
-    """Lädt Verbrauchsprofile aus JSON-Datei (cached)"""
-    return load_verbrauchsprofile()
+    """Lädt Verbrauchsprofile aus JSON-Datei (cached mit Auto-Reload bei Dateiänderung)"""
+    pfad = DATA_DIR / "Verbrauchsprofile.json"
+    mtime = pfad.stat().st_mtime
+    return load_verbrauchsprofile(), mtime
 
-szenarien = lade_szenarien()
-verbrauchsprofile = lade_verbrauchsprofile()
+szenarien, _ = lade_szenarien()
+verbrauchsprofile, _ = lade_verbrauchsprofile()
 
 with st.sidebar:
     st.header("📊 Navigation")
