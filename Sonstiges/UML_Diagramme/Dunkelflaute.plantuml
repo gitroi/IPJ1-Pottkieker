@@ -8,63 +8,39 @@ activity {
 
 start
 
-:Dunkelflaute aus CSV einlesen;
+:Übergabewerte: 
+Dataframe der normativen Speichersimulation
+Zieljahr in dem Dunkelflaute simuliert werden soll;
+
+:Jahreswerte einfügen;
+
+:Dunkelflauten-Daten aus CSV einlesen;
 
 note right
 Tabelle mit Tagen:
 -Monat
 -Tag
--Anteil realisierte Erneuerbare Energien
+-Anteil realisierte Erneuerbare Energien (Faktor)
 end note
 
 
 :Normativen Speicherverlauf aus Speicher-Prognose kopieren;
 
 
-:Erzeugungsdaten an Dunkelflauten-Tagen neu berechnen anhand Faktoren aus CSV\n MWh = M;
+:Erzeugungswerte an Dunkelflauten-Tagen neu berechnen anhand Faktoren aus CSV\n MWh = GW ⋅ 1000 ⋅ 1/4 ⋅ Faktor;
 
-:Anfangs-Ladestand setzen;
+:Werte überscheiben;
 
-partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
+partition "Schleife über Dunkelflaute Zeitpunkte + 1 Tag vorher und nachher(15 min Auflösung)" {
     
-    :Momentanleistungen und verfügbare Ladung berechnen;
+    :Schleife wie bei normativer Speichersimulation 
+    nur über begrenzten Bereich;
     
-    :Summe EE-Erzeuger berechnen;
-    
-    if (Anteil EE > Ladegrenze?) then (ja)
-        :Überschüssige Energie berechnen;
-        
-        :Speicher nacheinander laden\n(Schwungrad → Batterie → Pumpspeicher → Wasserstoff);
-        
-        note right
-            Pro Speicher:
-            - Prüfe Ladestand
-            - Lade max. Leistung/4 (15min)
-            - Lade max. bis Obergrenze
-            - Restenergie → "Export"
-        end note
-        
-    elseif (Anteil EE ≤ Entladegrenze?) then (ja)
-        :Fehlende Energie berechnen;
-        
-        :Speicher nacheinander entladen\n(Schwungrad → Batterie → Pumpspeicher → Wasserstoff);
-        
-        note right
-            Pro Speicher:
-            - Prüfe Ladestand
-            - Entlade max. Leistung/4 (15min)
-            - Entlade max. bis Untergrenze
-            - Berücksichtige Wirkungsgrad
-            - Restbedarf → "Import"
-        end note
-        
-    endif
-    
-    :Speicherstände und "extra" Energie in Listen speichern;
+
     
 }
 
-:Listen als neue Spalten dem Dataframe hinzufügen;
+:Dataframe auf relevante Tage reduzieren ;
 
 :Return Dataframe;
 

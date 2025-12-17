@@ -44,6 +44,7 @@ def Einlesen_Dunkelflaute(jahr: int) -> pd.DataFrame:
     Liest die Dunkelflauten-Daten aus einer CSV-Datei ein
     """
 
+    #TODO: Was tun, wenn Dauer der Dunkelflaute über Jahreswechsel geht?
     pfad = DATA_DIR / "Variable_Parameter" /"dunkelflaute.csv"  
     df_dunkelflaute = pd.read_csv(pfad, sep=';', decimal=',', low_memory=False, names=["month","day","realisierte EE [Anteil]"], header=0)
     df_dunkelflaute.insert(0, "year", jahr)
