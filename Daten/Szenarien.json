@@ -4,34 +4,34 @@
         "Beschreibung": "Szenario zum Testen der Implementierung",
         "Ziele 2030": {
             "Ausbau EE": {
-                "pv_dach": 145,
-                "pv_frei": 72,  
-                "wind_onshore": 98,
-                "wind_offshore": 26,
+                "pv_dach": 200,
+                "pv_frei": 100,  
+                "wind_onshore": 100,
+                "wind_offshore": 40,
                 "biomasse": 10,
                 "wasser": 6,
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 96.8,
-                "wasserstoff": 50,
+                "batteriespeicher": 120,
+                "wasserstoff": 70,
                 "pumpspeicher": 50
             }
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv_dach": 145,
-                "pv_frei": 100,  
-                "wind_onshore": 180,
-                "wind_offshore": 50,
-                "biomasse": 10,
+                "pv_dach": 450,
+                "pv_frei": 250,  
+                "wind_onshore": 300,
+                "wind_offshore": 150,
+                "biomasse": 40,
                 "wasser": 6,
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher":100,
-                "wasserstoff": 50,
-                "pumpspeicher": 43.8
+                "batteriespeicher": 2500,
+                "wasserstoff": 1000,
+                "pumpspeicher": 300
             }
         },
         "Veränderungsfaktoren":{
@@ -972,6 +972,308 @@
                     "wind_offshore": 1.0,
                     "biomasse": 1.0,
                     "wasser": 1.0,
+                    "sonstige": 1.0
+
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                }
+            }
+    },{
+    "Name": "VP1_2045_real",
+    "Beschreibung": "Realistischer Ausbaupfad bis 2045 für VP1",
+    "Ziele 2030": {
+      "Ausbau EE": {
+        "pv_dach": 80,
+        "pv_frei": 60,
+        "wind_onshore": 90,
+        "wind_offshore": 40,
+        "biomasse": 9,
+        "wasser": 1.5,
+        "sonstige": 0.5
+      },
+      "Ausbau Speicher": {
+        "batteriespeicher": 90,
+        "wasserstoff": 30,
+        "pumpspeicher": 40
+      }
+    },
+    "Ziele 2045": {
+      "Ausbau EE": {
+        "pv_dach": 200,
+        "pv_frei": 220,
+        "wind_onshore": 250,
+        "wind_offshore": 120,
+        "biomasse": 20,
+        "wasser": 1.5,
+        "sonstige": 2.0
+      },
+      "Ausbau Speicher": {
+        "batteriespeicher": 200,
+        "wasserstoff": 100,
+        "pumpspeicher": 55
+      }
+    },
+    "Veränderungsfaktoren": {
+      "Erzeugung": {
+        "pv_dach": 1.0,
+        "pv_frei": 1.0,
+        "wind_onshore": 1.0,
+        "wind_offshore": 1.0,
+        "biomasse": 1.0,
+        "wasser": 1.0,
+        "sonstige": 1.0
+      },
+      "Capex_EE": {
+        "pv_dach": 1.0,
+        "pv_frei": 1.0,
+        "wind_onshore": 1.0,
+        "wind_offshore": 1.0,
+        "biomasse": 1.0,
+        "wasser": 1.0,
+        "sonstige": 1.0
+      },
+      "Opex_EE": {
+        "pv_dach": 1.0,
+        "pv_frei": 1.0,
+        "wind_onshore": 1.0,
+        "wind_offshore": 1.0,
+        "biomasse": 1.0,
+        "wasser": 0.8,
+        "sonstige": 1.0
+      },
+      "Capex_Speicher": {
+        "batteriespeicher": 1.0,
+        "wasserstoff": 1.0,
+        "pumpspeicher": 1.0
+      },
+      "Opex_Speicher": {
+        "batteriespeicher": 1.0,
+        "wasserstoff": 1.0,
+        "pumpspeicher": 1.0
+      }
+    }
+  },
+{
+    "Name": "VP2_2045_real",
+    "Beschreibung": "Realistischer Ausbaupfad bis 2045 für VP2",
+    "Ziele 2030": {
+      "Ausbau EE": {
+        "pv_dach": 50,
+        "pv_frei": 60,
+        "wind_onshore": 70,
+        "wind_offshore": 40,
+        "biomasse": 9,
+        "wasser": 1.5,
+        "sonstige": 0.5
+      },
+      "Ausbau Speicher": {
+        "batteriespeicher": 90,
+        "wasserstoff": 30,
+        "pumpspeicher": 40
+      }
+    },
+    "Ziele 2045": {
+      "Ausbau EE": {
+        "pv_dach": 330,
+        "pv_frei": 370,
+        "wind_onshore": 420,
+        "wind_offshore": 200,
+        "biomasse": 30,
+        "wasser": 1.5,
+        "sonstige": 2.0
+      },
+      "Ausbau Speicher": {
+        "batteriespeicher": 220,
+        "wasserstoff": 150,
+        "pumpspeicher": 55
+      }
+    },
+    "Veränderungsfaktoren": {
+      "Erzeugung": {
+        "pv_dach": 1.0,
+        "pv_frei": 1.0,
+        "wind_onshore": 1.0,
+        "wind_offshore": 1.0,
+        "biomasse": 1.0,
+        "wasser": 1.0,
+        "sonstige": 1.0
+      },
+      "Capex_EE": {
+        "pv_dach": 1.0,
+        "pv_frei": 1.0,
+        "wind_onshore": 1.0,
+        "wind_offshore": 1.0,
+        "biomasse": 1.0,
+        "wasser": 1.0,
+        "sonstige": 1.0
+      },
+      "Opex_EE": {
+        "pv_dach": 1.0,
+        "pv_frei": 1.0,
+        "wind_onshore": 1.0,
+        "wind_offshore": 1.0,
+        "biomasse": 1.0,
+        "wasser": 0.8,
+        "sonstige": 1.0
+      },
+      "Capex_Speicher": {
+        "batteriespeicher": 1.0,
+        "wasserstoff": 1.0,
+        "pumpspeicher": 1.0
+      },
+      "Opex_Speicher": {
+        "batteriespeicher": 1.0,
+        "wasserstoff": 1.0,
+        "pumpspeicher": 1.0
+      }
+    }
+  },
+
+    {
+        "Name": "VP2_100",
+        "Beschreibung": "Szenario zum Testen der Implementierung",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 120,
+                "pv_frei": 150,  
+                "wind_onshore": 90,
+                "wind_offshore": 30,
+                "biomasse": 10,
+                "wasser": 1.5,
+                "sonstige": 0.1
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 60,
+                "wasserstoff": 20,
+                "pumpspeicher": 40
+            }
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 670,
+                "pv_frei": 670,  
+                "wind_onshore": 1000,
+                "wind_offshore": 400,
+                "biomasse": 50,
+                "wasser": 1.5,
+                "sonstige": 0.1
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 250,
+                "wasserstoff": 200,
+                "pumpspeicher": 60
+            }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.5,
+                    "pv_frei": 1.5,
+                    "wind_onshore": 1.5,
+                    "wind_offshore": 1.5,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 0.6,
+                    "sonstige": 1.0
+
+                },
+                "Capex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                },
+                "Opex_Speicher":{
+                    "batteriespeicher": 1.0,
+                    "wasserstoff": 1.0,
+                    "pumpspeicher": 1.0
+                }
+            }
+    },
+{
+        "Name": "VP1_100",
+        "Beschreibung": "Szenario zum Testen der Implementierung",
+        "Ziele 2030": {
+            "Ausbau EE": {
+                "pv_dach": 120,
+                "pv_frei": 150,  
+                "wind_onshore": 90,
+                "wind_offshore": 30,
+                "biomasse": 10,
+                "wasser": 1.5,
+                "sonstige": 0.1
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 60,
+                "wasserstoff": 20,
+                "pumpspeicher": 40
+            }
+        },
+        "Ziele 2045": {
+            "Ausbau EE": {
+                "pv_dach": 400,
+                "pv_frei": 400,  
+                "wind_onshore": 600,
+                "wind_offshore": 250,
+                "biomasse": 30,
+                "wasser": 1.5,
+                "sonstige": 0.1
+            },
+            "Ausbau Speicher": {
+                "batteriespeicher": 150,
+                "wasserstoff": 120,
+                "pumpspeicher": 35
+            }
+        },
+        "Veränderungsfaktoren":{
+                "Erzeugung":{
+                    "pv_dach": 1.5,
+                    "pv_frei": 1.5,
+                    "wind_onshore": 1.5,
+                    "wind_offshore": 1.5,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Capex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 1.0,
+                    "sonstige": 1.0
+                },
+                "Opex_EE":{
+                    "pv_dach": 1.0,
+                    "pv_frei": 1.0,
+                    "wind_onshore": 1.0,
+                    "wind_offshore": 1.0,
+                    "biomasse": 1.0,
+                    "wasser": 0.6,
                     "sonstige": 1.0
 
                 },
