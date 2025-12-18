@@ -304,7 +304,7 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
     from matplotlib.ticker import MaxNLocator
     ax.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
     
-    # === Zweites Diagramm: Installierte Kapazität pro Jahr ===
+    # === Zweites Diagramm: Installierte Kapazität pro Jahr === TODO: BERECHNUNGEN FALSCH, KORRIGIEREN bzw. aus Dataframe lesen
     x_positions = np.arange(len(jahre_liste))
     bar_width = 0.8 / len(speicherarten) 
     
