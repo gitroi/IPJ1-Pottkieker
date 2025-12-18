@@ -12,8 +12,6 @@ start
 Dataframe der normativen Speichersimulation
 Zieljahr in dem Dunkelflaute simuliert werden soll;
 
-:Jahreswerte einfügen;
-
 :Dunkelflauten-Daten aus CSV einlesen;
 
 note right
@@ -23,6 +21,7 @@ Tabelle mit Tagen:
 -Anteil realisierte Erneuerbare Energien (Faktor)
 end note
 
+:Jahreswerte einfügen um selben Zeitraum im Dataframe zu lokalisieren;
 
 :Normativen Speicherverlauf aus Speicher-Prognose kopieren;
 
@@ -40,7 +39,7 @@ partition "Schleife über Dunkelflaute Zeitpunkte + 1 Tag vorher und nachher(15 
     
 }
 
-:Dataframe auf relevante Tage reduzieren ;
+:Dataframe auf relevante Tage reduzieren;
 
 :Return Dataframe;
 
