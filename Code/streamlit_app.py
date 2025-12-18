@@ -301,6 +301,15 @@ elif modus == "📈 Alle Szenarien vergleichen":
     
     st.info("Dieser Modus berechnet alle verfügbaren Szenarien und vergleicht die Ergebnisse.")
     
+    szenarien_dict = {}
+    for szen in szenarien:
+        szenarien_dict[szen["Name"]] = szen
+
+    ausgewählte_szenarien = st.multiselect(
+        "Szenario auswählen",
+        options=szenarien_dict.keys()
+    )
+
     col1, col2 = st.columns(2)
     
     with col1:
@@ -316,8 +325,11 @@ elif modus == "📈 Alle Szenarien vergleichen":
             ["mittel", "schlecht", "gut"]
         )
     
+    ausgewählte = []
+    for key in ausgewählte_szenarien:
+        ausgewählte.append(szenarien_dict[key])
     
-    if st.button("🚀 Alle Szenarien simulieren", type="primary", use_container_width=True):
+    if st.button("🚀 Ausgewählte Szenarien simulieren", type="primary", use_container_width=True):
         gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, ausgewähltes_profil_name)
         
         if gewaehltes_profil:
@@ -326,8 +338,8 @@ elif modus == "📈 Alle Szenarien vergleichen":
             progress_bar = st.progress(0)
             status_text = st.empty()
             
-            for idx, szenario_data in enumerate(szenarien):
-                status_text.text(f"Berechne {szenario_data['Name']}... ({idx+1}/{len(szenarien)})")
+            for idx, szenario_data in enumerate(ausgewählte):
+                status_text.text(f"Berechne {szenario_data['Name']}... ({idx+1}/{len(ausgewählte)})")
                 
                 try:
                     szenario_ergebnis = Szenario(
@@ -348,7 +360,7 @@ elif modus == "📈 Alle Szenarien vergleichen":
                 except Exception as e:
                     st.warning(f"Fehler bei {szenario_data['Name']}: {str(e)}")
                 
-                progress_bar.progress((idx + 1) / len(szenarien))
+                progress_bar.progress((idx + 1) / len(ausgewählte))
             
             status_text.text("Erstelle Vergleichsvisualisierungen...")
             
