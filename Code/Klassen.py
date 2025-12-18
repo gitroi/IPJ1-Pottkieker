@@ -186,7 +186,7 @@ class Szenario:
             (len(self.ee_anteil_ohne_speicher_df[(self.ee_anteil_ohne_speicher_df["Jahr"]==2045) & (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100)])) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2045]) * 100
         ]
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE mit Speicher 2045 [%]"] = [
-            (len(self.gesamt_df[(self.gesamt_df["Jahr"]==2045) & (self.gesamt_df["Anteil Erneuerbare Speicher [%]"] >= 100)])) / len(self.gesamt_df[self.gesamt_df["Jahr"]==2045]) * 100
+            ((len(self.gesamt_df[(self.gesamt_df["Jahr"]==2045) & (self.gesamt_df["Anteil Erneuerbare Speicher [%]"] >= 100)])) / len(self.gesamt_df[self.gesamt_df["Jahr"]==2045])) * 100
         ]
 
         mask = self.gesamt_df["Anteil Erneuerbare Speicher [%]"] < 100
