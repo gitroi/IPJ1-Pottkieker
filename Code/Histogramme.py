@@ -417,3 +417,13 @@ def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
     ax4.set_title('Benötigte Leistung Konventionelle je Szenario')
     ax4.set_ylabel('Leistung [GW]')
     ax4.legend()
+
+def plot_liniendiagramm_ladestand(gesamt_df: pd.DataFrame, ax):
+    """
+    Erstellt ein Liniendiagramm des Ladestands der Speicher über die Zeit.
+    
+    Args:
+        gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
+        ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
+    """
+
