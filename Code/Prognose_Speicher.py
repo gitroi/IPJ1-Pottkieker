@@ -126,10 +126,9 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     # Simulation über alle Zeitpunkte, Leistung durch 4 um auf 15min zu kommen, Wirkungsgrad nur bei Entladung berücksichtigt
     for idx, row in df_gesamtVerlauf.iterrows():
         
-        #TODO: Leistung direkt auf 15min umrechnen?
-        aktuelle_leistung_batterie = FIXPARAMETER_BATTERIE.leistung * row["Speicherkapazität batteriespeicher [MWh]"] 
-        aktuelle_leistung_wasserstoff = FIXPARAMETER_WASSERSTOFF.leistung * row["Speicherkapazität wasserstoff [MWh]"]
-        aktuelle_leistung_pumpspeicher = FIXPARAMETER_PUMPSPEICHER.leistung * row["Speicherkapazität pumpspeicher [MWh]"]
+        aktuelle_leistung_batterie = row["Viertelstundenleistung batteriespeicher [MW]"] 
+        aktuelle_leistung_wasserstoff = row["Viertelstundenleistung wasserstoff [MW]"]
+        aktuelle_leistung_pumpspeicher = row["Viertelstundenleistung pumpspeicher [MW]"]
         aktuell_verfugbare_batterie = aktuell_batterie - (row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.untergrenze)
         aktuell_verfugbare_wasserstoff = aktuell_wasserstoff - (row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.untergrenze)
         aktuell_verfugbare_pumpspeicher = aktuell_pumpspeicher - (row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.untergrenze)
@@ -142,31 +141,31 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
             lademenge = erzeugung - row["Netzlast [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
 
             # Batterie laden
-            if aktuell_batterie <= ((row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.obergrenze) - aktuelle_leistung_batterie/4):
-                if lademenge > 0 and (aktuelle_leistung_batterie/4) > (lademenge*inputWirkungsgradBatterie):
+            if aktuell_batterie <= ((row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.obergrenze) - aktuelle_leistung_batterie):
+                if lademenge > 0 and (aktuelle_leistung_batterie) > (lademenge*inputWirkungsgradBatterie):
                     aktuell_batterie += (lademenge*inputWirkungsgradBatterie)
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_batterie/4) <= (lademenge*inputWirkungsgradBatterie):
-                    aktuell_batterie += (aktuelle_leistung_batterie/4)
-                    lademenge -= ((aktuelle_leistung_batterie/4)/inputWirkungsgradBatterie)
+                elif lademenge > 0 and (aktuelle_leistung_batterie) <= (lademenge*inputWirkungsgradBatterie):
+                    aktuell_batterie += (aktuelle_leistung_batterie)
+                    lademenge -= ((aktuelle_leistung_batterie)/inputWirkungsgradBatterie)
 
             # Pumpspeicher laden
-            if aktuell_pumpspeicher <= ((row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuelle_leistung_pumpspeicher/4):
-                if lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) > (lademenge*inputWirkungsgradPumpspeicher):
+            if aktuell_pumpspeicher <= ((row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuelle_leistung_pumpspeicher):
+                if lademenge > 0 and (aktuelle_leistung_pumpspeicher) > (lademenge*inputWirkungsgradPumpspeicher):
                     aktuell_pumpspeicher += (lademenge*inputWirkungsgradPumpspeicher)
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= (lademenge*inputWirkungsgradPumpspeicher):
-                    aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher/4)
-                    lademenge -= ((aktuelle_leistung_pumpspeicher/4)/inputWirkungsgradPumpspeicher)
+                elif lademenge > 0 and (aktuelle_leistung_pumpspeicher) <= (lademenge*inputWirkungsgradPumpspeicher):
+                    aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher)
+                    lademenge -= ((aktuelle_leistung_pumpspeicher)/inputWirkungsgradPumpspeicher)
 
             # Wasserstoff laden
-            if aktuell_wasserstoff <= ((row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuelle_leistung_wasserstoff/4):
-                if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > (lademenge*inputWirkungsgradWasserstoff):
+            if aktuell_wasserstoff <= ((row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuelle_leistung_wasserstoff):
+                if lademenge > 0 and (aktuelle_leistung_wasserstoff) > (lademenge*inputWirkungsgradWasserstoff):
                     aktuell_wasserstoff += (lademenge*inputWirkungsgradWasserstoff)
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_wasserstoff/4) <= (lademenge*inputWirkungsgradWasserstoff):
-                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
-                    lademenge -= ((aktuelle_leistung_wasserstoff/4)/inputWirkungsgradWasserstoff)
+                elif lademenge > 0 and (aktuelle_leistung_wasserstoff) <= (lademenge*inputWirkungsgradWasserstoff):
+                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff)
+                    lademenge -= ((aktuelle_leistung_wasserstoff)/inputWirkungsgradWasserstoff)
             
 
             exportEnergie += lademenge
@@ -178,15 +177,15 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
             # Batterie entladen
             if aktuell_batterie > (row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.untergrenze):
-                if fehlmenge > 0 and (aktuelle_leistung_batterie/4) > fehlmenge and aktuell_verfugbare_batterie >= (fehlmenge/outputWirkungsgradBatterie):
+                if fehlmenge > 0 and (aktuelle_leistung_batterie) > fehlmenge and aktuell_verfugbare_batterie >= (fehlmenge/outputWirkungsgradBatterie):
                     aktuell_batterie -= (fehlmenge/outputWirkungsgradBatterie)
                     aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0  
-                elif fehlmenge > 0 and (aktuelle_leistung_batterie/4) <= fehlmenge and aktuell_verfugbare_batterie >= ((aktuelle_leistung_batterie/4)/outputWirkungsgradBatterie):
-                    aktuell_batterie -= ((aktuelle_leistung_batterie/4)/outputWirkungsgradBatterie)
-                    aktuell_zusatz_energie += (aktuelle_leistung_batterie/4)
-                    fehlmenge -= (aktuelle_leistung_batterie/4)
-                elif fehlmenge > 0 and aktuell_verfugbare_batterie < ((aktuelle_leistung_batterie/4)/outputWirkungsgradBatterie):
+                elif fehlmenge > 0 and (aktuelle_leistung_batterie) <= fehlmenge and aktuell_verfugbare_batterie >= ((aktuelle_leistung_batterie)/outputWirkungsgradBatterie):
+                    aktuell_batterie -= ((aktuelle_leistung_batterie)/outputWirkungsgradBatterie)
+                    aktuell_zusatz_energie += (aktuelle_leistung_batterie)
+                    fehlmenge -= (aktuelle_leistung_batterie)
+                elif fehlmenge > 0 and aktuell_verfugbare_batterie < ((aktuelle_leistung_batterie)/outputWirkungsgradBatterie):
                     if fehlmenge < (aktuell_verfugbare_batterie*outputWirkungsgradBatterie):
                         aktuell_batterie -= (fehlmenge/outputWirkungsgradBatterie)
                         aktuell_zusatz_energie += fehlmenge
@@ -198,15 +197,15 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
                         
             # Pumpspeicher entladen
             if aktuell_pumpspeicher > (row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.untergrenze):
-                if fehlmenge > 0 and (aktuelle_leistung_pumpspeicher/4) > fehlmenge and aktuell_verfugbare_pumpspeicher >= (fehlmenge/outputWirkungsgradPumpspeicher):
+                if fehlmenge > 0 and (aktuelle_leistung_pumpspeicher) > fehlmenge and aktuell_verfugbare_pumpspeicher >= (fehlmenge/outputWirkungsgradPumpspeicher):
                     aktuell_pumpspeicher -= (fehlmenge/outputWirkungsgradPumpspeicher)
                     aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0  
-                elif fehlmenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= fehlmenge and aktuell_verfugbare_pumpspeicher >= ((aktuelle_leistung_pumpspeicher/4)/outputWirkungsgradPumpspeicher):
-                    aktuell_pumpspeicher -= ((aktuelle_leistung_pumpspeicher/4)/outputWirkungsgradPumpspeicher)
-                    aktuell_zusatz_energie += (aktuelle_leistung_pumpspeicher/4)
-                    fehlmenge -= (aktuelle_leistung_pumpspeicher/4)
-                elif fehlmenge > 0 and aktuell_verfugbare_pumpspeicher < ((aktuelle_leistung_pumpspeicher/4)/outputWirkungsgradPumpspeicher):
+                elif fehlmenge > 0 and (aktuelle_leistung_pumpspeicher) <= fehlmenge and aktuell_verfugbare_pumpspeicher >= ((aktuelle_leistung_pumpspeicher)/outputWirkungsgradPumpspeicher):
+                    aktuell_pumpspeicher -= ((aktuelle_leistung_pumpspeicher)/outputWirkungsgradPumpspeicher)
+                    aktuell_zusatz_energie += (aktuelle_leistung_pumpspeicher)
+                    fehlmenge -= (aktuelle_leistung_pumpspeicher)
+                elif fehlmenge > 0 and aktuell_verfugbare_pumpspeicher < ((aktuelle_leistung_pumpspeicher)/outputWirkungsgradPumpspeicher):
                     if fehlmenge < (aktuell_verfugbare_pumpspeicher*outputWirkungsgradPumpspeicher):
                         aktuell_pumpspeicher -= (fehlmenge/outputWirkungsgradPumpspeicher)
                         aktuell_zusatz_energie += fehlmenge
@@ -218,15 +217,15 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
             # Wasserstoff entladen
             if aktuell_wasserstoff > (row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.untergrenze):
-                if fehlmenge > 0 and (aktuelle_leistung_wasserstoff/4) > fehlmenge and aktuell_verfugbare_wasserstoff >= (fehlmenge/outputWirkungsgradWasserstoff):
+                if fehlmenge > 0 and (aktuelle_leistung_wasserstoff) > fehlmenge and aktuell_verfugbare_wasserstoff >= (fehlmenge/outputWirkungsgradWasserstoff):
                     aktuell_wasserstoff -= (fehlmenge/outputWirkungsgradWasserstoff)
                     aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0  
-                elif fehlmenge > 0 and (aktuelle_leistung_wasserstoff/4) <= fehlmenge and aktuell_verfugbare_wasserstoff >= ((aktuelle_leistung_wasserstoff/4)/outputWirkungsgradWasserstoff):
-                    aktuell_wasserstoff -= ((aktuelle_leistung_wasserstoff/4)/outputWirkungsgradWasserstoff)
-                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff/4)
-                    fehlmenge -= (aktuelle_leistung_wasserstoff/4)
-                elif fehlmenge > 0 and aktuell_verfugbare_wasserstoff < ((aktuelle_leistung_wasserstoff/4)/outputWirkungsgradWasserstoff):
+                elif fehlmenge > 0 and (aktuelle_leistung_wasserstoff) <= fehlmenge and aktuell_verfugbare_wasserstoff >= ((aktuelle_leistung_wasserstoff)/outputWirkungsgradWasserstoff):
+                    aktuell_wasserstoff -= ((aktuelle_leistung_wasserstoff)/outputWirkungsgradWasserstoff)
+                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff)
+                    fehlmenge -= (aktuelle_leistung_wasserstoff)
+                elif fehlmenge > 0 and aktuell_verfugbare_wasserstoff < ((aktuelle_leistung_wasserstoff)/outputWirkungsgradWasserstoff):
                     if fehlmenge < (aktuell_verfugbare_wasserstoff*outputWirkungsgradWasserstoff):
                         aktuell_wasserstoff -= (fehlmenge/outputWirkungsgradWasserstoff)
                         aktuell_zusatz_energie += fehlmenge
@@ -265,7 +264,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         print(df_gesamtVerlauf[mask.any(axis=1)])
 
     # Debug-Code
-    # df_gesamtVerlauf.to_csv(DATA_DIR / 'Output' / 'debug_gesamtverlauf.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_gesamtVerlauf.to_csv(DATA_DIR / 'Output' / 'debug_gesamtverlauf_alt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamtVerlauf
 
@@ -357,10 +356,9 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     # Simulation nur über Dunkelflaute-Tage +/- 1 Tag
     for idx, row in df_verlauf_dunkelflaute.loc[mask_simulation].iterrows():
         
-        #TODO: Leistung direkt auf 15min umrechnen?
-        aktuelle_leistung_batterie = FIXPARAMETER_BATTERIE.leistung * row["Speicherkapazität batteriespeicher [MWh]"] 
-        aktuelle_leistung_wasserstoff = FIXPARAMETER_WASSERSTOFF.leistung * row["Speicherkapazität wasserstoff [MWh]"]
-        aktuelle_leistung_pumpspeicher = FIXPARAMETER_PUMPSPEICHER.leistung * row["Speicherkapazität pumpspeicher [MWh]"]
+        aktuelle_leistung_batterie = row["Viertelstundenleistung batteriespeicher [MW]"] 
+        aktuelle_leistung_wasserstoff = row["Viertelstundenleistung wasserstoff [MW]"]
+        aktuelle_leistung_pumpspeicher = row["Viertelstundenleistung pumpspeicher [MW]"]
         aktuell_verfugbare_batterie = aktuell_batterie - (row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.untergrenze)
         aktuell_verfugbare_wasserstoff = aktuell_wasserstoff - (row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.untergrenze)
         aktuell_verfugbare_pumpspeicher = aktuell_pumpspeicher - (row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.untergrenze)
@@ -376,31 +374,31 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
             lademenge = erzeugung - row["Netzlast [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
 
             # Batterie laden
-            if aktuell_batterie <= ((row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.obergrenze) - aktuelle_leistung_batterie/4):
-                if lademenge > 0 and (aktuelle_leistung_batterie/4) > (lademenge*inputWirkungsgradBatterie):
+            if aktuell_batterie <= ((row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.obergrenze) - aktuelle_leistung_batterie):
+                if lademenge > 0 and (aktuelle_leistung_batterie) > (lademenge*inputWirkungsgradBatterie):
                     aktuell_batterie += (lademenge*inputWirkungsgradBatterie)
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_batterie/4) <= (lademenge*inputWirkungsgradBatterie):
-                    aktuell_batterie += (aktuelle_leistung_batterie/4)
-                    lademenge -= ((aktuelle_leistung_batterie/4)/inputWirkungsgradBatterie)
+                elif lademenge > 0 and (aktuelle_leistung_batterie) <= (lademenge*inputWirkungsgradBatterie):
+                    aktuell_batterie += (aktuelle_leistung_batterie)
+                    lademenge -= ((aktuelle_leistung_batterie)/inputWirkungsgradBatterie)
 
             # Pumpspeicher laden
-            if aktuell_pumpspeicher <= ((row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuelle_leistung_pumpspeicher/4):
-                if lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) > (lademenge*inputWirkungsgradPumpspeicher):
+            if aktuell_pumpspeicher <= ((row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuelle_leistung_pumpspeicher):
+                if lademenge > 0 and (aktuelle_leistung_pumpspeicher) > (lademenge*inputWirkungsgradPumpspeicher):
                     aktuell_pumpspeicher += (lademenge*inputWirkungsgradPumpspeicher)
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= (lademenge*inputWirkungsgradPumpspeicher):
-                    aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher/4)
-                    lademenge -= ((aktuelle_leistung_pumpspeicher/4)/inputWirkungsgradPumpspeicher)
+                elif lademenge > 0 and (aktuelle_leistung_pumpspeicher) <= (lademenge*inputWirkungsgradPumpspeicher):
+                    aktuell_pumpspeicher += (aktuelle_leistung_pumpspeicher)
+                    lademenge -= ((aktuelle_leistung_pumpspeicher)/inputWirkungsgradPumpspeicher)
 
             # Wasserstoff laden
-            if aktuell_wasserstoff <= ((row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuelle_leistung_wasserstoff/4):
-                if lademenge > 0 and (aktuelle_leistung_wasserstoff/4) > (lademenge*inputWirkungsgradWasserstoff):
+            if aktuell_wasserstoff <= ((row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuelle_leistung_wasserstoff):
+                if lademenge > 0 and (aktuelle_leistung_wasserstoff) > (lademenge*inputWirkungsgradWasserstoff):
                     aktuell_wasserstoff += (lademenge*inputWirkungsgradWasserstoff)
                     lademenge = 0
-                elif lademenge > 0 and (aktuelle_leistung_wasserstoff/4) <= (lademenge*inputWirkungsgradWasserstoff):
-                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff/4)
-                    lademenge -= ((aktuelle_leistung_wasserstoff/4)/inputWirkungsgradWasserstoff)
+                elif lademenge > 0 and (aktuelle_leistung_wasserstoff) <= (lademenge*inputWirkungsgradWasserstoff):
+                    aktuell_wasserstoff += (aktuelle_leistung_wasserstoff)
+                    lademenge -= ((aktuelle_leistung_wasserstoff)/inputWirkungsgradWasserstoff)
             
 
             exportEnergie += lademenge
@@ -412,15 +410,15 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
 
             # Batterie entladen
             if aktuell_batterie > (row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.untergrenze):
-                if fehlmenge > 0 and (aktuelle_leistung_batterie/4) > fehlmenge and aktuell_verfugbare_batterie >= (fehlmenge/outputWirkungsgradBatterie):
+                if fehlmenge > 0 and (aktuelle_leistung_batterie) > fehlmenge and aktuell_verfugbare_batterie >= (fehlmenge/outputWirkungsgradBatterie):
                     aktuell_batterie -= (fehlmenge/outputWirkungsgradBatterie)
                     aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0  
-                elif fehlmenge > 0 and (aktuelle_leistung_batterie/4) <= fehlmenge and aktuell_verfugbare_batterie >= ((aktuelle_leistung_batterie/4)/outputWirkungsgradBatterie):
-                    aktuell_batterie -= ((aktuelle_leistung_batterie/4)/outputWirkungsgradBatterie)
-                    aktuell_zusatz_energie += (aktuelle_leistung_batterie/4)
-                    fehlmenge -= (aktuelle_leistung_batterie/4)
-                elif fehlmenge > 0 and aktuell_verfugbare_batterie < ((aktuelle_leistung_batterie/4)/outputWirkungsgradBatterie):
+                elif fehlmenge > 0 and (aktuelle_leistung_batterie) <= fehlmenge and aktuell_verfugbare_batterie >= ((aktuelle_leistung_batterie)/outputWirkungsgradBatterie):
+                    aktuell_batterie -= ((aktuelle_leistung_batterie)/outputWirkungsgradBatterie)
+                    aktuell_zusatz_energie += (aktuelle_leistung_batterie)
+                    fehlmenge -= (aktuelle_leistung_batterie)
+                elif fehlmenge > 0 and aktuell_verfugbare_batterie < ((aktuelle_leistung_batterie)/outputWirkungsgradBatterie):
                     if fehlmenge < (aktuell_verfugbare_batterie*outputWirkungsgradBatterie):
                         aktuell_batterie -= (fehlmenge/outputWirkungsgradBatterie)
                         aktuell_zusatz_energie += fehlmenge
@@ -432,15 +430,15 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
                         
             # Pumpspeicher entladen
             if aktuell_pumpspeicher > (row["Speicherkapazität pumpspeicher [MWh]"]*FIXPARAMETER_PUMPSPEICHER.untergrenze):
-                if fehlmenge > 0 and (aktuelle_leistung_pumpspeicher/4) > fehlmenge and aktuell_verfugbare_pumpspeicher >= (fehlmenge/outputWirkungsgradPumpspeicher):
+                if fehlmenge > 0 and (aktuelle_leistung_pumpspeicher) > fehlmenge and aktuell_verfugbare_pumpspeicher >= (fehlmenge/outputWirkungsgradPumpspeicher):
                     aktuell_pumpspeicher -= (fehlmenge/outputWirkungsgradPumpspeicher)
                     aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0  
-                elif fehlmenge > 0 and (aktuelle_leistung_pumpspeicher/4) <= fehlmenge and aktuell_verfugbare_pumpspeicher >= ((aktuelle_leistung_pumpspeicher/4)/outputWirkungsgradPumpspeicher):
-                    aktuell_pumpspeicher -= ((aktuelle_leistung_pumpspeicher/4)/outputWirkungsgradPumpspeicher)
-                    aktuell_zusatz_energie += (aktuelle_leistung_pumpspeicher/4)
-                    fehlmenge -= (aktuelle_leistung_pumpspeicher/4)
-                elif fehlmenge > 0 and aktuell_verfugbare_pumpspeicher < ((aktuelle_leistung_pumpspeicher/4)/outputWirkungsgradPumpspeicher):
+                elif fehlmenge > 0 and (aktuelle_leistung_pumpspeicher) <= fehlmenge and aktuell_verfugbare_pumpspeicher >= ((aktuelle_leistung_pumpspeicher)/outputWirkungsgradPumpspeicher):
+                    aktuell_pumpspeicher -= ((aktuelle_leistung_pumpspeicher)/outputWirkungsgradPumpspeicher)
+                    aktuell_zusatz_energie += (aktuelle_leistung_pumpspeicher)
+                    fehlmenge -= (aktuelle_leistung_pumpspeicher)
+                elif fehlmenge > 0 and aktuell_verfugbare_pumpspeicher < ((aktuelle_leistung_pumpspeicher)/outputWirkungsgradPumpspeicher):
                     if fehlmenge < (aktuell_verfugbare_pumpspeicher*outputWirkungsgradPumpspeicher):
                         aktuell_pumpspeicher -= (fehlmenge/outputWirkungsgradPumpspeicher)
                         aktuell_zusatz_energie += fehlmenge
@@ -452,15 +450,15 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
 
             # Wasserstoff entladen
             if aktuell_wasserstoff > (row["Speicherkapazität wasserstoff [MWh]"]*FIXPARAMETER_WASSERSTOFF.untergrenze):
-                if fehlmenge > 0 and (aktuelle_leistung_wasserstoff/4) > fehlmenge and aktuell_verfugbare_wasserstoff >= (fehlmenge/outputWirkungsgradWasserstoff):
+                if fehlmenge > 0 and (aktuelle_leistung_wasserstoff) > fehlmenge and aktuell_verfugbare_wasserstoff >= (fehlmenge/outputWirkungsgradWasserstoff):
                     aktuell_wasserstoff -= (fehlmenge/outputWirkungsgradWasserstoff)
                     aktuell_zusatz_energie += fehlmenge
                     fehlmenge = 0  
-                elif fehlmenge > 0 and (aktuelle_leistung_wasserstoff/4) <= fehlmenge and aktuell_verfugbare_wasserstoff >= ((aktuelle_leistung_wasserstoff/4)/outputWirkungsgradWasserstoff):
-                    aktuell_wasserstoff -= ((aktuelle_leistung_wasserstoff/4)/outputWirkungsgradWasserstoff)
-                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff/4)
-                    fehlmenge -= (aktuelle_leistung_wasserstoff/4)
-                elif fehlmenge > 0 and aktuell_verfugbare_wasserstoff < ((aktuelle_leistung_wasserstoff/4)/outputWirkungsgradWasserstoff):
+                elif fehlmenge > 0 and (aktuelle_leistung_wasserstoff) <= fehlmenge and aktuell_verfugbare_wasserstoff >= ((aktuelle_leistung_wasserstoff)/outputWirkungsgradWasserstoff):
+                    aktuell_wasserstoff -= ((aktuelle_leistung_wasserstoff)/outputWirkungsgradWasserstoff)
+                    aktuell_zusatz_energie += (aktuelle_leistung_wasserstoff)
+                    fehlmenge -= (aktuelle_leistung_wasserstoff)
+                elif fehlmenge > 0 and aktuell_verfugbare_wasserstoff < ((aktuelle_leistung_wasserstoff)/outputWirkungsgradWasserstoff):
                     if fehlmenge < (aktuell_verfugbare_wasserstoff*outputWirkungsgradWasserstoff):
                         aktuell_wasserstoff -= (fehlmenge/outputWirkungsgradWasserstoff)
                         aktuell_zusatz_energie += fehlmenge
@@ -517,12 +515,6 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     date_range = pd.date_range(start='2026-01-01', end='2030-12-31 23:45', freq='15min',tz="UTC")
     df_2030 = pd.DataFrame({'Datum von': date_range})
 
-    # df_2030["Jahr"] = df_2030["Datum von"].dt.year
-    # df_2030["Monat"]= df_2030["Datum von"].dt.month
-    # df_2030["Wochentag"] = df_2030["Datum von"].dt.dayofweek
-    # df_2030["Uhrzeit"] = df_2030["Datum von"].dt.hour
-    # df_2030["Minute"] = df_2030["Datum von"].dt.minute
-
     anzahl_tage_2030 = len(df_2030["Datum von"].dt.date.unique()) # type: ignore
     
     wachstumsrate_2030 = (bestand2030 - bestand2025) / anzahl_tage_2030
@@ -537,12 +529,6 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
     date_range = pd.date_range(start='2031-01-01', end='2045-12-31 23:45', freq='15min',tz="UTC")
     df_2045 = pd.DataFrame({'Datum von': date_range})
 
-    # df_2045["Jahr"] = df_2045["Datum von"].dt.year
-    # df_2045["Monat"]= df_2045["Datum von"].dt.month
-    # df_2045["Wochentag"] = df_2045["Datum von"].dt.dayofweek
-    # df_2045["Uhrzeit"] = df_2045["Datum von"].dt.hour
-    # df_2045["Minute"] = df_2045["Datum von"].dt.minute
-
     anzahl_tage_2045 = len(df_2045["Datum von"].dt.date.unique()) # type: ignore
     
     wachstumsrate_2045 = (bestand2045 - bestand2030) / anzahl_tage_2045
@@ -551,6 +537,15 @@ def Prognose_Speicher_Ausbau(speicherart, bestand2025, bestand2030, bestand2045)
 
     df_gesamt = pd.concat([df_2030, df_2045], ignore_index=True) # Bereich von 2026 bis 2030 und 2031 bis 2045 zusammenfügen
     df_gesamt[speichername] = df_gesamt[speichername].round(2)
+
+    vierteltunden_leistung_spalte = f"Viertelstundenleistung {speicherart} [MW]"
+    match speicherart:
+        case "batteriespeicher": FIXPARAMETER_SPEICHERART = FIXPARAMETER_BATTERIE
+        case "wasserstoff": FIXPARAMETER_SPEICHERART = FIXPARAMETER_WASSERSTOFF
+        case "pumpspeicher": FIXPARAMETER_SPEICHERART = FIXPARAMETER_PUMPSPEICHER
+        case _: raise ValueError(f"Unbekannte Speicherart: {speicherart}")
+    
+    df_gesamt[vierteltunden_leistung_spalte] = df_gesamt[speichername] * (FIXPARAMETER_SPEICHERART.leistung / 4)
 
     # df_gesamt.to_csv(DATA_DIR / 'Output' / 'speicherprognosetestgesamt.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
