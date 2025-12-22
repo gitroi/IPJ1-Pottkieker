@@ -134,7 +134,7 @@ class Szenario:
                 - 'fig5': EE-Anteil mit/ohne Speicher
         """
 
-        plot_verbrauch_woche(self.verbrauch_df, "2028-01-01 00:00")
+        # plot_verbrauch_woche(self.verbrauch_df, "2028-01-01 00:00") # auskommentiert um Fehler in Streamlit zu vermeiden
         fig1, axs1 = plt.subplots(2, figsize=(14, 12)) 
         fig2, axs2 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
