@@ -14,6 +14,7 @@ from Prognose_Verbrauch import Prognose_Verbrauch
 from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,kosten, plot_Anteil_EE_mit_ohne_Speicher
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
+from Plot import plot_verbrauch_woche
 # from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GWh_Jahr
 import Prognose_Speicher as speicher
 from Auswertung import ausgabe, konventionelle_Leistung_Energie
@@ -132,6 +133,8 @@ class Szenario:
                 - 'fig4': Detaillierte Ausbauraten
                 - 'fig5': EE-Anteil mit/ohne Speicher
         """
+
+        plot_verbrauch_woche(self.verbrauch_df, "2028-01-01 00:00")
         fig1, axs1 = plt.subplots(2, figsize=(14, 12)) 
         fig2, axs2 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 

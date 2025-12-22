@@ -74,7 +74,7 @@ with st.sidebar:
     st.header("📊 Navigation")
     modus = st.radio(
         "Simulationsmodus wählen:",
-        ["🎯 Einzelnes Szenario", "📈 Alle Szenarien vergleichen", "➕ Szenario hinzufügen","ℹ️ Über das Projekt"],
+        ["🎯 Einzelnes Szenario", "📈 Szenarien vergleichen", "➕ Szenario hinzufügen","ℹ️ Über das Projekt"],
         index=0
     )
     
@@ -117,7 +117,7 @@ if modus == "🎯 Einzelnes Szenario":
             st.info(f"📝 {gewaehltes_profil.get('Beschreibung', 'Verbrauchsprofil für die Simulation')}")
     
     st.subheader("⚙️ Simulationsparameter")
-    col3, col4 = st.columns(2)
+    col3 = st.columns(1)[0]
     
     with col3:
         ertragsart = st.selectbox(
@@ -126,15 +126,15 @@ if modus == "🎯 Einzelnes Szenario":
             help="Ertragsniveau für erneuerbare Energien"
         )
     
-    with col4:
-        jahre = range(2026, 2046)
-        jahr_optionen = ["Alle Jahre"] + list(map(str, jahre))
-        jahr_auswahl = st.selectbox(
-            "Abbildungsjahr Diagramm:",
-            jahr_optionen,
-            help="Jahr für das die Ist-Analyse dargestellt werden soll"
-        )
-        jahr = None if jahr_auswahl == "Alle Jahre" else int(jahr_auswahl)
+    # with col4:
+    #     jahre = range(2026, 2046)
+    #     jahr_optionen = ["Alle Jahre"] + list(map(str, jahre))
+    #     jahr_auswahl = st.selectbox(
+    #         "Abbildungsjahr Diagramm:",
+    #         jahr_optionen,
+    #         help="Jahr für das die Ist-Analyse dargestellt werden soll"
+    #     )
+    #     jahr = None if jahr_auswahl == "Alle Jahre" else int(jahr_auswahl)
     
     st.markdown("---")
     if st.button("🚀 Simulation starten", type="primary", width='stretch'):
@@ -157,7 +157,7 @@ if modus == "🎯 Einzelnes Szenario":
                     st.success(f"✅ Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
                     
                     st.session_state['letztes_szenario'] = szenario_ergebnis
-                    st.session_state['jahr'] = jahr
+                    st.session_state['jahr'] = 2045
                     
                 except Exception as e:
                     st.error(f"❌ Fehler bei der Simulation: {str(e)}")
@@ -296,8 +296,8 @@ if modus == "🎯 Einzelnes Szenario":
 # ============================================================================
 # MODUS 2: ALLE SZENARIEN
 # ============================================================================
-elif modus == "📈 Alle Szenarien vergleichen":
-    st.header("📈 Alle Szenarien vergleichen")
+elif modus == "📈 Szenarien vergleichen":
+    st.header("📈 Szenarien vergleichen")
     
     st.info("Dieser Modus berechnet alle verfügbaren Szenarien und vergleicht die Ergebnisse.")
     

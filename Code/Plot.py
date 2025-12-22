@@ -73,4 +73,63 @@ def plot_ee_erzeugung_jaehrlich():
     plt.grid()
     plt.show()
 
-plot_ee_erzeugung_jaehrlich()
+
+def plot_verbrauch(gesamt:pd.DataFrame):
+    """
+    Erstellt ein Liniendiagramm des Gesamtenergieverbrauchs.
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
+    """
+    plt.figure(figsize=(14, 6))
+    plt.plot(gesamt.index, gesamt["Verbrauch [MWh]"], label="Gesamtverbrauch", color='orange', marker='o')
+    plt.title("Gesamtenergieverbrauch")
+    plt.xlabel("Datum")
+    plt.ylabel("Energieverbrauch [MWh]")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+def plot_verbrauch_woche(gesamt: pd.DataFrame, start_datum=None):
+    """
+    Erstellt ein Liniendiagramm des Energieverbrauchs in Stundenauflösung für eine Woche.
+    
+    Parameters:
+    -----------
+    gesamt : pd.DataFrame
+        DataFrame mit Verbrauchsdaten, Index muss DatetimeIndex sein
+    start_datum : str oder pd.Timestamp, optional
+        Startdatum der Woche (Format: 'YYYY-MM-DD' oder 'YYYY-MM-DD HH:MM:SS')
+        Wenn None, wird die erste verfügbare Woche verwendet
+    
+    Ünterstützt durch KI (GitHub Copilot)
+    """
+    # Stelle sicher, dass der Index ein DatetimeIndex ist
+    if not isinstance(gesamt.index, pd.DatetimeIndex):
+        raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein")
+    
+    # Bestimme Startdatum
+    if start_datum is None:
+        start = gesamt.index[0]
+    else:
+        start = pd.to_datetime(start_datum)
+    
+    # Berechne Enddatum (7 Tage später)
+    ende = start + pd.Timedelta(days=7)
+    
+    # Filtere Daten für die Woche
+    woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)]
+    
+    if woche_df.empty:
+        print(f"Keine Daten für den Zeitraum {start} bis {ende} gefunden")
+        return
+    
+    # Erstelle das Liniendiagramm
+    plt.figure(figsize=(16, 6))
+    plt.plot(woche_df.index, woche_df["Netzlast [MWh]"], label="Verbrauch", color='orange', marker='o', markersize=3)
+    plt.title(f"Energieverbrauch in Stundenauflösung ({start.strftime('%d.%m.%Y')} - {ende.strftime('%d.%m.%Y')})")
+    plt.xlabel("Datum und Uhrzeit")
+    plt.ylabel("Energieverbrauch [MWh]")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
