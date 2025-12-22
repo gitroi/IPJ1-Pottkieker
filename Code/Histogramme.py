@@ -271,7 +271,7 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
             if jahr <= 2030:
                 ausbaustände[et].append(ausbauraten['zuwachsrate_2030'][et]*(jahr-2025)+speicherarten[et]["bestand"])
             else: #FIXME: Überprüfung der Logik, erstellt von KI
-                ausbaustände[et].append(ausbauraten['zuwachsrate_2045'][et]*(jahr-2030)+szenario["Ziele 2045"]["Ausbau Speicher"][et])
+                ausbaustände[et].append(ausbauraten['zuwachsrate_2045'][et]*(jahr-2030)+szenario["Ziele 2030"]["Ausbau Speicher"][et])
 
     jahre = ["2026–2030", "2031–2045"]
 
