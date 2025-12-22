@@ -127,6 +127,7 @@ class Szenario:
             fig4.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots4.png", dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
+    # Todo: neue Diagramme einfügen
     def gebe_plots(self, jahr1=None):
         """
         Erstellt alle Plots und gibt sie als Dictionary von Figure-Objekten zurück.
