@@ -247,6 +247,7 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
     ax2.pie(anteil_gesamtkosten, labels=technologien, autopct='%1.1f%%', startangle=140, colors=colors)
     ax2.set_title('Anteil der Gesamtkosten nach Technologie')
 
+#FIXME: Daten aus Dataframe lesen um Rechenleistung zu vermindern
 def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
     """ 
     Funktion zur Visualisierung der jährlichen Ausbauraten der Speicher
@@ -270,7 +271,7 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
         for et in speicherarten.keys():
             if jahr <= 2030:
                 ausbaustände[et].append(ausbauraten['zuwachsrate_2030'][et]*(jahr-2025)+speicherarten[et]["bestand"])
-            else: #FIXME: Überprüfung der Logik, erstellt von KI
+            else: 
                 ausbaustände[et].append(ausbauraten['zuwachsrate_2045'][et]*(jahr-2030)+szenario["Ziele 2030"]["Ausbau Speicher"][et])
 
     jahre = ["2026–2030", "2031–2045"]
@@ -304,7 +305,7 @@ def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
     from matplotlib.ticker import MaxNLocator
     ax.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
     
-    # === Zweites Diagramm: Installierte Kapazität pro Jahr === TODO: BERECHNUNGEN FALSCH, KORRIGIEREN bzw. aus Dataframe lesen
+    # === Zweites Diagramm: Installierte Kapazität pro Jahr ===
     x_positions = np.arange(len(jahre_liste))
     bar_width = 0.8 / len(speicherarten) 
     
