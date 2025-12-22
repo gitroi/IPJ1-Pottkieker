@@ -8,7 +8,7 @@ import pandas as pd
 from typing import Optional
 from config import DATA_DIR, PROJECT_ROOT
 from Klassen import Szenario
-from Histogramme import plot_histogram_gesamtauswertung
+from Diagramme import plot_histogram_gesamtauswertung
 
 def load_scenarios()-> list:
     """Lädt Szenarien aus einer JSON-Datei."""

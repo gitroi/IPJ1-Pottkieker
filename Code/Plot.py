@@ -79,8 +79,9 @@ def plot_verbrauch(gesamt:pd.DataFrame):
     Erstellt ein Liniendiagramm des Gesamtenergieverbrauchs.
     Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
+    gesamt = gesamt.resample('ME').sum()
     plt.figure(figsize=(14, 6))
-    plt.plot(gesamt.index, gesamt["Verbrauch [MWh]"], label="Gesamtverbrauch", color='orange', marker='o')
+    plt.plot(gesamt.index, gesamt["Netzlast [MWh]"], label="Gesamtverbrauch", color='orange', marker='o')
     plt.title("Gesamtenergieverbrauch")
     plt.xlabel("Datum")
     plt.ylabel("Energieverbrauch [MWh]")
@@ -95,34 +96,38 @@ def plot_verbrauch_woche(gesamt: pd.DataFrame, start_datum=None):
     Parameters:
     -----------
     gesamt : pd.DataFrame
-        DataFrame mit Verbrauchsdaten, Index muss DatetimeIndex sein
+        DataFrame mit Verbrauchsdaten, Index muss DatetimeIndex sein oder es muss eine 'Datum von' Spalte vorhanden sein
     start_datum : str oder pd.Timestamp, optional
         Startdatum der Woche (Format: 'YYYY-MM-DD' oder 'YYYY-MM-DD HH:MM:SS')
         Wenn None, wird die erste verfügbare Woche verwendet
     
     Ünterstützt durch KI (GitHub Copilot)
     """
-    # Stelle sicher, dass der Index ein DatetimeIndex ist
     if not isinstance(gesamt.index, pd.DatetimeIndex):
-        raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein")
+        if 'Datum von' in gesamt.columns:
+            gesamt = gesamt.set_index('Datum von')
+        else:
+            raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein oder eine 'Datum von' Spalte enthalten")
     
-    # Bestimme Startdatum
     if start_datum is None:
         start = gesamt.index[0]
     else:
         start = pd.to_datetime(start_datum)
+        # Wenn der Index timezone-aware ist, muss auch start timezone-aware sein
+        if gesamt.index.tz is not None:
+            if start.tz is None:
+                start = start.tz_localize(gesamt.index.tz)
     
-    # Berechne Enddatum (7 Tage später)
     ende = start + pd.Timedelta(days=7)
     
-    # Filtere Daten für die Woche
     woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)]
     
     if woche_df.empty:
         print(f"Keine Daten für den Zeitraum {start} bis {ende} gefunden")
         return
     
-    # Erstelle das Liniendiagramm
+    woche_df = woche_df.resample('h').sum()
+    
     plt.figure(figsize=(16, 6))
     plt.plot(woche_df.index, woche_df["Netzlast [MWh]"], label="Verbrauch", color='orange', marker='o', markersize=3)
     plt.title(f"Energieverbrauch in Stundenauflösung ({start.strftime('%d.%m.%Y')} - {ende.strftime('%d.%m.%Y')})")

@@ -187,7 +187,6 @@ def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
     ax.set_xlabel('Jahr')
     ax.set_ylabel('Energie [TWh]')
     
-    # Setze x-Achsen-Ticks auf jedes Jahr
     ax.set_xticks(jahre)
     ax.set_xticklabels(jahre, rotation=45, ha='right')
     
@@ -428,3 +427,74 @@ def plot_liniendiagramm_ladestand(gesamt_df: pd.DataFrame, ax):
         ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
     """
 
+def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
+    """
+    Erstellt ein Liniendiagramm des Gesamtenergieverbrauchs für ein bestimmtes Jahr mit Wochenwerten.
+    Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
+    """
+    verbrauch_zeitraum = gesamt.set_index('Datum von')
+    verbrauch_zeitraum = verbrauch_zeitraum[verbrauch_zeitraum.index.year == jahr]
+    verbrauch_woechentlich = verbrauch_zeitraum.resample('D').sum()
+
+    ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Netzlast [MWh]"]/1e6, label=f"Verbrauch {jahr}", color='red', marker='o')
+    ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Realisierte Erzeugung [MWh]"]/1e6, label="Erzeugung", color='#F9BF02', marker='o')
+    ax.set_title(f"Energieverbrauch im Jahr {jahr} (Wochenwerte)")  
+    ax.set_xlabel('Wochen des Jahres')
+    ax.set_ylabel('Verbrauch [TWh]')
+    ax.legend()
+
+def wochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
+    """
+    Erstellt ein Liniendiagramm der Netzlast, der sumierten erzeugerwerte, sowie der erzeugerwerte
+    in Stundenauflösung für eine bestimmte Woche.
+    Parameters:
+    -----------
+    gesamt : pd.DataFrame
+        DataFrame mit Verbrauchsdaten, Index muss DatetimeIndex sein oder es muss eine 'Datum von' Spalte vorhanden sein
+    start_datum : str oder pd.Timestamp, optional
+        Startdatum der Woche (Format: 'YYYY-MM-DD' oder 'YYYY-MM-DD HH:MM:SS')
+        Wenn None, wird die erste verfügbare Woche verwendet
+    
+    Ünterstützt durch KI (GitHub Copilot)
+    """
+    if not isinstance(gesamt.index, pd.DatetimeIndex):
+        if 'Datum von' in gesamt.columns:
+            gesamt = gesamt.set_index('Datum von')
+        else:
+            raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein oder eine 'Datum von' Spalte enthalten")
+    
+    if start_datum is None:
+        start = gesamt.index[0]
+    else:
+        start = pd.to_datetime(start_datum)
+        if gesamt.index.tz is not None:
+            if start.tz is None:
+                start = start.tz_localize(gesamt.index.tz)
+    
+    ende = start + pd.Timedelta(days=7)
+    
+    woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)]
+    
+    if woche_df.empty:
+        raise ValueError("Keine Daten im angegebenen Zeitraum.")
+    
+    woche_df = woche_df.resample('h').sum()
+
+    ax.stackplot(woche_df.index, 
+                 woche_df["Photovoltaik [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Wind Onshore [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Wind Offshore [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Biomasse [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Wasserkraft [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Sonstige Erneuerbare [MWh] Originalauflösungen"]/1e3,
+                 labels=["PV", "Wind Onshore", "Wind Offshore", "Biomasse", "Wasserkraft", "Sonstige"],
+                 colors=['#F9BF02', '#87CEEB', '#4169E1', '#228B22', '#00CED1', '#FF8C00'],
+                 alpha=0.8)
+    
+    ax.plot(woche_df.index, woche_df["Netzlast [MWh]"]/1e3, label="Netzlast", color='red', linewidth=2, linestyle='--')
+    
+    ax.set_title(f"Energieerzeugung und Verbrauch vom {start.date()} bis {ende.date()}")
+    ax.set_xlabel('Datum und Uhrzeit')
+    ax.set_ylabel('Energie [GWh]')
+    ax.legend()
+    ax.grid(True)

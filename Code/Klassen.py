@@ -11,11 +11,14 @@ from config import DATA_DIR, PROJECT_ROOT
 from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
-from Histogramme import plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,kosten, plot_Anteil_EE_mit_ohne_Speicher
+from Diagramme import (plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,
+    plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,
+    kosten, plot_Anteil_EE_mit_ohne_Speicher,
+    verbrauch_jahr,wochendiagramm_stunden
+)
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
-from Plot import plot_verbrauch_woche
-# from Prognose_Speicher import Verlauf_Speicher, ausbaurate_GWh_Jahr
+from Plot import plot_verbrauch_woche,plot_verbrauch
 import Prognose_Speicher as speicher
 from Auswertung import ausgabe, konventionelle_Leistung_Energie
 
@@ -104,13 +107,17 @@ class Szenario:
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig4, axs4 = plt.subplots(2, figsize=(14, 12))
         fig5, axs5 = plt.subplots(1, figsize=(14, 12))
+        fig6, axs6 = plt.subplots(1, figsize=(14, 6))
+        fig7, axs7 = plt.subplots(1, figsize=(14, 6))
 
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
+        verbrauch_jahr(self.gesamt_df, 2028, axs6) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
         kosten(self.kosten_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
+        wochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
         plt.tight_layout()
         
         if(speichern):
@@ -134,7 +141,6 @@ class Szenario:
                 - 'fig5': EE-Anteil mit/ohne Speicher
         """
 
-        # plot_verbrauch_woche(self.verbrauch_df, "2028-01-01 00:00") # auskommentiert um Fehler in Streamlit zu vermeiden
         fig1, axs1 = plt.subplots(2, figsize=(14, 12)) 
         fig2, axs2 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
@@ -216,3 +222,8 @@ class Szenario:
             ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
 
         return ergebnisse
+    
+    def get_jahresdiagramme(self, jahr: int) -> plt.Figure:
+        """Gibt die Jahresdiagramme für ein bestimmtes Jahr zurück"""
+        
+        
