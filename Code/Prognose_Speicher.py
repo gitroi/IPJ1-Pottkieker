@@ -23,15 +23,17 @@ class Speicher:
     obergrenze: float
     untergrenze: float
 
+# JSON-Datei einmal am Anfang laden um Rechenleistung zu verringern
+with open(DATA_DIR / "Feste_Parameter" / "speicherarten.json", "r") as f:
+    SPEICHERARTEN_DATA = json.load(f)
+
 def Einlesen_Speicherdaten_fix(speicherart) -> Speicher:
     """
-    Liest alle festen Parameter einer Speicherart aus einer JSON-Datei ein
+    Liest alle festen Parameter einer Speicherart aus vorgeladenen Daten ein
     """
     
-    with open(DATA_DIR / "Feste_Parameter" / "speicherarten.json", "r") as f:
-        data = json.load(f)
+    speicher_data = SPEICHERARTEN_DATA.get(speicherart) # Über den Funktionen eingelesen, um Datei nicht mehrfach zu öffnen
 
-    speicher_data = data.get(speicherart)
     if speicher_data is None:
         raise ValueError(f"Speicherart '{speicherart}' nicht in der JSON-Datei gefunden.")
 
