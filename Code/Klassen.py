@@ -14,7 +14,7 @@ from Prognose_Verbrauch import Prognose_Verbrauch
 from Diagramme import (plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,
     plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,
     kosten, plot_Anteil_EE_mit_ohne_Speicher,
-    verbrauch_jahr,wochendiagramm_stunden
+    verbrauch_jahr,zweiwochendiagramm_stunden
 )
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
@@ -117,7 +117,7 @@ class Szenario:
         kosten(self.kosten_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
-        wochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
+        zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
         plt.tight_layout()
         
         if(speichern):
@@ -127,7 +127,6 @@ class Szenario:
             fig4.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots4.png", dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
-    # Todo: neue Diagramme einfügen
     def gebe_plots(self, jahr1=None):
         """
         Erstellt alle Plots und gibt sie als Dictionary von Figure-Objekten zurück.
