@@ -29,7 +29,7 @@ try:
     from config import DATA_DIR, PROJECT_ROOT as PR
     from Klassen import Szenario
     from Szenarien_auswahl import load_scenarios, load_verbrauchsprofile, get_scenario_by_name, get_verbrauchsprofil_by_name
-    from Histogramme import plot_histogram_gesamtauswertung
+    from Code.Diagramme import plot_histogram_gesamtauswertung,verbrauch_jahr,zweiwochendiagramm_stunden
 
 except ImportError as e:
     st.error(f"❌ Import-Fehler: {str(e)}")
