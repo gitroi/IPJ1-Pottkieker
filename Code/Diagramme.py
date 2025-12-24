@@ -434,7 +434,7 @@ def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     """
     verbrauch_zeitraum = gesamt.set_index('Datum von')
     verbrauch_zeitraum = verbrauch_zeitraum[verbrauch_zeitraum.index.year == jahr]
-    verbrauch_woechentlich = verbrauch_zeitraum.resample('D').sum()
+    verbrauch_woechentlich = verbrauch_zeitraum.resample('ME').sum()
 
     ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Netzlast [MWh]"]/1e6, label=f"Verbrauch {jahr}", color='red', marker='o')
     ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Realisierte Erzeugung [MWh]"]/1e6, label="Erzeugung", color='#F9BF02', marker='o')
@@ -443,7 +443,7 @@ def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     ax.set_ylabel('Verbrauch [TWh]')
     ax.legend()
 
-def wochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
+def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     """
     Erstellt ein Liniendiagramm der Netzlast, der sumierten erzeugerwerte, sowie der erzeugerwerte
     in Stundenauflösung für eine bestimmte Woche.
@@ -471,7 +471,7 @@ def wochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
             if start.tz is None:
                 start = start.tz_localize(gesamt.index.tz)
     
-    ende = start + pd.Timedelta(days=7)
+    ende = start + pd.Timedelta(days=14)
     
     woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)]
     
