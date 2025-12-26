@@ -17,6 +17,3 @@ Dann schauen, ob speicher reichen
     Als prozenz mit über 100
 
 In klassen: Virtel stunden auf 2030 und 2045 beziehen
-
-Gesamtauswertung überprüfen (Wert für anteil EE in 2030/2045 nicht richtig berechnet)
-Ausgabe Energie nicht EE überprüfen

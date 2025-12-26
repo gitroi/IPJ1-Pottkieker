@@ -172,7 +172,7 @@ if modus == "🎯 Einzelnes Szenario":
         szenario = st.session_state['letztes_szenario']
         jahr = st.session_state.get('jahr')
         
-        tab1, tab2 = st.tabs(["📈 Übersicht", "📊 Plots"])
+        tab1, tab2, tab3 = st.tabs(["ℹ️ Übersicht", "📊 Plots","📈 Verlaufsdarstellung"])
         
         with tab1:
             st.subheader("Zusammenfassung")
@@ -281,8 +281,58 @@ if modus == "🎯 Einzelnes Szenario":
                 except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen der Plots: {str(e)}")
                     st.exception(e)
+            
+        with tab3:
+
+            st.subheader("📈 Verlaufsdarstellung")
+            st.markdown("### Verbrauch & Erzeugung im Jahr")
+            jahr_auswertung = st.slider(
+                "Jahr auswählen:", range(2026, 2046), value=2045, step=1
+            )
+
+            try:
+                fig1, ax1 = plt.subplots(figsize=(12, 6))
+                verbrauch_jahr(szenario, jahr_auswertung if jahr_auswertung else 2045, ax1)
+                st.pyplot(fig1)
+                buf_auswertung = BytesIO()
+                fig1.savefig(buf_auswertung, format='png', dpi=300, bbox_inches='tight')
+                buf_auswertung.seek(0)
+                st.download_button(
+                    label="💾 Plot herunterladen",
+                    data=buf_auswertung,
+                    file_name=f"szenario_{szenario.name}_zweierwochendiagramm_ertragsart_{szenario.ertragsart}_jahr_{jahr if jahr else 'alle'}.png",
+                    mime="image/png",
+                    on_click="ignore"
+                )
+            except Exception as e:
+                st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
+                st.exception(e)    
+
+            st.markdown("---")
+            st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")
+            startdatum = st.text_area(
+                "Startdatum im Format TT-MM-JJJJ (z.B., 15-12-2045):",
+                value="15-12-2045",
+                help="Geben Sie das Startdatum für das Zwei-Wochen-Diagramm ein."
+            )
+            try:
+                fig2, ax2 = plt.subplots(figsize=(12, 6))
+                zweiwochendiagramm_stunden(szenario, startdatum, ax2)
+                st.pyplot(fig2)
+                buf_zweiwochen = BytesIO()
+                fig2.savefig(buf_zweiwochen, format='png', dpi=300, bbox_inches='tight')
+                buf_zweiwochen.seek(0)
+                st.download_button(
+                    label="💾 Plot herunterladen",
+                    data=buf_zweiwochen,
+                    file_name=f"szenario_{szenario.name}_zweierwochendiagramm_stunden_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                    mime="image/png",
+                    on_click="ignore"
+                )
+            except Exception as e:
+                st.error(f"❌ Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
+                st.exception(e)
                 
-        
         st.markdown("---")
         excel_buffer = BytesIO()
         szenario.auswertungsdaten_generieren().to_excel(excel_buffer, index=False, engine='openpyxl')

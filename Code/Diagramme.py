@@ -438,6 +438,7 @@ def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
 
     ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Netzlast [MWh]"]/1e6, label=f"Verbrauch {jahr}", color='red', marker='o')
     ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Realisierte Erzeugung [MWh]"]/1e6, label="Erzeugung", color='#F9BF02', marker='o')
+    ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Energie aus Speicher [MWh]"]/1e6, label="Energie aus Speicher", color='green', marker='o')
     ax.set_title(f"Energieverbrauch im Jahr {jahr} (Wochenwerte)")  
     ax.set_xlabel('Wochen des Jahres')
     ax.set_ylabel('Verbrauch [TWh]')
