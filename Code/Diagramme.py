@@ -418,7 +418,7 @@ def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
     ax4.set_ylabel('Leistung [GW]')
     ax4.legend()
 
-def plot_liniendiagramm_ladestand(gesamt_df: pd.DataFrame, ax):
+def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     """
     Erstellt ein Liniendiagramm des Ladestands der Speicher über die Zeit.
     
@@ -426,6 +426,40 @@ def plot_liniendiagramm_ladestand(gesamt_df: pd.DataFrame, ax):
         gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
         ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
     """
+    if not isinstance(gesamt.index, pd.DatetimeIndex):
+        if 'Datum von' in gesamt.columns:
+            gesamt = gesamt.set_index('Datum von')
+        else:
+            raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein oder eine 'Datum von' Spalte enthalten")
+    
+    if start_datum is None:
+        start = gesamt.index[0]
+    else:
+        start = pd.to_datetime(start_datum)
+        if gesamt.index.tz is not None:
+            if start.tz is None:
+                start = start.tz_localize(gesamt.index.tz)
+    
+    ende = start + pd.Timedelta(days=14)
+    
+    woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)]
+    
+    if woche_df.empty:
+        raise ValueError("Keine Daten im angegebenen Zeitraum.")
+    
+    woche_df = woche_df.resample('h').sum()
+    print(woche_df.sample(5))
+    ax.fill_between(woche_df.index, 0, woche_df["Ladestand batteriespeicher [MWh]"]/1e3, label="Batteriespeicher", color='#9C27B0', alpha=0.7)
+    ax.fill_between(woche_df.index, 0, woche_df["Ladestand wasserstoff [MWh]"]/1e3, label="Wasserstoffspeicher", color='#E91E63', alpha=0.7)
+    ax.fill_between(woche_df.index, 0, woche_df["Ladestand pumpspeicher [MWh]"]/1e3, label="Pumpspeicher", color='#1633D8', alpha=0.7) 
+    ax.fill_between(woche_df.index, 0, woche_df["Energie aus Speicher [MWh]"]/1e3, label="Gesamt", color='green', alpha=0.3)
+    
+    ax.set_title(f"Speichernutzung von {start.date()} bis {ende.date()}")
+    ax.set_xlabel('Datum und Uhrzeit')
+    ax.set_ylabel('Energie [GWh]')
+    ax.legend()
+    ax.grid(True)
+
 
 def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     """

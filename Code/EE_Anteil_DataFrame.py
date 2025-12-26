@@ -83,23 +83,8 @@ def anteil_erneuerbare_speicher(erzeugung: pd.DataFrame) -> pd.DataFrame:
     # ==============================
     # 1. Relevante Spalten filtern
     # ==============================
-    erneuerbare_cols = [
-    "Biomasse [MWh] Originalauflösungen",
-    "Wasserkraft [MWh] Originalauflösungen",
-    "Wind Offshore [MWh] Originalauflösungen",
-    "Wind Onshore [MWh] Originalauflösungen",
-    "Photovoltaik [MWh] Originalauflösungen",
-    "Sonstige Erneuerbare [MWh] Originalauflösungen",
-    ]
 
     erzeugung = erzeugung.copy()
-    erzeugung = erzeugung[[
-        "Datum von",
-        "Erneuerbare [MWh]",
-        "Anteil Erneuerbare [%]",
-        "Energie aus Speicher [MWh]",
-        "Netzlast [MWh]"
-    ]+erneuerbare_cols]  
 
     # ==============================
     # 2. Anteil von Erneuerbaren Energien mit Speicher berechnen

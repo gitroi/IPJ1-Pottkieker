@@ -14,7 +14,8 @@ from Prognose_Verbrauch import Prognose_Verbrauch
 from Diagramme import (plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,
     plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,
     kosten, plot_Anteil_EE_mit_ohne_Speicher,
-    verbrauch_jahr,zweiwochendiagramm_stunden
+    verbrauch_jahr,zweiwochendiagramm_stunden,
+    plot_liniendiagramm_ladestand
 )
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
@@ -113,6 +114,7 @@ class Szenario:
         fig5, axs5 = plt.subplots(1, figsize=(14, 12))
         fig6, axs6 = plt.subplots(1, figsize=(14, 6))
         fig7, axs7 = plt.subplots(1, figsize=(14, 6))
+        fig8, axs8 = plt.subplots(1, figsize=(14, 6))
 
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
         verbrauch_jahr(self.gesamt_df, 2028, axs6) 
@@ -122,6 +124,7 @@ class Szenario:
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
         zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
+        plot_liniendiagramm_ladestand(self.gesamt_df, f'01-01-{jahr1}', axs8)
         plt.tight_layout()
         
         if(speichern):
