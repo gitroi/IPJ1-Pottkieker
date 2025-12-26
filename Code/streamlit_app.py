@@ -287,12 +287,12 @@ if modus == "🎯 Einzelnes Szenario":
             st.subheader("📈 Verlaufsdarstellung")
             st.markdown("### Verbrauch & Erzeugung im Jahr")
             jahr_auswertung = st.slider(
-                "Jahr auswählen:", range(2026, 2046), value=2045, step=1
+                "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1
             )
 
             try:
                 fig1, ax1 = plt.subplots(figsize=(12, 6))
-                verbrauch_jahr(szenario, jahr_auswertung if jahr_auswertung else 2045, ax1)
+                verbrauch_jahr(szenario.getGesamtDF(), jahr_auswertung if jahr_auswertung else 2045, ax1)
                 st.pyplot(fig1)
                 buf_auswertung = BytesIO()
                 fig1.savefig(buf_auswertung, format='png', dpi=300, bbox_inches='tight')
@@ -317,7 +317,7 @@ if modus == "🎯 Einzelnes Szenario":
             )
             try:
                 fig2, ax2 = plt.subplots(figsize=(12, 6))
-                zweiwochendiagramm_stunden(szenario, startdatum, ax2)
+                zweiwochendiagramm_stunden(szenario.getGesamtDF(), startdatum, ax2)
                 st.pyplot(fig2)
                 buf_zweiwochen = BytesIO()
                 fig2.savefig(buf_zweiwochen, format='png', dpi=300, bbox_inches='tight')
@@ -332,7 +332,7 @@ if modus == "🎯 Einzelnes Szenario":
             except Exception as e:
                 st.error(f"❌ Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
                 st.exception(e)
-                
+
         st.markdown("---")
         excel_buffer = BytesIO()
         szenario.auswertungsdaten_generieren().to_excel(excel_buffer, index=False, engine='openpyxl')

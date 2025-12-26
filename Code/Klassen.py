@@ -90,6 +90,10 @@ class Szenario:
     def auswertungsdaten_generieren(self)-> pd.DataFrame:
         """Generiert die Auswertungsdaten"""
         return ausgabe(self.kosten_df, self.gesamt_df, self.szenario,self.konventionelle)
+    
+    def getGesamtDF(self) -> pd.DataFrame:
+        """Gibt das Gesamt-DataFrame zurück"""
+        return self.gesamt_df
 
     def exportiere_ergebnisse(self):
         """Exportiert alle Ergebnisse nach Excel"""
