@@ -23,10 +23,6 @@ TECHNOLOGIE_MAPPING = {
     'pumpspeicher': 'Pumpspeicher'
 }
 
-# ==============================
-# 1. Visualisierung: Anteil Erneuerbare Energien über die Jahre
-# ==============================
-
 def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
     """
     Erstellt ein Histogramm des Anteils der Erneuerbaren Energien am Stromverbrauch
@@ -440,25 +436,36 @@ def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes
             if start.tz is None:
                 start = start.tz_localize(gesamt.index.tz)
     
-    ende = start + pd.Timedelta(days=14)
+    ende = start + pd.Timedelta(days=7)
     
-    woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)]
+    woche_df = gesamt[(gesamt.index >= start) & (gesamt.index < ende)].copy()
     
     if woche_df.empty:
         raise ValueError("Keine Daten im angegebenen Zeitraum.")
+    # woche_df.to_csv("ladestand_debug.csv",sep=";",decimal=",")
+    # woche_df = woche_df.resample('h').sum()
+    # woche_df.to_csv("ladestand_debug2.csv",sep=";",decimal=",")
     
-    woche_df = woche_df.resample('h').sum()
-    print(woche_df.sample(5))
+    woche_df['EE_Status'] = (woche_df["Anteil Erneuerbare [%]"] >= 100).astype(int)
+    
     ax.fill_between(woche_df.index, 0, woche_df["Ladestand batteriespeicher [MWh]"]/1e3, label="Batteriespeicher", color='#9C27B0', alpha=0.7)
     ax.fill_between(woche_df.index, 0, woche_df["Ladestand wasserstoff [MWh]"]/1e3, label="Wasserstoffspeicher", color='#E91E63', alpha=0.7)
     ax.fill_between(woche_df.index, 0, woche_df["Ladestand pumpspeicher [MWh]"]/1e3, label="Pumpspeicher", color='#1633D8', alpha=0.7) 
-    ax.fill_between(woche_df.index, 0, woche_df["Energie aus Speicher [MWh]"]/1e3, label="Gesamt", color='green', alpha=0.3)
     
     ax.set_title(f"Speichernutzung von {start.date()} bis {ende.date()}")
     ax.set_xlabel('Datum und Uhrzeit')
     ax.set_ylabel('Energie [GWh]')
-    ax.legend()
+    ax.legend(loc='upper left')
     ax.grid(True)
+    
+    ax2 = ax.twinx()
+    ax2.plot(woche_df.index, woche_df['EE_Status'], color='orange', linewidth=2, linestyle='-', label='EE-Status', alpha=0.6)
+    ax2.set_ylabel('Defizit (0) / Überschuss (1)', color='orange')
+    ax2.tick_params(axis='y', labelcolor='orange')
+    ax2.set_ylim(-0.1, 1.1)
+    ax2.set_yticks([0, 1])
+    ax2.set_yticklabels(['Defizit', 'Überschuss'])
+    ax2.legend(loc='upper right')
 
 
 def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
