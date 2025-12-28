@@ -333,7 +333,7 @@ if modus == "🎯 Einzelnes Szenario":
                 st.error(f"❌ Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
                 st.exception(e)
 
-                try:
+            try:
                     st.markdown("---")
                     st.markdown("### Ladestand des Batteriespeichers")
                     fig3, ax3 = plt.subplots(figsize=(12, 6))
@@ -349,7 +349,7 @@ if modus == "🎯 Einzelnes Szenario":
                         mime="image/png",
                         on_click="ignore"
                     )
-                except Exception as e:
+            except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen des Ladestand-Diagramms: {str(e)}")
                     st.exception(e)
 
