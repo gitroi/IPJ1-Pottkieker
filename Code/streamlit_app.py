@@ -495,8 +495,322 @@ elif modus == "📈 Szenarien vergleichen":
 
 elif modus == "➕ Szenario hinzufügen":
     st.header("➕ Szenario hinzufügen")
-    st.info("Diese Funktion ist derzeit nicht verfügbar.")
-    # Platzhalter für zukünftige Implementierung zum Hinzufügen von Szenarien
+    st.info("Hier können Sie neue Szenarien und Verbrauchsprofile zur Simulation hinzufügen.")
+    
+    tab1, tab2 = st.tabs(["🎯 Neues Szenario", "📊 Neues Verbrauchsprofil"])
+    
+    # ========================================================================
+    # TAB 1: NEUES SZENARIO HINZUFÜGEN
+    # ========================================================================
+    with tab1:
+        st.subheader("🎯 Neues Szenario erstellen")
+        
+        with st.form("neues_szenario_form"):
+            st.markdown("### Grunddaten")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                name = st.text_input("Szenario-Name*", placeholder="z.B. Optimistisches Szenario")
+            with col2:
+                beschreibung = st.text_area("Beschreibung*", placeholder="Kurze Beschreibung des Szenarios")
+            
+            st.markdown("---")
+            st.markdown("### 🎯 Ziele 2030")
+            st.markdown("#### Ausbau Erneuerbare Energien (in GW)")
+            
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                pv_dach_2030 = st.number_input("PV Dach", min_value=0.0, value=125.0, step=1.0, key="pv_dach_2030")
+                pv_frei_2030 = st.number_input("PV Frei", min_value=0.0, value=90.0, step=1.0, key="pv_frei_2030")
+            with col2:
+                wind_onshore_2030 = st.number_input("Wind Onshore", min_value=0.0, value=115.0, step=1.0, key="wind_onshore_2030")
+                wind_offshore_2030 = st.number_input("Wind Offshore", min_value=0.0, value=30.0, step=1.0, key="wind_offshore_2030")
+            with col3:
+                biomasse_2030 = st.number_input("Biomasse", min_value=0.0, value=10.0, step=0.1, key="biomasse_2030")
+                wasser_2030 = st.number_input("Wasser", min_value=0.0, value=6.0, step=0.1, key="wasser_2030")
+            with col4:
+                sonstige_2030 = st.number_input("Sonstige", min_value=0.0, value=0.1, step=0.1, key="sonstige_2030")
+            
+            st.markdown("#### Ausbau Speicher 2030 (in GWh)")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                batteriespeicher_2030 = st.number_input("Batteriespeicher", min_value=0.0, value=120.0, step=1.0, key="batt_2030")
+            with col2:
+                wasserstoff_2030 = st.number_input("Wasserstoff", min_value=0.0, value=70.0, step=1.0, key="h2_2030")
+            with col3:
+                pumpspeicher_2030 = st.number_input("Pumpspeicher", min_value=0.0, value=50.0, step=1.0, key="pump_2030")
+            
+            st.markdown("---")
+            st.markdown("### 🎯 Ziele 2045")
+            st.markdown("#### Ausbau Erneuerbare Energien (in GW)")
+            
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                pv_dach_2045 = st.number_input("PV Dach", min_value=0.0, value=450.0, step=1.0, key="pv_dach_2045")
+                pv_frei_2045 = st.number_input("PV Frei", min_value=0.0, value=250.0, step=1.0, key="pv_frei_2045")
+            with col2:
+                wind_onshore_2045 = st.number_input("Wind Onshore", min_value=0.0, value=300.0, step=1.0, key="wind_onshore_2045")
+                wind_offshore_2045 = st.number_input("Wind Offshore", min_value=0.0, value=150.0, step=1.0, key="wind_offshore_2045")
+            with col3:
+                biomasse_2045 = st.number_input("Biomasse", min_value=0.0, value=40.0, step=0.1, key="biomasse_2045")
+                wasser_2045 = st.number_input("Wasser", min_value=0.0, value=6.0, step=0.1, key="wasser_2045")
+            with col4:
+                sonstige_2045 = st.number_input("Sonstige", min_value=0.0, value=0.1, step=0.1, key="sonstige_2045")
+            
+            st.markdown("#### Ausbau Speicher 2045 (in GWh)")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                batteriespeicher_2045 = st.number_input("Batteriespeicher", min_value=0.0, value=2500.0, step=10.0, key="batt_2045")
+            with col2:
+                wasserstoff_2045 = st.number_input("Wasserstoff", min_value=0.0, value=1000.0, step=10.0, key="h2_2045")
+            with col3:
+                pumpspeicher_2045 = st.number_input("Pumpspeicher", min_value=0.0, value=300.0, step=10.0, key="pump_2045")
+            
+            st.markdown("---")
+            st.markdown("### 🔧 Veränderungsfaktoren")
+            st.markdown("#### Erzeugung")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                v_pv_dach = st.number_input("PV Dach", min_value=0.0, value=1.0, step=0.1, key="v_pv_dach")
+                v_pv_frei = st.number_input("PV Frei", min_value=0.0, value=1.0, step=0.1, key="v_pv_frei")
+            with col2:
+                v_wind_onshore = st.number_input("Wind Onshore", min_value=0.0, value=1.0, step=0.1, key="v_wind_on")
+                v_wind_offshore = st.number_input("Wind Offshore", min_value=0.0, value=1.0, step=0.1, key="v_wind_off")
+            with col3:
+                v_biomasse = st.number_input("Biomasse", min_value=0.0, value=1.0, step=0.1, key="v_biomasse")
+                v_wasser = st.number_input("Wasser", min_value=0.0, value=1.0, step=0.1, key="v_wasser")
+            with col4:
+                v_sonstige = st.number_input("Sonstige", min_value=0.0, value=1.0, step=0.1, key="v_sonstige")
+            
+            st.markdown("#### CAPEX EE")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                c_pv_dach = st.number_input("PV Dach", min_value=0.0, value=1.0, step=0.1, key="c_pv_dach")
+                c_pv_frei = st.number_input("PV Frei", min_value=0.0, value=1.0, step=0.1, key="c_pv_frei")
+            with col2:
+                c_wind_onshore = st.number_input("Wind Onshore", min_value=0.0, value=1.0, step=0.1, key="c_wind_on")
+                c_wind_offshore = st.number_input("Wind Offshore", min_value=0.0, value=1.0, step=0.1, key="c_wind_off")
+            with col3:
+                c_biomasse = st.number_input("Biomasse", min_value=0.0, value=1.0, step=0.1, key="c_biomasse")
+                c_wasser = st.number_input("Wasser", min_value=0.0, value=1.0, step=0.1, key="c_wasser")
+            with col4:
+                c_sonstige = st.number_input("Sonstige", min_value=0.0, value=1.0, step=0.1, key="c_sonstige")
+            
+            st.markdown("#### OPEX EE")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                o_pv_dach = st.number_input("PV Dach", min_value=0.0, value=1.0, step=0.1, key="o_pv_dach")
+                o_pv_frei = st.number_input("PV Frei", min_value=0.0, value=1.0, step=0.1, key="o_pv_frei")
+            with col2:
+                o_wind_onshore = st.number_input("Wind Onshore", min_value=0.0, value=1.0, step=0.1, key="o_wind_on")
+                o_wind_offshore = st.number_input("Wind Offshore", min_value=0.0, value=1.0, step=0.1, key="o_wind_off")
+            with col3:
+                o_biomasse = st.number_input("Biomasse", min_value=0.0, value=1.0, step=0.1, key="o_biomasse")
+                o_wasser = st.number_input("Wasser", min_value=0.0, value=1.0, step=0.1, key="o_wasser")
+            with col4:
+                o_sonstige = st.number_input("Sonstige", min_value=0.0, value=1.0, step=0.1, key="o_sonstige")
+            
+            st.markdown("#### CAPEX Speicher")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                cs_batt = st.number_input("Batteriespeicher", min_value=0.0, value=1.0, step=0.1, key="cs_batt")
+            with col2:
+                cs_h2 = st.number_input("Wasserstoff", min_value=0.0, value=1.0, step=0.1, key="cs_h2")
+            with col3:
+                cs_pump = st.number_input("Pumpspeicher", min_value=0.0, value=1.0, step=0.1, key="cs_pump")
+            
+            st.markdown("#### OPEX Speicher")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                os_batt = st.number_input("Batteriespeicher", min_value=0.0, value=1.0, step=0.1, key="os_batt")
+            with col2:
+                os_h2 = st.number_input("Wasserstoff", min_value=0.0, value=1.0, step=0.1, key="os_h2")
+            with col3:
+                os_pump = st.number_input("Pumpspeicher", min_value=0.0, value=1.0, step=0.1, key="os_pump")
+            
+            st.markdown("---")
+            submitted = st.form_submit_button("💾 Szenario speichern", type="primary", use_container_width=True)
+            
+            if submitted:
+                if not name or not beschreibung:
+                    st.error("❌ Bitte füllen Sie Name und Beschreibung aus!")
+                else:
+                    # Neues Szenario erstellen
+                    neues_szenario = {
+                        "Name": name,
+                        "Beschreibung": beschreibung,
+                        "Ziele 2030": {
+                            "Ausbau EE": {
+                                "pv_dach": pv_dach_2030,
+                                "pv_frei": pv_frei_2030,
+                                "wind_onshore": wind_onshore_2030,
+                                "wind_offshore": wind_offshore_2030,
+                                "biomasse": biomasse_2030,
+                                "wasser": wasser_2030,
+                                "sonstige": sonstige_2030
+                            },
+                            "Ausbau Speicher": {
+                                "batteriespeicher": batteriespeicher_2030,
+                                "wasserstoff": wasserstoff_2030,
+                                "pumpspeicher": pumpspeicher_2030
+                            }
+                        },
+                        "Ziele 2045": {
+                            "Ausbau EE": {
+                                "pv_dach": pv_dach_2045,
+                                "pv_frei": pv_frei_2045,
+                                "wind_onshore": wind_onshore_2045,
+                                "wind_offshore": wind_offshore_2045,
+                                "biomasse": biomasse_2045,
+                                "wasser": wasser_2045,
+                                "sonstige": sonstige_2045
+                            },
+                            "Ausbau Speicher": {
+                                "batteriespeicher": batteriespeicher_2045,
+                                "wasserstoff": wasserstoff_2045,
+                                "pumpspeicher": pumpspeicher_2045
+                            }
+                        },
+                        "Veränderungsfaktoren": {
+                            "Erzeugung": {
+                                "pv_dach": v_pv_dach,
+                                "pv_frei": v_pv_frei,
+                                "wind_onshore": v_wind_onshore,
+                                "wind_offshore": v_wind_offshore,
+                                "biomasse": v_biomasse,
+                                "wasser": v_wasser,
+                                "sonstige": v_sonstige
+                            },
+                            "Capex_EE": {
+                                "pv_dach": c_pv_dach,
+                                "pv_frei": c_pv_frei,
+                                "wind_onshore": c_wind_onshore,
+                                "wind_offshore": c_wind_offshore,
+                                "biomasse": c_biomasse,
+                                "wasser": c_wasser,
+                                "sonstige": c_sonstige
+                            },
+                            "Opex_EE": {
+                                "pv_dach": o_pv_dach,
+                                "pv_frei": o_pv_frei,
+                                "wind_onshore": o_wind_onshore,
+                                "wind_offshore": o_wind_offshore,
+                                "biomasse": o_biomasse,
+                                "wasser": o_wasser,
+                                "sonstige": o_sonstige
+                            },
+                            "Capex_Speicher": {
+                                "batteriespeicher": cs_batt,
+                                "wasserstoff": cs_h2,
+                                "pumpspeicher": cs_pump
+                            },
+                            "Opex_Speicher": {
+                                "batteriespeicher": os_batt,
+                                "wasserstoff": os_h2,
+                                "pumpspeicher": os_pump
+                            }
+                        }
+                    }
+                    
+                    try:
+                        # JSON-Datei laden
+                        with open(szenarien_pfad, 'r', encoding='utf-8') as f:
+                            alle_szenarien = json.load(f)
+                        
+                        # Prüfen ob Name bereits existiert
+                        if any(s["Name"] == name for s in alle_szenarien):
+                            st.error(f"❌ Ein Szenario mit dem Namen '{name}' existiert bereits!")
+                        else:
+                            # Neues Szenario hinzufügen
+                            alle_szenarien.append(neues_szenario)
+                            
+                            # JSON-Datei speichern
+                            with open(szenarien_pfad, 'w', encoding='utf-8') as f:
+                                json.dump(alle_szenarien, f, indent=4, ensure_ascii=False)
+                            
+                            # Cache invalidieren
+                            st.cache_data.clear()
+                            
+                            st.success(f"✅ Szenario '{name}' erfolgreich gespeichert!")
+                            st.balloons()
+                            st.info("🔄 Seite wird neu geladen, um das neue Szenario anzuzeigen...")
+                            st.rerun()
+                            
+                    except Exception as e:
+                        st.error(f"❌ Fehler beim Speichern: {str(e)}")
+                        st.exception(e)
+    
+    # ========================================================================
+    # TAB 2: NEUES VERBRAUCHSPROFIL HINZUFÜGEN
+    # ========================================================================
+    with tab2:
+        st.subheader("📊 Neues Verbrauchsprofil erstellen")
+        
+        with st.form("neues_profil_form"):
+            st.markdown("### Grunddaten")
+            
+            profil_name = st.text_input("Profil-Name*", placeholder="z.B. 3")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                verbrauch_2030 = st.number_input(
+                    "Verbrauch 2030 (TWh)*", 
+                    min_value=0.0, 
+                    value=628.0, 
+                    step=1.0,
+                    help="Gesamtverbrauch im Jahr 2030 in Terawattstunden"
+                )
+            with col2:
+                verbrauch_2045 = st.number_input(
+                    "Verbrauch 2045 (TWh)*", 
+                    min_value=0.0, 
+                    value=890.0, 
+                    step=1.0,
+                    help="Gesamtverbrauch im Jahr 2045 in Terawattstunden"
+                )
+            
+            st.markdown("---")
+            profil_submitted = st.form_submit_button("💾 Verbrauchsprofil speichern", type="primary", use_container_width=True)
+            
+            if profil_submitted:
+                if not profil_name:
+                    st.error("❌ Bitte geben Sie einen Namen ein!")
+                else:
+                    # Neues Verbrauchsprofil erstellen
+                    neues_profil = {
+                        "Name": profil_name,
+                        "Verbrauch_2030": verbrauch_2030,
+                        "Verbrauch_2045": verbrauch_2045
+                    }
+                    
+                    try:
+                        # JSON-Datei laden
+                        with open(verbrauchsprofile_pfad, 'r', encoding='utf-8') as f:
+                            alle_profile = json.load(f)
+                        
+                        # Prüfen ob Name bereits existiert
+                        if any(p["Name"] == profil_name for p in alle_profile):
+                            st.error(f"❌ Ein Verbrauchsprofil mit dem Namen '{profil_name}' existiert bereits!")
+                        else:
+                            # Neues Profil hinzufügen
+                            alle_profile.append(neues_profil)
+                            
+                            # JSON-Datei speichern
+                            with open(verbrauchsprofile_pfad, 'w', encoding='utf-8') as f:
+                                json.dump(alle_profile, f, indent=4, ensure_ascii=False)
+                            
+                            # Cache invalidieren
+                            st.cache_data.clear()
+                            
+                            st.success(f"✅ Verbrauchsprofil '{profil_name}' erfolgreich gespeichert!")
+                            st.balloons()
+                            st.info("🔄 Seite wird neu geladen, um das neue Profil anzuzeigen...")
+                            st.rerun()
+                            
+                    except Exception as e:
+                        st.error(f"❌ Fehler beim Speichern: {str(e)}")
+                        st.exception(e)
+
 
 
 # ============================================================================
