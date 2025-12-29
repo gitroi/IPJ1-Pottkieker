@@ -136,6 +136,9 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         #Summe aller Erzeuger 
         erzeugung = row["Erneuerbare [MWh]"]     
 
+        # Variable immer zu Beginn der Iteration initialisieren
+        aktuell_zusatz_energie = 0
+
         if row["Anteil Erneuerbare [%]"] > ladegrenze: #überschüssige Energie vorhanden
 
             lademenge = erzeugung - row["Netzlast [MWh]"]*(ladegrenze/100) #überschüssige Energie zum Laden
@@ -173,7 +176,6 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         elif row["Anteil Erneuerbare [%]"] <= entladegrenze: #fehlende Energie vorhanden
 
             fehlmenge = row["Netzlast [MWh]"]*(entladegrenze/100) - erzeugung #fehlende Energie
-            aktuell_zusatz_energie = 0
 
             # Batterie entladen
             if aktuell_batterie > (row["Speicherkapazität batteriespeicher [MWh]"]*FIXPARAMETER_BATTERIE.untergrenze):
