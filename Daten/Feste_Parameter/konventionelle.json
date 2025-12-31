@@ -1,0 +1,26 @@
+{
+    "braun": {
+        "bestand": 15.176,
+        "capex": 1640,
+        "opex_kw": 42.5,
+        "opex_MWh": 4.8 
+    },
+    "erdgas": {
+        "bestand": 36.614,
+        "capex": 729,
+        "opex_kw": 20,
+        "opex_MWh": 63.3 
+    },
+    "stein": {
+        "bestand": 15.951,
+        "capex": 1420,
+        "opex_kw": 38,
+        "opex_MWh": 25.2
+    },
+    "sonstige": {
+        "bestand": 12.917,
+        "capex": 355,
+        "opex_kw": 12,
+        "opex_MWh": 205
+    }
+}

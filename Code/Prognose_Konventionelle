@@ -1,0 +1,29 @@
+import json
+import pandas as pd
+import numpy as np
+from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich
+
+def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict) -> pd.DataFrame:
+    """
+    Diese Funktion nimmt Eingabedaten in Form eines DataFrames entgegen,
+    verarbeitet sie und gibt eine Prognose für konventionelle Methoden zurück.
+    
+    :param gesamt: pd.DataFrame mit den Eingabedaten
+    :param konventionelle: dict mit den maximalen Jahresleistungen an konventionellen
+    :param anteile: dict mit den Anteilen für konventionelle Methoden
+    :return: pd.DataFrame mit den Prognoseergebnissen
+    """
+    """
+    Dict mit Konventionellen anteilen:
+    braun: 0.6,
+    stein: 0.3,
+    sonstige: 0.1
+    erdgas: 0.5,
+    """
+    prognose_konventionelle = gesamt.copy()
+    
+    prognose_konventionelle['konventionelle [MWh]'] = prognose_konventionelle["Netzlast [MWh]"] - prognose_konventionelle["Realisierte Erzeugung [MWh]"]
+    
+    
+
+    return prognose_konventionelle
