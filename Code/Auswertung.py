@@ -73,6 +73,16 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
         end_df.loc[mask1, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2030"][key]
         end_df.loc[mask2, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2045"][key]
 
+    konventionelle_typen = ["braun", "erdgas", "stein", "sonstige", "importe"]
+    for konv_typ in konventionelle_typen:
+        if f"{konv_typ} [GW]" in gesamt.columns:
+            leistung_jahr = gesamt.groupby('Jahr')[f"{konv_typ} [GW]"].first()
+            end_df[f"Installierte Leistung {konv_typ} [GW]"] = leistung_jahr.values
+            
+            kosten_capex = gesamt.groupby('Jahr')[f"{konv_typ}_capex [€]"].sum() if f"{konv_typ}_capex [€]" in gesamt.columns else 0
+            kosten_opex = gesamt.groupby('Jahr')[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in gesamt.columns else 0
+            end_df[f"Gesamtkosten {konv_typ} [Mrd. €]"] = ((kosten_capex + kosten_opex) / 1e9).round(2).values
+
     return end_df
 
 def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:

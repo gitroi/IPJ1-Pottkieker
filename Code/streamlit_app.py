@@ -129,21 +129,70 @@ if modus == "🎯 Einzelnes Szenario":
             help="Ertragsniveau für erneuerbare Energien"
         )
     
-    # with col4:
-    #     jahre = range(2026, 2046)
-    #     jahr_optionen = ["Alle Jahre"] + list(map(str, jahre))
-    #     jahr_auswahl = st.selectbox(
-    #         "Abbildungsjahr Diagramm:",
-    #         jahr_optionen,
-    #         help="Jahr für das die Ist-Analyse dargestellt werden soll"
-    #     )
-    #     jahr = None if jahr_auswahl == "Alle Jahre" else int(jahr_auswahl)
+    st.markdown("### ⚡ Konventionelle Anteile")
+    st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
+    
+    with st.expander("Anteile 2030 konfigurieren", expanded=False):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            braun_2030 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="sim_braun_2030")
+        with col2:
+            erdgas_2030 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.4, step=0.05, key="sim_erdgas_2030")
+        with col3:
+            stein_2030 = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="sim_stein_2030")
+        with col4:
+            sonstige_konv_2030 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_sonst_konv_2030")
+        with col5:
+            importe_2030 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_importe_2030")
+        
+        summe_2030 = braun_2030 + erdgas_2030 + stein_2030 + sonstige_konv_2030 + importe_2030
+        if abs(summe_2030 - 1.0) > 0.01:
+            st.warning(f"⚠️ Summe 2030: {summe_2030:.2f} (sollte 1.0 sein)")
+        else:
+            st.success(f"✓ Summe 2030: {summe_2030:.2f}")
+    
+    with st.expander("Anteile 2045 konfigurieren", expanded=False):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            braun_2045 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="sim_braun_2045")
+        with col2:
+            erdgas_2045 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.6, step=0.05, key="sim_erdgas_2045")
+        with col3:
+            stein_2045 = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="sim_stein_2045")
+        with col4:
+            sonstige_konv_2045 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="sim_sonst_konv_2045")
+        with col5:
+            importe_2045 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="sim_importe_2045")
+        
+        summe_2045 = braun_2045 + erdgas_2045 + stein_2045 + sonstige_konv_2045 + importe_2045
+        if abs(summe_2045 - 1.0) > 0.01:
+            st.warning(f"⚠️ Summe 2045: {summe_2045:.2f} (sollte 1.0 sein)")
+        else:
+            st.success(f"✓ Summe 2045: {summe_2045:.2f}")
     
     st.markdown("---")
     if st.button("🚀 Simulation starten", type="primary", width='stretch'):
         if gewaehltes_szenario and gewaehltes_profil:
             with st.spinner(f"🔄 Berechne Prognosen für '{ausgewähltes_szenario_name}'..."):
                 try:
+                    # Konventionelle Anteile aus den UI-Inputs verwenden
+                    konven_anteile = {
+                        "2030": {
+                            "braun": braun_2030,
+                            "erdgas": erdgas_2030,
+                            "stein": stein_2030,
+                            "sonstige": sonstige_konv_2030,
+                            "importe": importe_2030
+                        },
+                        "2045": {
+                            "braun": braun_2045,
+                            "erdgas": erdgas_2045,
+                            "stein": stein_2045,
+                            "sonstige": sonstige_konv_2045,
+                            "importe": importe_2045
+                        }
+                    }
+                    
                     szenario_ergebnis = Szenario(
                         name=ausgewähltes_szenario_name,
                         beschreibung=gewaehltes_szenario["Beschreibung"],
@@ -152,7 +201,8 @@ if modus == "🎯 Einzelnes Szenario":
                         ziele_2045=gewaehltes_szenario["Ziele 2045"],
                         ertragsart=ertragsart,
                         verbrauchsprofile=gewaehltes_profil,
-                        veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"]
+                        veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
+                        konven_anteile=konven_anteile
                     )
                     
                     #szenario_ergebnis.berechne_alle_prognosen()
@@ -398,6 +448,47 @@ elif modus == "📈 Szenarien vergleichen":
             ["mittel", "schlecht", "gut"]
         )
     
+    st.markdown("### ⚡ Konventionelle Anteile")
+    st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
+    
+    with st.expander("Anteile 2030 konfigurieren", expanded=False):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            braun_2030_vgl = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="vgl_braun_2030")
+        with col2:
+            erdgas_2030_vgl = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.4, step=0.05, key="vgl_erdgas_2030")
+        with col3:
+            stein_2030_vgl = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="vgl_stein_2030")
+        with col4:
+            sonstige_konv_2030_vgl = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="vgl_sonst_konv_2030")
+        with col5:
+            importe_2030_vgl = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="vgl_importe_2030")
+        
+        summe_2030_vgl = braun_2030_vgl + erdgas_2030_vgl + stein_2030_vgl + sonstige_konv_2030_vgl + importe_2030_vgl
+        if abs(summe_2030_vgl - 1.0) > 0.01:
+            st.warning(f"⚠️ Summe 2030: {summe_2030_vgl:.2f} (sollte 1.0 sein)")
+        else:
+            st.success(f"✓ Summe 2030: {summe_2030_vgl:.2f}")
+    
+    with st.expander("Anteile 2045 konfigurieren", expanded=False):
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            braun_2045_vgl = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="vgl_braun_2045")
+        with col2:
+            erdgas_2045_vgl = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.6, step=0.05, key="vgl_erdgas_2045")
+        with col3:
+            stein_2045_vgl = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="vgl_stein_2045")
+        with col4:
+            sonstige_konv_2045_vgl = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="vgl_sonst_konv_2045")
+        with col5:
+            importe_2045_vgl = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="vgl_importe_2045")
+        
+        summe_2045_vgl = braun_2045_vgl + erdgas_2045_vgl + stein_2045_vgl + sonstige_konv_2045_vgl + importe_2045_vgl
+        if abs(summe_2045_vgl - 1.0) > 0.01:
+            st.warning(f"⚠️ Summe 2045: {summe_2045_vgl:.2f} (sollte 1.0 sein)")
+        else:
+            st.success(f"✓ Summe 2045: {summe_2045_vgl:.2f}")
+    
     ausgewählte = []
     for key in ausgewählte_szenarien:
         ausgewählte.append(szenarien_dict[key])
@@ -415,6 +506,24 @@ elif modus == "📈 Szenarien vergleichen":
                 status_text.text(f"Berechne {szenario_data['Name']}... ({idx+1}/{len(ausgewählte)})")
                 
                 try:
+                    # Konventionelle Anteile aus den UI-Inputs verwenden
+                    konven_anteile = {
+                        "2030": {
+                            "braun": braun_2030_vgl,
+                            "erdgas": erdgas_2030_vgl,
+                            "stein": stein_2030_vgl,
+                            "sonstige": sonstige_konv_2030_vgl,
+                            "importe": importe_2030_vgl
+                        },
+                        "2045": {
+                            "braun": braun_2045_vgl,
+                            "erdgas": erdgas_2045_vgl,
+                            "stein": stein_2045_vgl,
+                            "sonstige": sonstige_konv_2045_vgl,
+                            "importe": importe_2045_vgl
+                        }
+                    }
+                    
                     szenario_ergebnis = Szenario(
                         name=szenario_data["Name"],
                         beschreibung=szenario_data["Beschreibung"],
@@ -423,7 +532,8 @@ elif modus == "📈 Szenarien vergleichen":
                         ziele_2045=szenario_data["Ziele 2045"],
                         ertragsart=ertragsart,
                         verbrauchsprofile=gewaehltes_profil,
-                        veränderungsfaktoren=szenario_data["Veränderungsfaktoren"]["Erzeugung"]
+                        veränderungsfaktoren=szenario_data["Veränderungsfaktoren"]["Erzeugung"],
+                        konven_anteile=konven_anteile
                     )
                     
                     #szenario_ergebnis.berechne_alle_prognosen()

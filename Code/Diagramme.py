@@ -1,5 +1,5 @@
 """
-Programmiert von Joris Bürger
+Programmiert von Joris Bürger, Robin Matzke 
 """
 from config import DATA_DIR
 import matplotlib.pyplot as plt
@@ -83,7 +83,6 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
     ax.set_ylabel('Anzahl Viertelstunden (in 1.000)')
 
     plt.tight_layout()
-
 
 def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax,ax2):
     """ 
@@ -188,13 +187,15 @@ def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
     
     ax.legend()
 
-def kosten(kosten_df: pd.DataFrame, ax1,ax2):
+def kosten(kosten_df: pd.DataFrame, gesamt_df: pd.DataFrame, ax1, ax2):
     """
     Erstellt ein Balkendiagramm der Gesamtkosten für jede Technologie.
     
     Args:
-        kosten_df (pd.DataFrame): DataFrame mit den Kosteninformationen.
-        ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
+        kosten_df (pd.DataFrame): DataFrame mit den Kosteninformationen für EE und Speicher.
+        gesamt_df (pd.DataFrame): DataFrame mit den konventionellen Kosten.
+        ax1 (matplotlib.axes.Axes): Axes-Objekt für das Balkendiagramm.
+        ax2 (matplotlib.axes.Axes): Axes-Objekt für das Kreisdiagramm.
     """
     
     farben = {
@@ -207,7 +208,12 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
         'Sonstige': '#FF8C00',
         'Batteriespeicher': '#9C27B0',
         'Wasserstoffspeicher': '#E91E63',
-        'Pumpspeicher': '#1633D8'
+        'Pumpspeicher': '#1633D8',
+        'Braunkohle': '#8B4513',
+        'Erdgas': '#FFA500',
+        'Steinkohle': '#696969',
+        'Sonstige Konv.': '#A9A9A9',
+        'Importe': '#CD5C5C'
     }
     
     technologien = []
@@ -217,6 +223,26 @@ def kosten(kosten_df: pd.DataFrame, ax1,ax2):
         spalte = f"Gesamtkosten {key} [€]"
         if spalte in kosten_df.columns:
             gesamt = kosten_df[spalte].sum() / 1e9  
+            technologien.append(name)
+            kosten.append(gesamt)
+    
+    konventionelle_mapping = {
+        'braun': 'Braunkohle',
+        'erdgas': 'Erdgas',
+        'stein': 'Steinkohle',
+        'sonstige': 'Sonstige Konv.',
+        'importe': 'Importe'
+    }
+    
+    for key, name in konventionelle_mapping.items():
+        capex_spalte = f"{key}_capex [€]"
+        opex_spalte = f"{key}_opex [€]"
+        gesamt = 0
+        if capex_spalte in gesamt_df.columns:
+            gesamt += gesamt_df[capex_spalte].sum() / 1e9
+        if opex_spalte in gesamt_df.columns:
+            gesamt += gesamt_df[opex_spalte].sum() / 1e9
+        if gesamt > 0:
             technologien.append(name)
             kosten.append(gesamt)
     
@@ -475,7 +501,7 @@ def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     """
     verbrauch_zeitraum = gesamt.set_index('Datum von')
     verbrauch_zeitraum = verbrauch_zeitraum[verbrauch_zeitraum.index.year == jahr]
-    verbrauch_woechentlich = verbrauch_zeitraum.resample('ME').sum()
+    verbrauch_woechentlich = verbrauch_zeitraum.resample('W').sum()
 
     ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Netzlast [MWh]"]/1e6, label=f"Verbrauch {jahr}", color='red', marker='o')
     ax.plot(verbrauch_woechentlich.index, verbrauch_woechentlich["Realisierte Erzeugung [MWh]"]/1e6, label="Erzeugung", color='#F9BF02', marker='o')

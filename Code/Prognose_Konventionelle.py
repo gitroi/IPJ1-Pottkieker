@@ -46,8 +46,12 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
             for jahr in prognose_konventionelle['Jahr'].unique():
                 jahr_mask = prognose_konventionelle['Jahr'] == jahr
                 anteil = anteile["2030"][key] if jahr <= 2030 else anteile["2045"][key]
-                prognose_konventionelle.loc[jahr_mask, f'{key} [GW]'] = konventionelle[jahr]['Leistung'] * anteil / 1e3
-                prognose_konventionelle.loc[jahr_mask, f'{key}_opex [€]'] = (prognose_konventionelle.loc[jahr_mask, f'{key} [GW]'] * feste_parameter_konventionelle[key]['opex_kw'] * 1e6) + (prognose_konventionelle.loc[jahr_mask, f'{key} [MWh]'] * feste_parameter_konventionelle[key]['opex_MWh'])
+                leistung_mw = konventionelle[jahr]['Leistung'] * anteil / 1e3
+                prognose_konventionelle.loc[jahr_mask, f'{key} [MW]'] = leistung_mw
+                anzahl_viertelstunden_jahr = jahr_mask.sum()
+                opex_leistung_pro_viertelstunde = (leistung_mw * 1e3 * feste_parameter_konventionelle[key]['opex_kw']) / anzahl_viertelstunden_jahr
+                opex_energie = prognose_konventionelle.loc[jahr_mask, f'{key} [MWh]'] * feste_parameter_konventionelle[key]['opex_MWh']
+                prognose_konventionelle.loc[jahr_mask, f'{key}_opex [€]'] = opex_leistung_pro_viertelstunde + opex_energie
         else:
             prognose_konventionelle.loc[mask_2030, f'{key} [MWh]'] = prognose_konventionelle.loc[mask_2030, 'konventionelle [MWh]'] * anteile["2030"][key]
             prognose_konventionelle.loc[mask_2045, f'{key} [MWh]'] = prognose_konventionelle.loc[mask_2045, 'konventionelle [MWh]'] * anteile["2045"][key]
@@ -59,7 +63,7 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
             jahr_mask = prognose_konventionelle['Jahr'] == jahr
             anteil = anteile["2030"][key] if jahr <= 2030 else anteile["2045"][key]
             
-            installiert_aktuell = konventionelle[jahr]['Leistung'] * anteil
+            installiert_aktuell = konventionelle[jahr]['Leistung'] * anteil / 1e3  
             
             zubau_gw = max(0, installiert_aktuell - installiert_vorjahr)
             
@@ -77,4 +81,4 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
 
 
     
-    return prognose_konventionelle
+    return prognose_konventionelle.drop(columns=['Jahr'])

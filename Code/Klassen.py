@@ -11,6 +11,7 @@ from config import DATA_DIR, PROJECT_ROOT
 from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
+from Prognose_Konventionelle import konventionelle_prognose
 from Diagramme import (plot_ee_anteil_histogram_overflow,plot_histogram_ausbauraten_EE,
     plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,
     kosten, plot_Anteil_EE_mit_ohne_Speicher,
@@ -34,6 +35,7 @@ class Szenario:
     ertragsart: str
     verbrauchsprofile: json
     veränderungsfaktoren: dict
+    konven_anteile: dict
     
     erzeugung_df: Optional[pd.DataFrame] = None
     verbrauch_df: Optional[pd.DataFrame] = None
@@ -85,7 +87,8 @@ class Szenario:
         self.gesamt_df = anteil_erneuerbare_speicher(self.speicher_df)
         
         self.konventionelle = konventionelle_Leistung_Energie(self.gesamt_df)
-        
+        self.gesamt_df = konventionelle_prognose(self.gesamt_df, self.konventionelle, self.konven_anteile)
+
         print(f"✓ Berechnungen für '{self.name}' abgeschlossen.")
     
     def auswertungsdaten_generieren(self)-> pd.DataFrame:
@@ -120,7 +123,7 @@ class Szenario:
         verbrauch_jahr(self.gesamt_df, 2028, axs6) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
-        kosten(self.kosten_df, axs2[0], axs2[1])
+        kosten(self.kosten_df, self.gesamt_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
         zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
@@ -157,7 +160,7 @@ class Szenario:
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs1[1])
         plot_histogram_energie_nichtEE(self.konventionelle, axs1[0])
-        kosten(self.kosten_df, axs2[0], axs2[1])
+        kosten(self.kosten_df, self.gesamt_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0], axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1], axs4[1])
         
@@ -217,6 +220,21 @@ class Szenario:
         ergebnisse["Benötigte Leistung Konventioenelle 2030 [GW]"] = [
             self.konventionelle[2030]["Leistung"] / 1e3
         ]
+
+        konventionelle_typen = ["braun", "erdgas", "stein", "sonstige", "importe"]
+        for konv_typ in konventionelle_typen:
+            if f"{konv_typ} [GW]" in self.gesamt_df.columns:
+                mask_2030 = self.gesamt_df["Jahr"] == 2030
+                leistung_2030 = self.gesamt_df.loc[mask_2030, f"{konv_typ} [GW]"].iloc[0] if mask_2030.any() else 0
+                ergebnisse[f"Installierte Leistung {konv_typ} 2030 [GW]"] = [leistung_2030]
+                
+                mask_2045 = self.gesamt_df["Jahr"] == 2045
+                leistung_2045 = self.gesamt_df.loc[mask_2045, f"{konv_typ} [GW]"].iloc[0] if mask_2045.any() else 0
+                ergebnisse[f"Installierte Leistung {konv_typ} 2045 [GW]"] = [leistung_2045]
+                
+                kosten_capex = self.gesamt_df[f"{konv_typ}_capex [€]"].sum() if f"{konv_typ}_capex [€]" in self.gesamt_df.columns else 0
+                kosten_opex = self.gesamt_df[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in self.gesamt_df.columns else 0
+                ergebnisse[f"Gesamtkosten {konv_typ} [Mil. €]"] = [(kosten_capex + kosten_opex) / 1e6]
 
         for key in ausbauraten["zuwachsrate_2030"].keys():
             ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
