@@ -22,5 +22,11 @@
         "capex": 355,
         "opex_kw": 12,
         "opex_MWh": 205
+    },
+    "importe": {
+        "bestand": 0,
+        "capex": 0,
+        "opex_kw": 0,
+        "opex_MWh": 100
     }
 }
