@@ -73,6 +73,13 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
         end_df.loc[mask1, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2030"][key]
         end_df.loc[mask2, f"Ausbaurate {key} [GWh/Jahr]"] = ausbauraten_speicher["zuwachsrate_2045"][key]
 
+    for key in Keys_Speicher:
+    kapazitaet_spalte = f"Speicherkapazität {key} [MWh]"
+    if kapazitaet_spalte in gesamt.columns:
+        end_df[f"Speicherkapazität {key} [GWh]"] = (
+            gesamt.groupby('Jahr')[kapazitaet_spalte].last() / 1e3
+        ).round(2).values
+
     konventionelle_typen = ["braun", "erdgas", "stein", "sonstige", "importe"]
     for konv_typ in konventionelle_typen:
         if f"{konv_typ} [GW]" in gesamt.columns:
