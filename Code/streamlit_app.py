@@ -173,7 +173,7 @@ if modus == "🎯 Einzelnes Szenario":
     st.markdown("---")
     if st.button("🚀 Simulation starten", type="primary", width='stretch'):
         if gewaehltes_szenario and gewaehltes_profil:
-            with st.spinner(f"🔄 Berechne Prognosen für '{ausgewähltes_szenario_name}'..."):
+            with st.spinner(f"Berechne Prognosen für '{ausgewähltes_szenario_name}'..."):
                 try:
                     # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
