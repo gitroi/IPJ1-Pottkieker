@@ -82,6 +82,9 @@ class Szenario:
         # --FIXME: in Auswertung einpflegen?--
         self.dunkelflaute_2030_df.to_csv(DATA_DIR / 'Output' / 'dunkelflaute_2030.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
         self.dunkelflaute_2045_df.to_csv(DATA_DIR / 'Output' / 'dunkelflaute_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+        # Top 10 Zeitpunkte mit größter Fehlmenge 
+        top10_Fehlenergie_df = self.speicher_df.nlargest(10, "Fehlende Energie [MWh]", 'all')[["Datum von", "Fehlende Energie [MWh]", "Anteil Erneuerbare [%]"]]
+        # top10_Fehlenergie_df.to_csv(DATA_DIR / 'Output' / 'top10_Fehlenergie.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
         # ------------------------------------
 
         self.gesamt_df = anteil_erneuerbare_speicher(self.speicher_df)
