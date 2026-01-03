@@ -71,6 +71,7 @@ def speicher_laden(
 ) -> tuple[float, float]:
     """
     Lädt einen Speicher mit verfügbarer Energie.
+    Code refactored aus vorheriger Verlaufs-Funktion mithilfe von KI Claude Opus 4.5.
     
     Args:
         aktueller_bestand: Aktueller Ladestand in MWh
@@ -115,7 +116,8 @@ def speicher_entladen(
     wirkungsgrad: Fraction
 ) -> tuple[float, float, float]:
     """
-    Entlädt einen Speicher um Fehlmenge zu decken.
+    Entlädt einen Speicher um Fehlmenge zu decken. 
+    Code refactored aus vorheriger Verlaufs-Funktion mithilfe von KI Claude Opus 4.5.
     
     Args:
         aktueller_bestand: Aktueller Ladestand in MWh
@@ -214,6 +216,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     speicherstand_wasserstoff = []
     speicherstand_pumpspeicher = []
     zusatz_energie = []
+    fehl_energie = []
 
     # Anfangswerte Ladestand (Annahme: 25% geladen im Januar 2026)
     aktuell_batterie = bestandBatterie * 0.25 * 1e3 
@@ -229,6 +232,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         
         erzeugung = erneuerbare[idx]
         aktuell_zusatz_energie = 0
+        fehlmenge = 0
 
         if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
             
@@ -285,6 +289,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         speicherstand_wasserstoff.append(aktuell_wasserstoff)   
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
+        fehl_energie.append(fehlmenge)
 
         # Langzeitverluste der Speicher jede Stunde
         if idx % 4 == 0:
@@ -296,6 +301,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     df_gesamtVerlauf["Ladestand wasserstoff [MWh]"] = speicherstand_wasserstoff
     df_gesamtVerlauf["Ladestand pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_gesamtVerlauf["Energie aus Speicher [MWh]"] = zusatz_energie
+    df_gesamtVerlauf["Fehlende Energie [MWh]"] = fehl_energie
 
     if(df_gesamtVerlauf.isna().any().any()):
         print("Warnung: Es gibt fehlende Werte in der Speicherprognose!")
@@ -410,12 +416,14 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     speicherstand_wasserstoff = []
     speicherstand_pumpspeicher = []
     zusatz_energie = []
+    fehl_energie = []
     
     # Simulation über alle Zeitpunkte im Simulationszeitraum
     for idx in range(len(erneuerbare)):
         
         erzeugung = erneuerbare[idx]
         aktuell_zusatz_energie = 0
+        fehlmenge = 0
 
         if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
             
@@ -472,6 +480,7 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
         speicherstand_wasserstoff.append(aktuell_wasserstoff)   
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
+        fehl_energie.append(fehlmenge)
 
         # Langzeitverluste der Speicher jede Stunde
         if idx % 4 == 0:
@@ -484,6 +493,7 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     df_simulation["Ladestand wasserstoff [MWh]"] = speicherstand_wasserstoff
     df_simulation["Ladestand pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_simulation["Energie aus Speicher [MWh]"] = zusatz_energie
+    df_simulation["Fehlende Energie [MWh]"] = fehl_energie
     
     return df_simulation
 
