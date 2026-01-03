@@ -304,7 +304,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         print(df_gesamtVerlauf[mask.any(axis=1)])
 
     # Debug-Code
-    df_gesamtVerlauf.to_csv(DATA_DIR / 'Output' / 'debug_gesamtverlauf_neu.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
+    # df_gesamtVerlauf.to_csv(DATA_DIR / 'Output' / 'debug_gesamtverlauf_neu.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
 
     return df_gesamtVerlauf
 
