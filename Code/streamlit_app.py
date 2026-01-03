@@ -234,7 +234,7 @@ if modus == "🎯 Einzelnes Szenario":
                 try:         
                     stromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
                     gesamtkosten = ergebnisse["Gesamtkosten_EE_und_Speicher [Mrd. €]"].sum()   
-                    st.dataframe(ergebnisse, use_container_width=True)
+                    st.dataframe(ergebnisse, width='stretch')
                     col1.metric("Erzeugung Erneuerbare 2026-2045", f"{stromerzeugung:.1f} TWh")
                     col2.metric("Gesamtkosten 2026-2045", f"{gesamtkosten:.2f} Mrd. €")
                 except Exception as e:
@@ -412,19 +412,22 @@ if modus == "🎯 Einzelnes Szenario":
             label="💾 Gesamtergebnis als Excel herunterladen",
             data=excel_buffer,
             file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_ergebnisse.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            on_click="ignore"
         )
 
-        st.markdown("---")
-        excel_buffer = BytesIO()
-        gesamt = szenario.getGesamtDF()
-        gesamt["Datum von"] = gesamt["Datum von"].dt.tz_localize(None)
-        gesamt.to_excel(excel_buffer, index=False, engine='openpyxl')
-        excel_buffer.seek(0)
+        excel_buffer2 = BytesIO()
+        gesamt = szenario.getGesamtDF().copy()
+        
+        if hasattr(gesamt["Datum von"].dtype, 'tz') and gesamt["Datum von"].dt.tz is not None:
+            gesamt["Datum von"] = gesamt["Datum von"].dt.tz_localize(None)
+        
+        gesamt.to_excel(excel_buffer2, index=False, engine='openpyxl')
+        excel_buffer2.seek(0)
         
         st.download_button(
-            label="💾 Simualationsdaten als Excel herunterladen",
-            data=excel_buffer,
+            label="💾 Simulationsdaten als Excel herunterladen",
+            data=excel_buffer2,
             file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
@@ -506,7 +509,7 @@ elif modus == "📈 Szenarien vergleichen":
     for key in ausgewählte_szenarien:
         ausgewählte.append(szenarien_dict[key])
     
-    if st.button("🚀 Ausgewählte Szenarien simulieren", type="primary", use_container_width=True):
+    if st.button("🚀 Ausgewählte Szenarien simulieren", type="primary", width='stretch'):
         gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, ausgewähltes_profil_name)
         
         if gewaehltes_profil:
@@ -577,8 +580,7 @@ elif modus == "📈 Szenarien vergleichen":
                     label="💾 Plot herunterladen",
                     data=buf1,
                     file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots1.png",
-                    mime="image/png",
-                    on_click="ignore"
+                    mime="image/png"
                 )
                 st.pyplot(fig2)
                 buf2 = BytesIO()
@@ -588,12 +590,11 @@ elif modus == "📈 Szenarien vergleichen":
                     label="💾 Plot herunterladen",
                     data=buf2,
                     file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots2.png",
-                    mime="image/png",
-                    on_click="ignore"
+                    mime="image/png"
                 )
                 
                 st.subheader("📊 Vergleichstabelle")
-                st.dataframe(alle_ergebnisse, use_container_width=True)
+                st.dataframe(alle_ergebnisse, width='stretch')
                 st.markdown("---")
                 excel_buffer = BytesIO()
                 alle_ergebnisse.to_excel(excel_buffer, index=False, engine='openpyxl')
@@ -753,7 +754,7 @@ elif modus == "➕ Szenario hinzufügen":
                 os_pump = st.number_input("Pumpspeicher", min_value=0.0, value=1.0, step=0.1, key="os_pump")
             
             st.markdown("---")
-            submitted = st.form_submit_button("💾 Szenario speichern", type="primary", use_container_width=True)
+            submitted = st.form_submit_button("💾 Szenario speichern", type="primary", width='stretch')
             
             if submitted:
                 if not name or not beschreibung:
@@ -894,7 +895,7 @@ elif modus == "➕ Szenario hinzufügen":
                 )
             
             st.markdown("---")
-            profil_submitted = st.form_submit_button("💾 Verbrauchsprofil speichern", type="primary", use_container_width=True)
+            profil_submitted = st.form_submit_button("💾 Verbrauchsprofil speichern", type="primary", width='stretch')
             
             if profil_submitted:
                 if not profil_name:

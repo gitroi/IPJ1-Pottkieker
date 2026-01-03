@@ -457,7 +457,7 @@ def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes
     if start_datum is None:
         start = gesamt.index[0]
     else:
-        start = pd.to_datetime(start_datum)
+        start = pd.to_datetime(start_datum, dayfirst=True)
         if gesamt.index.tz is not None:
             if start.tz is None:
                 start = start.tz_localize(gesamt.index.tz)
@@ -534,7 +534,7 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     if start_datum is None:
         start = gesamt.index[0]
     else:
-        start = pd.to_datetime(start_datum)
+        start = pd.to_datetime(start_datum, dayfirst=True)
         if gesamt.index.tz is not None:
             if start.tz is None:
                 start = start.tz_localize(gesamt.index.tz)
