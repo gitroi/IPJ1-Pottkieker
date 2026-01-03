@@ -417,7 +417,9 @@ if modus == "🎯 Einzelnes Szenario":
 
         st.markdown("---")
         excel_buffer = BytesIO()
-        szenario.getGesamtDF().to_excel(excel_buffer, index=False, engine='openpyxl')
+        gesamt = szenario.getGesamtDF()
+        gesamt["Datum von"] = gesamt["Datum von"].dt.tz_localize(None)
+        gesamt.to_excel(excel_buffer, index=False, engine='openpyxl')
         excel_buffer.seek(0)
         
         st.download_button(
