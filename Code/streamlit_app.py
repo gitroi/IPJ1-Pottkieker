@@ -205,7 +205,6 @@ if modus == "🎯 Einzelnes Szenario":
                         konven_anteile=konven_anteile
                     )
                     
-                    #szenario_ergebnis.berechne_alle_prognosen()
                     
                     st.success(f"✅ Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
                     
@@ -413,6 +412,18 @@ if modus == "🎯 Einzelnes Szenario":
             label="💾 Gesamtergebnis als Excel herunterladen",
             data=excel_buffer,
             file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_ergebnisse.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        st.markdown("---")
+        excel_buffer = BytesIO()
+        szenario.getGesamtDF().to_excel(excel_buffer, index=False, engine='openpyxl')
+        excel_buffer.seek(0)
+        
+        st.download_button(
+            label="💾 Simualationsdaten als Excel herunterladen",
+            data=excel_buffer,
+            file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
