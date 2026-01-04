@@ -407,9 +407,9 @@ if modus == "🎯 Einzelnes Szenario":
             
             try:
                     st.markdown("---")
-                    st.markdown("### Ladestand der Speicher während der Dunkelflaute")
+                    st.markdown("### Ladestand der Speicher während der Dunkelflaute 2030")
                     fig4, ax4 = plt.subplots(figsize=(12, 6))
-                    plot_liniendiagramm_ladestand_dunkelflaute(szenario.getGesamtDF(), ax4)
+                    plot_liniendiagramm_ladestand_dunkelflaute(szenario.getDunkelflauteDF(2030), ax4)
                     st.pyplot(fig4)
                     buf_ladestand = BytesIO()
                     fig4.savefig(buf_ladestand, format='png', dpi=300, bbox_inches='tight')
@@ -422,8 +422,29 @@ if modus == "🎯 Einzelnes Szenario":
                         on_click="ignore"
                     )
             except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-Diagramms: {str(e)}")
+                    st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-2030-Diagramms: {str(e)}")
                     st.exception(e)
+
+            try:
+                    st.markdown("---")
+                    st.markdown("### Ladestand der Speicher während der Dunkelflaute 2045")
+                    fig5, ax5 = plt.subplots(figsize=(12, 6))
+                    plot_liniendiagramm_ladestand_dunkelflaute(szenario.getDunkelflauteDF(2045), ax5)
+                    st.pyplot(fig5)
+                    buf_ladestand = BytesIO()
+                    fig5.savefig(buf_ladestand, format='png', dpi=300, bbox_inches='tight')
+                    buf_ladestand.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf_ladestand,
+                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+            except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-2045-Diagramms: {str(e)}")
+                    st.exception(e)
+
 
         # st.markdown("---")
         # try:

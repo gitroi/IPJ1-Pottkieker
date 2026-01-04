@@ -103,6 +103,15 @@ class Szenario:
         """Gibt das Gesamt-DataFrame zurück"""
         return self.gesamt_df
     
+    def getDunkelflauteDF(self, jahr: int) -> pd.DataFrame:
+        """Gibt das Dunkelflaute-DataFrame für das angegebene Jahr zurück"""
+        if jahr == 2030:
+            return self.dunkelflaute_2030_df
+        elif jahr == 2045:
+            return self.dunkelflaute_2045_df
+        else:
+            raise ValueError("Nur die Jahre 2030 und 2045 sind verfügbar.")
+    
     def getFehlenergieDF(self) -> pd.DataFrame:
         """Gibt das Fehlenergie-DataFrame zurück"""
         return self.top10_Fehlenergie_df
