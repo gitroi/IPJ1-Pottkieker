@@ -140,15 +140,15 @@ def top10_fehlenergie_berechnen(gesamt_df: pd.DataFrame) -> pd.DataFrame:
         "Datum von", 
         "Fehlende Energie [MWh]", 
         "Anteil Erneuerbare Speicher [%]", 
+        "Ladestand batteriespeicher [MWh]",
+        "Ladestand wasserstoff [MWh]",
+        "Ladestand pumpspeicher [MWh]",
         "Viertelstundenleistung batteriespeicher [MW]", 
         "Viertelstundenleistung wasserstoff [MW]",
         "Viertelstundenleistung pumpspeicher [MW]",
         "Speicherkapazität batteriespeicher [MWh]",
         "Speicherkapazität wasserstoff [MWh]",
-        "Speicherkapazität pumpspeicher [MWh]",
-        "Ladestand batteriespeicher [MWh]",
-        "Ladestand wasserstoff [MWh]",
-        "Ladestand pumpspeicher [MWh]"
+        "Speicherkapazität pumpspeicher [MWh]"
     ]
     
     top10_Fehlenergie_df = gesamt_df.nlargest(10, "Fehlende Energie [MWh]", 'all')[spalten]
