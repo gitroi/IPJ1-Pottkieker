@@ -155,6 +155,7 @@ def prognose_alle_Szenarien():
         #szenario_ergebnis.berechne_alle_prognosen()
         ergebnisse_df = szenario_ergebnis.getErgebnisse()
         alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
+        top10_fehlenergie = szenario_ergebnis.getFehlenergieDF()
     
     fig1, ax1 = plt.subplots(1, 2, figsize=(12, 6))
     fig2, ax2 = plt.subplots(1, 2, figsize=(12, 6))
@@ -170,4 +171,6 @@ def prognose_alle_Szenarien():
 
     pfad = DATA_DIR/ "Output" / f"auswertung_aller_szenarien_erzeugung_{ertragsart}.xlsx"
     alle_ergebnisse.to_excel(pfad, index=False)
+    pfad = DATA_DIR/ "Output" / f"top10_energiedefizit_erzeugung_{ertragsart}.xlsx"
+    top10_fehlenergie.to_excel(pfad, index=False)
     print(f"✓ Alle Szenarien wurden verarbeitet und in '{pfad}' gespeichert.")
