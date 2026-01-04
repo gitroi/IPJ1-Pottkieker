@@ -540,6 +540,9 @@ def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     Erstellt ein Liniendiagramm des Gesamtenergieverbrauchs für ein bestimmtes Jahr mit Wochenwerten.
     Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
+    if(not jahr):
+        jahr = 2045
+
     verbrauch_zeitraum = gesamt.set_index('Datum von')
     verbrauch_zeitraum = verbrauch_zeitraum[verbrauch_zeitraum.index.year == jahr]
     verbrauch_woechentlich = verbrauch_zeitraum.resample('W').sum()

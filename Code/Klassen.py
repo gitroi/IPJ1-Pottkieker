@@ -135,16 +135,20 @@ class Szenario:
         fig6, axs6 = plt.subplots(1, figsize=(14, 6))
         fig7, axs7 = plt.subplots(1, figsize=(14, 6))
         fig8, axs8 = plt.subplots(1, figsize=(14, 6))
-
+        if(not jahr1):
+            jahr2 = 2045
+        else:
+            jahr2 = jahr1
+            
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
-        verbrauch_jahr(self.gesamt_df, 2028, axs6) 
+        verbrauch_jahr(self.gesamt_df, jahr1, axs6) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
         kosten(self.kosten_df, self.gesamt_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
-        zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
-        plot_liniendiagramm_ladestand(self.gesamt_df, f'01-01-{jahr1}', axs8)
+        zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr2}',axs7)
+        plot_liniendiagramm_ladestand(self.gesamt_df, f'01-01-{jahr2}', axs8)
         plt.tight_layout()
         
         if(speichern):
