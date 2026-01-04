@@ -230,11 +230,13 @@ if modus == "🎯 Einzelnes Szenario":
             col1, col2,col3,col4 = st.columns(4)
             
             ergebnisse = szenario.auswertungsdaten_generieren()
-            if ergebnisse is not None:
+            top10_fehlenergie = szenario.getFehlenergieDF()
+            if ergebnisse is not None and top10_fehlenergie is not None:
                 try:         
                     stromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
                     gesamtkosten = ergebnisse["Gesamtkosten_EE_und_Speicher [Mrd. €]"].sum()   
                     st.dataframe(ergebnisse, width='stretch')
+                    st.dataframe(top10_fehlenergie, width='stretch')
                     col1.metric("Erzeugung Erneuerbare 2026-2045", f"{stromerzeugung:.1f} TWh")
                     col2.metric("Gesamtkosten 2026-2045", f"{gesamtkosten:.2f} Mrd. €")
                 except Exception as e:
