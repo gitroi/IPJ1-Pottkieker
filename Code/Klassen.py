@@ -16,7 +16,8 @@ from Diagramme import (plot_ee_anteil_histogram_overflow,plot_histogram_ausbaura
     plot_histogram_energie_nichtEE,plot_histogram_ausbauraten_Speicher,
     kosten, plot_Anteil_EE_mit_ohne_Speicher,
     verbrauch_jahr,zweiwochendiagramm_stunden,
-    plot_liniendiagramm_ladestand
+    plot_liniendiagramm_ladestand,
+    plot_liniendiagramm_ladestand_dunkelflaute
 )
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
@@ -135,20 +136,25 @@ class Szenario:
         fig6, axs6 = plt.subplots(1, figsize=(14, 6))
         fig7, axs7 = plt.subplots(1, figsize=(14, 6))
         fig8, axs8 = plt.subplots(1, figsize=(14, 6))
+        fig9, axs9 = plt.subplots(1, figsize=(14, 6))
+        fig10, axs10 = plt.subplots(1, figsize=(14, 6))
+
         if(not jahr1):
             jahr2 = 2045
         else:
             jahr2 = jahr1
             
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
-        verbrauch_jahr(self.gesamt_df, jahr1, axs6) 
+        verbrauch_jahr(self.gesamt_df, 2028, axs6) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
         plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
         kosten(self.kosten_df, self.gesamt_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
-        zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr2}',axs7)
-        plot_liniendiagramm_ladestand(self.gesamt_df, f'01-01-{jahr2}', axs8)
+        zweiwochendiagramm_stunden(self.gesamt_df, f'01-01-{jahr1}',axs7)
+        plot_liniendiagramm_ladestand(self.gesamt_df, f'01-01-{jahr1}', axs8)
+        plot_liniendiagramm_ladestand_dunkelflaute(self.dunkelflaute_2030_df, axs9)
+        plot_liniendiagramm_ladestand_dunkelflaute(self.dunkelflaute_2045_df, axs10)
         plt.tight_layout()
         
         if(speichern):
@@ -156,7 +162,14 @@ class Szenario:
             fig2.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots2.png", dpi=300, bbox_inches='tight', format='png')
             fig3.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots3.png", dpi=300, bbox_inches='tight', format='png')
             fig4.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots4.png", dpi=300, bbox_inches='tight', format='png')
+            fig5.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots5.png", dpi=300, bbox_inches='tight', format='png')
+            fig6.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots6.png", dpi=300, bbox_inches='tight', format='png')
+            fig7.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots7.png", dpi=300, bbox_inches='tight', format='png')
+            fig8.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots8.png", dpi=300, bbox_inches='tight', format='png')
+            fig9.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots9.png", dpi=300, bbox_inches='tight', format='png')
+            fig10.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots10.png", dpi=300, bbox_inches='tight', format='png')
         plt.show()
+
 
     def gebe_plots(self, jahr1=None):
         """
