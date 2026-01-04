@@ -493,6 +493,47 @@ def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes
     ax2.set_yticklabels(['Defizit', 'Überschuss'])
     ax2.legend(loc='upper right')
 
+def plot_liniendiagramm_ladestand_dunkelflaute(dunkelflaute_df: pd.DataFrame, ax: plt.Axes):
+    """
+    Erstellt ein Liniendiagramm des Ladestands der Speicher über die Zeit der Dunkelflaute.
+    
+    Args:
+        dunkelflaute_df (pd.DataFrame): DataFrame mit den Daten der Dunkelflaute.
+        ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
+    """
+    if not isinstance(dunkelflaute_df.index, pd.DatetimeIndex):
+        if 'Datum von' in dunkelflaute_df.columns:
+            dunkelflaute_df = dunkelflaute_df.set_index('Datum von')
+        else:
+            raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein oder eine 'Datum von' Spalte enthalten")
+    
+    
+    if dunkelflaute_df.empty:
+        raise ValueError("Keine Daten im angegebenen Zeitraum.")
+    
+    start = dunkelflaute_df.index[1]
+    ende = dunkelflaute_df.index[-2]
+    
+    dunkelflaute_df['EE_Status'] = (dunkelflaute_df["Anteil Erneuerbare [%]"] >= 100).astype(int)
+    
+    ax.fill_between(dunkelflaute_df.index, 0, dunkelflaute_df["Ladestand batteriespeicher [MWh]"]/1e3, label="Batteriespeicher", color='#9C27B0', alpha=0.7)
+    ax.fill_between(dunkelflaute_df.index, 0, dunkelflaute_df["Ladestand wasserstoff [MWh]"]/1e3, label="Wasserstoffspeicher", color='#E91E63', alpha=0.7)
+    ax.fill_between(dunkelflaute_df.index, 0, dunkelflaute_df["Ladestand pumpspeicher [MWh]"]/1e3, label="Pumpspeicher", color='#1633D8', alpha=0.7) 
+    
+    ax.set_title(f"Dunkelflaute von {start.date()} bis {ende.date()}")
+    ax.set_xlabel('Datum und Uhrzeit')
+    ax.set_ylabel('Energie [GWh]')
+    ax.legend(loc='upper left')
+    ax.grid(True)
+    
+    ax2 = ax.twinx()
+    ax2.plot(dunkelflaute_df.index, dunkelflaute_df['EE_Status'], color='orange', linewidth=2, linestyle='-', label='EE-Status', alpha=0.6)
+    ax2.set_ylabel('Defizit (0) / Überschuss (1)', color='orange')
+    ax2.tick_params(axis='y', labelcolor='orange')
+    ax2.set_ylim(-0.1, 1.1)
+    ax2.set_yticks([0, 1])
+    ax2.set_yticklabels(['Defizit', 'Überschuss'])
+    ax2.legend(loc='upper right')
 
 def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     """

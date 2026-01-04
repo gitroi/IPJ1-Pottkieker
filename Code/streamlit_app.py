@@ -32,7 +32,7 @@ try:
     from config import DATA_DIR, PROJECT_ROOT as PR
     from Klassen import Szenario
     from Szenarien_auswahl import load_scenarios, load_verbrauchsprofile, get_scenario_by_name, get_verbrauchsprofil_by_name
-    from Diagramme import plot_histogram_gesamtauswertung,verbrauch_jahr,zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand
+    from Diagramme import plot_histogram_gesamtauswertung,verbrauch_jahr,zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,plot_liniendiagramm_ladestand_dunkelflaute
 
 except ImportError as e:
     st.error(f"❌ Import-Fehler: {str(e)}")
@@ -387,7 +387,7 @@ if modus == "🎯 Einzelnes Szenario":
 
             try:
                     st.markdown("---")
-                    st.markdown("### Ladestand des Batteriespeichers")
+                    st.markdown("### Ladestand der Speicher")
                     fig3, ax3 = plt.subplots(figsize=(12, 6))
                     plot_liniendiagramm_ladestand(szenario.getGesamtDF(), startdatum, ax3)
                     st.pyplot(fig3)
@@ -403,6 +403,26 @@ if modus == "🎯 Einzelnes Szenario":
                     )
             except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen des Ladestand-Diagramms: {str(e)}")
+                    st.exception(e)
+            
+            try:
+                    st.markdown("---")
+                    st.markdown("### Ladestand der Speicher während der Dunkelflaute")
+                    fig4, ax4 = plt.subplots(figsize=(12, 6))
+                    plot_liniendiagramm_ladestand_dunkelflaute(szenario.getGesamtDF(), ax4)
+                    st.pyplot(fig4)
+                    buf_ladestand = BytesIO()
+                    fig4.savefig(buf_ladestand, format='png', dpi=300, bbox_inches='tight')
+                    buf_ladestand.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf_ladestand,
+                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        mime="image/png",
+                        on_click="ignore"
+                    )
+            except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-Diagramms: {str(e)}")
                     st.exception(e)
 
         # st.markdown("---")
