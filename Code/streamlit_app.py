@@ -413,13 +413,13 @@ if modus == "🎯 Einzelnes Szenario":
                     fig4, ax4 = plt.subplots(figsize=(12, 6))
                     plot_liniendiagramm_ladestand_dunkelflaute(szenario.getDunkelflauteDF(2030), ax4)
                     st.pyplot(fig4)
-                    buf_ladestand = BytesIO()
-                    fig4.savefig(buf_ladestand, format='png', dpi=300, bbox_inches='tight')
-                    buf_ladestand.seek(0)
+                    buf_dunkel2030 = BytesIO()
+                    fig4.savefig(buf_dunkel2030, format='png', dpi=300, bbox_inches='tight')
+                    buf_dunkel2030.seek(0)
                     st.download_button(
                         label="💾 Plot herunterladen",
-                        data=buf_ladestand,
-                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        data=buf_dunkel2030,
+                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute2030_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
                         mime="image/png",
                         on_click="ignore"
                     )
@@ -433,13 +433,13 @@ if modus == "🎯 Einzelnes Szenario":
                     fig5, ax5 = plt.subplots(figsize=(12, 6))
                     plot_liniendiagramm_ladestand_dunkelflaute(szenario.getDunkelflauteDF(2045), ax5)
                     st.pyplot(fig5)
-                    buf_ladestand = BytesIO()
-                    fig5.savefig(buf_ladestand, format='png', dpi=300, bbox_inches='tight')
-                    buf_ladestand.seek(0)
+                    buf_dunkel2045 = BytesIO()
+                    fig5.savefig(buf_dunkel2045, format='png', dpi=300, bbox_inches='tight')
+                    buf_dunkel2045.seek(0)
                     st.download_button(
                         label="💾 Plot herunterladen",
-                        data=buf_ladestand,
-                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        data=buf_dunkel2045,
+                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute2045_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
                         mime="image/png",
                         on_click="ignore"
                     )
