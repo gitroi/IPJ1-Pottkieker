@@ -126,3 +126,31 @@ def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:
 
 
     return reserven_dict
+
+def top10_fehlenergie_berechnen(gesamt_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Berechnet die Top 10 Zeitpunkte mit der größten Fehlenergie aus dem Speicher-DataFrame.
+    Args:
+        gesamt_df (pd.DataFrame): DataFrame mit Speicherinformationen
+    Returns:
+        pd.DataFrame: DataFrame mit den Top 10 Zeitpunkten und relevanten Daten
+    """
+
+    spalten = [
+        "Datum von", 
+        "Fehlende Energie [MWh]", 
+        "Anteil Erneuerbare Speicher [%]", 
+        "Viertelstundenleistung batteriespeicher [MW]", 
+        "Viertelstundenleistung wasserstoff [MW]",
+        "Viertelstundenleistung pumpspeicher [MW]",
+        "Speicherkapazität batteriespeicher [MWh]",
+        "Speicherkapazität wasserstoff [MWh]",
+        "Speicherkapazität pumpspeicher [MWh]",
+        "Ladestand batteriespeicher [MWh]",
+        "Ladestand wasserstoff [MWh]",
+        "Ladestand pumpspeicher [MWh]"
+    ]
+    
+    top10_Fehlenergie_df = gesamt_df.nlargest(10, "Fehlende Energie [MWh]", 'all')[spalten]
+
+    return top10_Fehlenergie_df

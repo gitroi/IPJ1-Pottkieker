@@ -22,7 +22,7 @@ from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speich
 from Kosten import kostenrechnung
 from Plot import plot_verbrauch_woche,plot_verbrauch
 import Prognose_Speicher as speicher
-from Auswertung import ausgabe, konventionelle_Leistung_Energie
+from Auswertung import ausgabe, konventionelle_Leistung_Energie, top10_fehlenergie_berechnen
 
 @dataclass
 class Szenario:
@@ -85,10 +85,10 @@ class Szenario:
         self.dunkelflaute_2045_df.to_csv(DATA_DIR / 'Output' / 'dunkelflaute_2045.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')
         # ------------------------------------
 
-        # Top 10 Zeitpunkte mit größter Fehlmenge 
-        self.top10_Fehlenergie_df = self.speicher_df.nlargest(10, "Fehlende Energie [MWh]", 'all')[["Datum von", "Fehlende Energie [MWh]", "Anteil Erneuerbare [%]"]]
-
         self.gesamt_df = anteil_erneuerbare_speicher(self.speicher_df)
+
+        # Top 10 Zeitpunkte mit größter Fehlmenge 
+        self.top10_Fehlenergie_df = top10_fehlenergie_berechnen(self.gesamt_df)
         
         self.konventionelle = konventionelle_Leistung_Energie(self.gesamt_df)
         self.gesamt_df = konventionelle_prognose(self.gesamt_df, self.konventionelle, self.konven_anteile)
