@@ -235,7 +235,9 @@ if modus == "🎯 Einzelnes Szenario":
                 try:         
                     stromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
                     gesamtkosten = ergebnisse["Gesamtkosten_EE_und_Speicher [Mrd. €]"].sum()   
+                    st.header("Jahresübersicht")
                     st.dataframe(ergebnisse, width='stretch')
+                    st.header("10 Viertelstunden mit größtem Energie-Defizit")
                     st.dataframe(top10_fehlenergie, width='stretch')
                     col1.metric("Erzeugung Erneuerbare 2026-2045", f"{stromerzeugung:.1f} TWh")
                     col2.metric("Gesamtkosten 2026-2045", f"{gesamtkosten:.2f} Mrd. €")
