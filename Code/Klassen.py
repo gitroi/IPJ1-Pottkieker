@@ -37,6 +37,7 @@ class Szenario:
     verbrauchsprofile: json
     veränderungsfaktoren: dict
     konven_anteile: dict
+    lastprofile: bool
     
     erzeugung_df: Optional[pd.DataFrame] = None
     verbrauch_df: Optional[pd.DataFrame] = None
@@ -65,8 +66,8 @@ class Szenario:
         )
         
         self.verbrauch_df = Prognose_Verbrauch(
-            self.verbrauchsprofile["Verbrauch_2030"],
-            self.verbrauchsprofile["Verbrauch_2045"]
+            self.verbrauchsprofile,
+            self.lastprofile
         )
         
         self.ee_anteil_ohne_speicher_df = anteil_erneuerbare_df(

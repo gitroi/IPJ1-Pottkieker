@@ -214,6 +214,14 @@ if modus == "🎯 Einzelnes Szenario":
         else:
             st.success(f"✓ Summe 2045: {summe_2045:.2f}")
     
+    st.markdown("### 📊 Lastprofile")
+    lastprofile_einzel = st.checkbox(
+        "Lastprofile berücksichtigen",
+        value=True,
+        help="Aktivieren, um E-Auto- und Wärmepumpen-Lastprofile in die Simulation einzubeziehen",
+        key="lastprofile_einzel"
+    )
+    
     st.markdown("---")
     if st.button("🚀 Simulation starten", type="primary", width='stretch'):
         if gewaehltes_szenario and gewaehltes_profil:
@@ -246,7 +254,8 @@ if modus == "🎯 Einzelnes Szenario":
                         ertragsart=ertragsart,
                         verbrauchsprofile=gewaehltes_profil,
                         veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
-                        konven_anteile=konven_anteile
+                        konven_anteile=konven_anteile,
+                        lastprofile=lastprofile_einzel
                     )
                     
                     
@@ -601,6 +610,14 @@ elif modus == "📈 Szenarien vergleichen":
         else:
             st.success(f"✓ Summe 2045: {summe_2045_vgl:.2f}")
     
+    st.markdown("### 📊 Lastprofile")
+    lastprofile_vergleich = st.checkbox(
+        "Lastprofile berücksichtigen",
+        value=True,
+        help="Aktivieren, um E-Auto- und Wärmepumpen-Lastprofile in die Simulation einzubeziehen",
+        key="lastprofile_vergleich"
+    )
+    
     ausgewählte = []
     for key in ausgewählte_szenarien:
         ausgewählte.append(szenarien_dict[key])
@@ -645,7 +662,8 @@ elif modus == "📈 Szenarien vergleichen":
                         ertragsart=ertragsart,
                         verbrauchsprofile=gewaehltes_profil,
                         veränderungsfaktoren=szenario_data["Veränderungsfaktoren"]["Erzeugung"],
-                        konven_anteile=konven_anteile
+                        konven_anteile=konven_anteile,
+                        lastprofile=lastprofile_vergleich
                     )
                     
                     #szenario_ergebnis.berechne_alle_prognosen()
@@ -1002,6 +1020,25 @@ elif modus == "➕ Szenario hinzufügen":
                     help="Gesamtverbrauch im Jahr 2045 in Terawattstunden"
                 )
             
+            st.markdown("### 🔥 Wärmepumpen")
+            col3, col4 = st.columns(2)
+            with col3:
+                e_autos_2030 = st.number_input(
+                    "E-Autos 2030 (Anzahl)*", 
+                    min_value=0, 
+                    value=15000000, 
+                    step=1000000,
+                    help="Anzahl der E-Autos im Jahr 2030"
+                )
+            with col4:
+                e_autos_2045 = st.number_input(
+                    "E-Autos 2045 (Anzahl)*", 
+                    min_value=0, 
+                    value=40000000, 
+                    step=1000000,
+                    help="Anzahl der E-Autos im Jahr 2045"
+                )
+            
             st.markdown("---")
             profil_submitted = st.form_submit_button("💾 Verbrauchsprofil speichern", type="primary", width='stretch')
             
@@ -1013,7 +1050,9 @@ elif modus == "➕ Szenario hinzufügen":
                     neues_profil = {
                         "Name": profil_name,
                         "Verbrauch_2030": verbrauch_2030,
-                        "Verbrauch_2045": verbrauch_2045
+                        "Verbrauch_2045": verbrauch_2045,
+                        "E_Autos_2030": e_autos_2030,
+                        "E_Autos_2045": e_autos_2045
                     }
                     
                     try:

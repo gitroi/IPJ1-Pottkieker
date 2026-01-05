@@ -125,6 +125,14 @@ def prognose_alle_Szenarien():
             break
         else:
             print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
+    
+    while(True):
+        lastprofil_input = input("Möchten Sie das E-Auto Lastprofil berücksichtigen? (ja/nein): ").lower()
+        if lastprofil_input in ["ja", "nein"]:
+            lastprofil = lastprofil_input == "ja"
+            break
+        else:
+            print("Ungültige Eingabe. Bitte geben Sie 'ja' oder 'nein' ein.")
 
     gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
 
@@ -149,7 +157,8 @@ def prognose_alle_Szenarien():
             ertragsart=ertragsart,
             verbrauchsprofile=gewaehltes_profil,
             veränderungsfaktoren=szenario["Veränderungsfaktoren"]["Erzeugung"],
-            konven_anteile=konven_anteile
+            konven_anteile=konven_anteile,
+            lastprofile=lastprofil
         )
         
         #szenario_ergebnis.berechne_alle_prognosen()

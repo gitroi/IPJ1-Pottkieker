@@ -21,11 +21,23 @@ with open(DATA_DIR / "Feste_Parameter" / "Wochenende_E_Autos.csv", "r") as f:
 with open(DATA_DIR / "Feste_Parameter" / "Werktag_E_Autos.csv", "r") as f:
     WERKTAGE_E_AUTOS = pd.read_csv(f, sep=',',decimal='.')
 
-def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
+#TODO: Richtigen Wert recherchieren
+#BEISPIELWERTE
+E_AUTOS_2025 = 2000000
+
+def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.DataFrame:
     
+
+
     #=== Parameter in MWh umrechnen ===
-    verbrauch_2030_MWh = verbrauch_2030_TWh * 1e6
-    verbrauch_2045_MWh = verbrauch_2045_TWh * 1e6
+    verbrauch_2030_MWh = verbrauchsprofil["Verbrauch_2030"] * 1e6
+    verbrauch_2045_MWh = verbrauchsprofil["Verbrauch_2045"] * 1e6
+
+    if not lastprofil:
+        verbrauch_2030_MWh += verbrauchsprofil["E_Autos_2030"] * E_FAHRZEUG_JAHR_MWH
+        verbrauch_2045_MWh += verbrauchsprofil["E_Autos_2045"] * E_FAHRZEUG_JAHR_MWH
+
+
 
     #==== Einlesen der Daten und anpassung ====
     # Pfad relativ zum Skript bestimmen
@@ -143,7 +155,14 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
         mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
         print(df_gesamt_2045[mask.any(axis=1)])
     
-    
+    if lastprofil:
+        df_gesamt_2045 = e_auto_Lastprofil(
+            anzahl_e_autos={
+                2030: verbrauchsprofil["E_Autos_2030"],
+                2045: verbrauchsprofil["E_Autos_2045"]
+            },
+            gesamt_df=df_gesamt_2045
+        )
 
     return df_gesamt_2045
 
@@ -185,7 +204,7 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
         
         # Lineare Interpolation der Anzahl der E-Autos zwischen den Jahren
         if row["Jahr"] <= 2030:
-            anzahl_autos = anzahl_e_autos[2030] * (row["Jahr"] - 2024) / (2030 - 2024)
+            anzahl_autos = E_AUTOS_2025 + (anzahl_e_autos[2030] - E_AUTOS_2025) * (row["Jahr"] - 2025) / (2030 - 2025)
         else:
             anzahl_autos = anzahl_e_autos[2030] + (anzahl_e_autos[2045] - anzahl_e_autos[2030]) * (row["Jahr"] - 2030) / (2045 - 2030)
         
