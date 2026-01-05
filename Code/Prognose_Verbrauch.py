@@ -8,7 +8,18 @@ Programmiert von Joris Bürger
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from config import PROJECT_ROOT 
+from config import PROJECT_ROOT, DATA_DIR
+import json
+
+E_FAHRZEUG_JAHR_MWH = 2.25  # MWh pro E-Fahrzeug und Jahr
+
+# CSV-Dateien einmal am Anfang laden um Rechenleistung zu verringern
+
+with open(DATA_DIR / "Feste_Parameter" / "Wochenende_E_Autos.csv", "r") as f:
+    WOCHENENDE_E_AUTOS = pd.read_csv(f, sep=',',decimal='.')
+
+with open(DATA_DIR / "Feste_Parameter" / "Werktag_E_Autos.csv", "r") as f:
+    WERKTAGE_E_AUTOS = pd.read_csv(f, sep=',',decimal='.')
 
 def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     
@@ -21,7 +32,7 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
     verbrauchpfad = PROJECT_ROOT / "Daten" /"SMARD-Daten"/ "verbrauch_2024.csv"
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
-    sep=';', low_memory=False)
+    sep=';',low_memory=False)
 
     verbrauch_df["Datum von"] = pd.to_datetime(verbrauch_df["Datum von"], format="%d.%m.%Y %H:%M")
     verbrauch_df["Datum von"] = verbrauch_df["Datum von"].dt.tz_localize("Europe/Berlin", ambiguous='infer').dt.tz_convert('UTC')
@@ -131,5 +142,57 @@ def Prognose_Verbrauch(verbrauch_2030_TWh , verbrauch_2045_TWh):
         print(df_gesamt_2045.isna().sum())
         mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
         print(df_gesamt_2045[mask.any(axis=1)])
+    
+    
 
     return df_gesamt_2045
+
+def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFrame:
+    """
+    Erstelltt auf basis eines Lastprofils die Lastprognose für E-Autos.
+    :param anzahl_e_autos: dict mit Anzahl der E-Autos pro Jahr in 2030 und 2045 z.B. {2030: 1000000, 2045: 5000000}
+    :param gesamt_df: DataFrame mit der Gesamtverbrauchsprognose
+    :return: DataFrame mit der E-Auto Lastprognose eingerechnet in die Gesamtverbrauchsprognose
+    """
+    gesamt_df["Jahr"] = gesamt_df["Datum von"].dt.year
+    gesamt_df["Monat"] = gesamt_df["Datum von"].dt.month
+    gesamt_df["Wochentag"] = gesamt_df["Datum von"].dt.dayofweek
+    gesamt_df["Uhrzeit"] = gesamt_df["Datum von"].dt.hour
+    gesamt_df["Minute"] = gesamt_df["Datum von"].dt.minute
+
+    WOCHENENDE_E_AUTOS["Zeitstempel"] = pd.to_datetime(
+        WOCHENENDE_E_AUTOS["Zeitstempel"], format="%H:%M"
+    )
+
+    WERKTAGE_E_AUTOS["Zeitstempel"] = pd.to_datetime(
+        WERKTAGE_E_AUTOS["Zeitstempel"], format="%H:%M"
+    )
+
+    def get_e_auto_last(row):
+        if row["Wochentag"] >= 5:  # Wochenende
+            profil_row = WOCHENENDE_E_AUTOS[
+                (WOCHENENDE_E_AUTOS["Stunde"] == row["Uhrzeit"]) 
+            ]
+        else:  # Werktag
+            profil_row = WERKTAGE_E_AUTOS[
+                (WERKTAGE_E_AUTOS["Stunde"] == row["Uhrzeit"])
+            ]
+        
+        if not profil_row.empty:
+            basis_last = profil_row["Szenario_C"].values[0] * E_FAHRZEUG_JAHR_MWH / (365 * 4) 
+        else:
+            basis_last = 0
+        
+        # Lineare Interpolation der Anzahl der E-Autos zwischen den Jahren
+        if row["Jahr"] <= 2030:
+            anzahl_autos = anzahl_e_autos[2030] * (row["Jahr"] - 2024) / (2030 - 2024)
+        else:
+            anzahl_autos = anzahl_e_autos[2030] + (anzahl_e_autos[2045] - anzahl_e_autos[2030]) * (row["Jahr"] - 2030) / (2045 - 2030)
+        
+        return basis_last * anzahl_autos
+    
+    gesamt_df["E-Auto Last [MWh]"] = gesamt_df.apply(get_e_auto_last, axis=1)
+
+    gesamt_df["Netzlast [MWh]"] += gesamt_df["E-Auto Last [MWh]"]
+
+    return gesamt_df.drop(columns=["Jahr", "Monat", "Wochentag", "Uhrzeit", "Minute", "E-Auto Last [MWh]"])
