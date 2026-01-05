@@ -12,6 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 from io import BytesIO
+import subprocess
 
 script_path = Path(__file__).resolve()
 
@@ -66,6 +67,49 @@ def lade_szenarien(_mtime):
 def lade_verbrauchsprofile(_mtime):
     """Lädt Verbrauchsprofile aus JSON-Datei (cached mit Auto-Reload bei Dateiänderung)"""
     return load_verbrauchsprofile()
+
+def git_commit_and_push(filepath, commit_message):
+    """Führt Git Add, Commit und Push für eine Datei aus"""
+    try:
+        # Prüfen ob Git verfügbar ist
+        result = subprocess.run(["git", "--version"], 
+                              capture_output=True, 
+                              text=True, 
+                              cwd=str(PROJECT_ROOT))
+        if result.returncode != 0:
+            return False, "Git ist nicht verfügbar"
+        
+        # Git Add
+        result = subprocess.run(["git", "add", str(filepath)], 
+                              capture_output=True, 
+                              text=True, 
+                              cwd=str(PROJECT_ROOT))
+        if result.returncode != 0:
+            return False, f"Git Add fehlgeschlagen: {result.stderr}"
+        
+        # Git Commit
+        result = subprocess.run(["git", "commit", "-m", commit_message], 
+                              capture_output=True, 
+                              text=True, 
+                              cwd=str(PROJECT_ROOT))
+        if result.returncode != 0:
+            # Kein Fehler wenn nichts zu committen ist
+            if "nothing to commit" in result.stdout or "nothing to commit" in result.stderr:
+                return True, "Keine Änderungen zu committen"
+            return False, f"Git Commit fehlgeschlagen: {result.stderr}"
+        
+        # Git Push
+        result = subprocess.run(["git", "push"], 
+                              capture_output=True, 
+                              text=True, 
+                              cwd=str(PROJECT_ROOT))
+        if result.returncode != 0:
+            return False, f"Git Push fehlgeschlagen: {result.stderr}"
+        
+        return True, "Erfolgreich ins Repository gespeichert"
+        
+    except Exception as e:
+        return False, f"Git-Operation fehlgeschlagen: {str(e)}"
 
 szenarien_pfad = DATA_DIR / "Szenarien.json"
 verbrauchsprofile_pfad = DATA_DIR / "Verbrauchsprofile.json"
@@ -519,7 +563,7 @@ elif modus == "📈 Szenarien vergleichen":
     st.markdown("### ⚡ Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
     
-    with st.expander("Anteile 2030 konfigurieren", expanded=False):
+    with st.expander("Anteile bis 2030 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             braun_2030_vgl = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="vgl_braun_2030")
@@ -538,7 +582,7 @@ elif modus == "📈 Szenarien vergleichen":
         else:
             st.success(f"✓ Summe 2030: {summe_2030_vgl:.2f}")
     
-    with st.expander("Anteile 2045 konfigurieren", expanded=False):
+    with st.expander("Anteile bis 2045 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             braun_2045_vgl = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="vgl_braun_2045")
@@ -909,6 +953,18 @@ elif modus == "➕ Szenario hinzufügen":
                             st.cache_data.clear()
                             
                             st.success(f"✅ Szenario '{name}' erfolgreich gespeichert!")
+                            
+                            # Git-Automatisierung
+                            with st.spinner("📤 Speichere ins Repository..."):
+                                success, message = git_commit_and_push(
+                                    szenarien_pfad.relative_to(PROJECT_ROOT),
+                                    f"Neues Szenario hinzugefügt: {name}"
+                                )
+                                if success:
+                                    st.success(f"✅ {message}")
+                                else:
+                                    st.warning(f"⚠️ Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
+                            
                             st.balloons()
                             st.info("🔄 Seite wird neu geladen, um das neue Szenario anzuzeigen...")
                             st.rerun()
@@ -980,6 +1036,18 @@ elif modus == "➕ Szenario hinzufügen":
                             st.cache_data.clear()
                             
                             st.success(f"✅ Verbrauchsprofil '{profil_name}' erfolgreich gespeichert!")
+                            
+                            # Git-Automatisierung
+                            with st.spinner("📤 Speichere ins Repository..."):
+                                success, message = git_commit_and_push(
+                                    verbrauchsprofile_pfad.relative_to(PROJECT_ROOT),
+                                    f"Neues Verbrauchsprofil hinzugefügt: {profil_name}"
+                                )
+                                if success:
+                                    st.success(f"✅ {message}")
+                                else:
+                                    st.warning(f"⚠️ Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
+                            
                             st.balloons()
                             st.info("🔄 Seite wird neu geladen, um das neue Profil anzuzeigen...")
                             st.rerun()
