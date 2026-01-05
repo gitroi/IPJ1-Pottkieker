@@ -182,35 +182,42 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
     WOCHENENDE_E_AUTOS["Zeitstempel"] = pd.to_datetime(
         WOCHENENDE_E_AUTOS["Zeitstempel"], format="%H:%M"
     )
+    WOCHENENDE_E_AUTOS["Stunde"] = WOCHENENDE_E_AUTOS["Zeitstempel"].dt.hour
 
     WERKTAGE_E_AUTOS["Zeitstempel"] = pd.to_datetime(
         WERKTAGE_E_AUTOS["Zeitstempel"], format="%H:%M"
     )
+    WERKTAGE_E_AUTOS["Stunde"] = WERKTAGE_E_AUTOS["Zeitstempel"].dt.hour
 
-    def get_e_auto_last(row):
-        if row["Wochentag"] >= 5:  # Wochenende
-            profil_row = WOCHENENDE_E_AUTOS[
-                (WOCHENENDE_E_AUTOS["Stunde"] == row["Uhrzeit"]) 
-            ]
-        else:  # Werktag
-            profil_row = WERKTAGE_E_AUTOS[
-                (WERKTAGE_E_AUTOS["Stunde"] == row["Uhrzeit"])
-            ]
-        
-        if not profil_row.empty:
-            basis_last = profil_row["Szenario_C"].values[0] * E_FAHRZEUG_JAHR_MWH / (365 * 4) 
-        else:
-            basis_last = 0
-        
-        # Lineare Interpolation der Anzahl der E-Autos zwischen den Jahren
-        if row["Jahr"] <= 2030:
-            anzahl_autos = E_AUTOS_2025 + (anzahl_e_autos[2030] - E_AUTOS_2025) * (row["Jahr"] - 2025) / (2030 - 2025)
-        else:
-            anzahl_autos = anzahl_e_autos[2030] + (anzahl_e_autos[2045] - anzahl_e_autos[2030]) * (row["Jahr"] - 2030) / (2045 - 2030)
-        
-        return basis_last * anzahl_autos
+    werktag_profil = WERKTAGE_E_AUTOS.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Werktag"})
+    wochenende_profil = WOCHENENDE_E_AUTOS.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Wochenende"})
     
-    gesamt_df["E-Auto Last [MWh]"] = gesamt_df.apply(get_e_auto_last, axis=1)
+    gesamt_df = gesamt_df.merge(
+        werktag_profil[["Uhrzeit", "Profil_Werktag"]], 
+        on="Uhrzeit", 
+        how="left"
+    )
+    gesamt_df = gesamt_df.merge(
+        wochenende_profil[["Uhrzeit", "Profil_Wochenende"]], 
+        on="Uhrzeit", 
+        how="left"
+    )
+    
+    gesamt_df["basis_last"] = np.where(
+        gesamt_df["Wochentag"] >= 5, 
+        gesamt_df["Profil_Wochenende"], 
+        gesamt_df["Profil_Werktag"]
+    ) * E_FAHRZEUG_JAHR_MWH / (365 * 4)
+    
+    gesamt_df["anzahl_autos"] = np.where(
+        gesamt_df["Jahr"] <= 2030,
+        E_AUTOS_2025 + (anzahl_e_autos[2030] - E_AUTOS_2025) * (gesamt_df["Jahr"] - 2025) / (2030 - 2025),
+        anzahl_e_autos[2030] + (anzahl_e_autos[2045] - anzahl_e_autos[2030]) * (gesamt_df["Jahr"] - 2030) / (2045 - 2030)
+    )
+    
+    gesamt_df["E-Auto Last [MWh]"] = gesamt_df["basis_last"] * gesamt_df["anzahl_autos"]
+    
+    gesamt_df = gesamt_df.drop(columns=["Profil_Werktag", "Profil_Wochenende", "basis_last", "anzahl_autos"])
 
     gesamt_df["Netzlast [MWh]"] += gesamt_df["E-Auto Last [MWh]"]
 
