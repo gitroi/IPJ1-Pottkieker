@@ -1,5 +1,5 @@
 """
-Programmiert von Joris Bürger
+Programmiert von Joris Bürger , Robin Matzke
 """
 import pandas as pd
 import json
