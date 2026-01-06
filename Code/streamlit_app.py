@@ -245,24 +245,28 @@ if modus == "🎯 Einzelnes Szenario":
                         }
                     }
                     
-                    szenario_ergebnis = Szenario(
-                        name=ausgewähltes_szenario_name,
-                        beschreibung=gewaehltes_szenario["Beschreibung"],
-                        szenario=gewaehltes_szenario,
-                        ziele_2030=gewaehltes_szenario["Ziele 2030"],
-                        ziele_2045=gewaehltes_szenario["Ziele 2045"],
-                        ertragsart=ertragsart,
-                        verbrauchsprofile=gewaehltes_profil,
-                        veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
-                        konven_anteile=konven_anteile,
-                        lastprofile=lastprofile_einzel
-                    )
+                    szenario_key = f"{ausgewähltes_szenario_name}_{ertragsart}_{lastprofile_einzel}_{ausgewähltes_profil_name}"
                     
-                    
-                    st.success(f"✅ Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
-                    
-                    st.session_state['letztes_szenario'] = szenario_ergebnis
-                    st.session_state['jahr'] = 2045
+                    if 'szenario_key' not in st.session_state or st.session_state['szenario_key'] != szenario_key:
+                        szenario_ergebnis = Szenario(
+                            name=ausgewähltes_szenario_name,
+                            beschreibung=gewaehltes_szenario["Beschreibung"],
+                            szenario=gewaehltes_szenario,
+                            ziele_2030=gewaehltes_szenario["Ziele 2030"],
+                            ziele_2045=gewaehltes_szenario["Ziele 2045"],
+                            ertragsart=ertragsart,
+                            verbrauchsprofile=gewaehltes_profil,
+                            veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
+                            konven_anteile=konven_anteile,
+                            lastprofile=lastprofile_einzel
+                        )
+                        
+                        st.session_state['letztes_szenario'] = szenario_ergebnis
+                        st.session_state['szenario_key'] = szenario_key
+                        st.session_state['jahr'] = 2045
+                        st.success(f"✅ Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
+                    else:
+                        st.info("ℹ️ Verwende gecachte Simulation (keine Parameter geändert)")
                     
                 except Exception as e:
                     st.error(f"❌ Fehler bei der Simulation: {str(e)}")
@@ -417,34 +421,47 @@ if modus == "🎯 Einzelnes Szenario":
 
             st.markdown("---")
             st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")
-            startdatum = st.text_area(
-                "Startdatum im Format TT-MM-JJJJ (z.B., 15-12-2045):",
-                value="15-12-2045",
-                help="Geben Sie das Startdatum für das Zwei-Wochen-Diagramm ein."
-            )
-            try:
-                fig2, ax2 = plt.subplots(figsize=(12, 6))
-                zweiwochendiagramm_stunden(szenario.getGesamtDF(), startdatum, ax2)
-                st.pyplot(fig2)
-                buf_zweiwochen = BytesIO()
-                fig2.savefig(buf_zweiwochen, format='png', dpi=300, bbox_inches='tight')
-                buf_zweiwochen.seek(0)
-                st.download_button(
-                    label="💾 Plot herunterladen",
-                    data=buf_zweiwochen,
-                    file_name=f"szenario_{szenario.name}_zweierwochendiagramm_stunden_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
-                    mime="image/png",
-                    on_click="ignore"
+            
+            @st.fragment
+            def render_zweiwochen_diagramm():
+                startdatum = st.text_input(
+                    "Startdatum im Format TT-MM-JJJJ (z.B., 15-12-2045):",
+                    value="15-12-2045",
+                    help="Geben Sie das Startdatum für das Zwei-Wochen-Diagramm ein.",
+                    key="startdatum_zweiwochen"
                 )
-            except Exception as e:
-                st.error(f"❌ Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
-                st.exception(e)
+                try:
+                    fig2, ax2 = plt.subplots(figsize=(12, 6))
+                    zweiwochendiagramm_stunden(szenario.getGesamtDF(), startdatum, ax2)
+                    st.pyplot(fig2)
+                    buf_zweiwochen = BytesIO()
+                    fig2.savefig(buf_zweiwochen, format='png', dpi=300, bbox_inches='tight')
+                    buf_zweiwochen.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf_zweiwochen,
+                        file_name=f"szenario_{szenario.name}_zweierwochendiagramm_stunden_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        mime="image/png",
+                        key="download_zweiwochen"
+                    )
+                except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
+                    st.exception(e)
+            
+            render_zweiwochen_diagramm()
 
-            try:
+            @st.fragment
+            def render_ladestand_diagramm():
+                startdatum_ladestand = st.text_input(
+                    "Startdatum für Ladestand (TT-MM-JJJJ):",
+                    value="15-12-2045",
+                    key="startdatum_ladestand"
+                )
+                try:
                     st.markdown("---")
                     st.markdown("### Ladestand der Speicher")
                     fig3, ax3 = plt.subplots(figsize=(12, 6))
-                    plot_liniendiagramm_ladestand(szenario.getGesamtDF(), startdatum, ax3)
+                    plot_liniendiagramm_ladestand(szenario.getGesamtDF(), startdatum_ladestand, ax3)
                     st.pyplot(fig3)
                     buf_ladestand = BytesIO()
                     fig3.savefig(buf_ladestand, format='png', dpi=300, bbox_inches='tight')
@@ -452,13 +469,15 @@ if modus == "🎯 Einzelnes Szenario":
                     st.download_button(
                         label="💾 Plot herunterladen",
                         data=buf_ladestand,
-                        file_name=f"szenario_{szenario.name}_ladestand_batteriespeicher_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        file_name=f"szenario_{szenario.name}_ladestand_batteriespeicher_ertragsart_{szenario.ertragsart}_start_{startdatum_ladestand}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        key="download_ladestand"
                     )
-            except Exception as e:
+                except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen des Ladestand-Diagramms: {str(e)}")
                     st.exception(e)
+            
+            render_ladestand_diagramm()
             
             try:
                     st.markdown("---")
@@ -472,9 +491,9 @@ if modus == "🎯 Einzelnes Szenario":
                     st.download_button(
                         label="💾 Plot herunterladen",
                         data=buf_dunkel2030,
-                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute2030_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute2030_ertragsart_{szenario.ertragsart}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        key="download_dunkel2030"
                     )
             except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-2030-Diagramms: {str(e)}")
@@ -492,9 +511,9 @@ if modus == "🎯 Einzelnes Szenario":
                     st.download_button(
                         label="💾 Plot herunterladen",
                         data=buf_dunkel2045,
-                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute2045_ertragsart_{szenario.ertragsart}_start_{startdatum}.png",
+                        file_name=f"szenario_{szenario.name}_ladestand_dunkelflaute2045_ertragsart_{szenario.ertragsart}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        key="download_dunkel2045"
                     )
             except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-2045-Diagramms: {str(e)}")
@@ -515,10 +534,11 @@ if modus == "🎯 Einzelnes Szenario":
             excel_buffer2.seek(0)
             
             st.download_button(
-                label="💾 Simulationsdaten als Excel herunterladen",
+                label="💾 Simulationsdaten als csv herunterladen",
                 data=excel_buffer2,
-                file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.csv",
+                mime="text/csv",
+                on_click="ignore"
             )
         except Exception as e:
             st.error(f"❌ Fehler beim Erstellen der Simulationsdaten-Excel: {str(e)}")

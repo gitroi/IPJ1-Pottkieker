@@ -12,12 +12,13 @@ from config import PROJECT_ROOT, DATA_DIR
 import json
 
 E_FAHRZEUG_JAHR_MWH = 2.25  # MWh pro E-Fahrzeug und Jahr
-
+WAERMEPUMPE_JAHR_MWH = 4
 # CSV-Dateien einmal am Anfang laden um Rechenleistung zu verringern
 
 #TODO: Richtigen Wert recherchieren
 #BEISPIELWERTE
 E_AUTOS_2025 = 2000000
+WAERMEPUMPEN_2025 = 1500000
 
 def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.DataFrame:
     
@@ -28,13 +29,12 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.D
     verbrauch_2045_MWh = verbrauchsprofil["Verbrauch_2045"] * 1e6
 
     if not lastprofil:
-        verbrauch_2030_MWh += verbrauchsprofil["E_Autos_2030"] * E_FAHRZEUG_JAHR_MWH
-        verbrauch_2045_MWh += verbrauchsprofil["E_Autos_2045"] * E_FAHRZEUG_JAHR_MWH
+        verbrauch_2030_MWh += ((verbrauchsprofil["E_Autos_2030"] * E_FAHRZEUG_JAHR_MWH) + (verbrauchsprofil["WP_2030"] * WAERMEPUMPE_JAHR_MWH))
+        verbrauch_2045_MWh += ((verbrauchsprofil["E_Autos_2045"] * E_FAHRZEUG_JAHR_MWH) + (verbrauchsprofil["WP_2045"] * WAERMEPUMPE_JAHR_MWH))
 
 
 
     #==== Einlesen der Daten und anpassung ====
-    # Pfad relativ zum Skript bestimmen
     verbrauchpfad = PROJECT_ROOT / "Daten" /"SMARD-Daten"/ "verbrauch_2024.csv"
 
     verbrauch_df = pd.read_csv(verbrauchpfad,
@@ -150,10 +150,18 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.D
             gesamt_df=df_gesamt_2045
         )
 
-    # lastprofil_wärmepumpe(4555, df_gesamt_2045)
+        df_gesamt_2045 = lastprofil_wärmepumpe(
+            anzahl_wärmepumpen={
+                2030: verbrauchsprofil["WP_2030"],
+                2045: verbrauchsprofil["WP_2045"]
+            },
+            gesamt_df=df_gesamt_2045
+        )
+
+    df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
+    df_gesamt_2045 = df_gesamt_2045.sort_values(by="Datum von").reset_index(drop=True)
 
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
-    df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
     if(df_gesamt_2045.isna().any().any()):
         print("Warnung: Es gibt fehlende Werte in der Verbrauchsprognose!"  )
         print(df_gesamt_2045.isna().sum())
@@ -238,21 +246,87 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
 
     return gesamt_df.drop(columns=["Jahr", "Monat", "Wochentag", "Uhrzeit", "Minute", "E-Auto Last [MWh]"])
 
-def lastprofil_wärmepumpe(anzahl_wärmepumpen: int, gesamt_df: pd.DataFrame) -> pd.DataFrame:
+def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame) -> pd.DataFrame:
     """
     Erstellt auf Basis eines Lastprofils die Lastprognose für Wärmepumpen.
-    :param anzahl_wärmepumpen: Anzahl der Wärmepumpen
+    :param anzahl_wärmepumpen: dict mit Anzahl der Wärmepumpen pro Jahr z.B. {2030: 5000000, 2045: 10000000}
     :param gesamt_df: DataFrame mit der Gesamtverbrauchsprognose
     :return: DataFrame mit der Wärmepumpen Lastprognose eingerechnet in die Gesamtverbrauchsprognose
     """
 
     df_2015 = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Wetter_2015.csv",sep=',',decimal='.')
 
-    df_2015['Datum'] = pd.to_datetime(
+    df_2015['Datum'] = (
         '2015-' + df_2015['MM'].astype(str) + '-' + 
         df_2015['DD'].astype(str) + ' ' + 
-        df_2015['HH'].astype(str) + ':00:00'
+        (df_2015['HH']-1).astype(str) + ':00'
     )
-    df_2015.set_index('Datum', inplace=True)
 
-    print(df_2015['t'].describe())
+    lastprofil = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Lastprofil_waermepumpe.csv", sep=';', decimal=',')
+    lastprofil[['Uhrzeit', 'Minute']] = lastprofil['Zeit'].str.split('-', expand=True)[0].str.split(':', expand=True).astype(int)
+
+
+    df_2015['Datum'] = pd.to_datetime(df_2015['Datum'])
+    df_2015 = df_2015.drop(columns=['RW','HW','MM','DD','HH','N','x','RF','B','D','A','E','IL','p','WR','WG'])
+
+    tages_temp = df_2015.groupby(df_2015['Datum'].dt.date)['t'].mean().reset_index()
+    tages_temp.columns = ['Datum', 'Tages_Mittel_Temp']
+    tages_temp['Datum'] = pd.to_datetime(tages_temp['Datum'])
+    tages_temp['Monat'] = tages_temp['Datum'].dt.month
+    tages_temp['Tag'] = tages_temp['Datum'].dt.day
+    
+    tages_temp['Temp_Spalte'] = tages_temp['Tages_Mittel_Temp'].clip(-14, 18).round().astype(int)
+    
+    # 29. Februar ergänzen (falls 2015 kein Schaltjahr): Nutze Werte vom 28. Februar
+    if not ((tages_temp['Monat'] == 2) & (tages_temp['Tag'] == 29)).any():
+        feb28 = tages_temp[(tages_temp['Monat'] == 2) & (tages_temp['Tag'] == 28)].copy()
+        feb28['Tag'] = 29
+        tages_temp = pd.concat([tages_temp, feb28], ignore_index=True)
+
+    tmz_summe_jahr = np.maximum(19 - tages_temp['Tages_Mittel_Temp'], 1).sum()
+    a_wp = WAERMEPUMPE_JAHR_MWH / tmz_summe_jahr
+
+    gesamt_df['Jahr'] = gesamt_df['Datum von'].dt.year
+    gesamt_df['Monat'] = gesamt_df['Datum von'].dt.month
+    gesamt_df['Tag'] = gesamt_df['Datum von'].dt.day
+    gesamt_df['Uhrzeit'] = gesamt_df['Datum von'].dt.hour
+    gesamt_df['Minute'] = gesamt_df['Datum von'].dt.minute
+    
+    gesamt_df["anzahl_wp"] = np.where(
+        gesamt_df["Jahr"] <= 2030,
+        WAERMEPUMPEN_2025 + (anzahl_wärmepumpen[2030] - WAERMEPUMPEN_2025) * (gesamt_df["Jahr"] - 2025) / (2030 - 2025),
+        anzahl_wärmepumpen[2030] + (anzahl_wärmepumpen[2045] - anzahl_wärmepumpen[2030]) * (gesamt_df["Jahr"] - 2030) / (2045 - 2030)
+    )
+
+    gesamt_df = gesamt_df.merge(
+        tages_temp[['Monat', 'Tag', 'Temp_Spalte']],
+        on=['Monat', 'Tag'],
+        how='left'
+    )
+
+    lastprofil = lastprofil.drop(columns=['Zeit'])
+    
+    lastprofil_long = lastprofil.melt(
+        id_vars=['Uhrzeit', 'Minute'], 
+        var_name='Temp_Spalte', 
+        value_name='profil_wert'
+    )
+    lastprofil_long['Temp_Spalte'] = lastprofil_long['Temp_Spalte'].astype(int)
+    
+    gesamt_df = gesamt_df.merge(
+        lastprofil_long,
+        on=['Uhrzeit', 'Minute', 'Temp_Spalte'],
+        how='left'
+    )
+    
+    gesamt_df['Wärmepumpe Last [MWh]'] = ( 
+        gesamt_df['profil_wert'] * a_wp * gesamt_df["anzahl_wp"] / 4  
+    )
+    
+    gesamt_df["Netzlast [MWh]"] += gesamt_df["Wärmepumpe Last [MWh]"]
+    
+    return gesamt_df.drop(columns=["Jahr", "Monat", "Tag", "Uhrzeit", "Minute", "Temp_Spalte","profil_wert", "anzahl_wp", "Wärmepumpe Last [MWh]"])
+
+
+
+
