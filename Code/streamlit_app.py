@@ -501,28 +501,28 @@ if modus == "🎯 Einzelnes Szenario":
                     st.exception(e)
 
 
-        # st.markdown("---")
-        # try:
-        #     excel_buffer2 = BytesIO()
-        #     gesamt = szenario.getGesamtDF().copy()
+        st.markdown("---")
+        try:
+            excel_buffer2 = BytesIO()
+            gesamt = szenario.getGesamtDF().copy()
             
-        #     # Timezone entfernen falls vorhanden
-        #     if "Datum von" in gesamt.columns:
-        #         if hasattr(gesamt["Datum von"].dtype, 'tz') and gesamt["Datum von"].dt.tz is not None:
-        #             gesamt["Datum von"] = gesamt["Datum von"].dt.tz_localize(None)
+            # Timezone entfernen falls vorhanden
+            if "Datum von" in gesamt.columns:
+                if hasattr(gesamt["Datum von"].dtype, 'tz') and gesamt["Datum von"].dt.tz is not None:
+                    gesamt["Datum von"] = gesamt["Datum von"].dt.tz_localize(None)
             
-        #     gesamt.to_excel(excel_buffer2, index=False, engine='openpyxl')
-        #     excel_buffer2.seek(0)
+            gesamt.to_csv(excel_buffer2, index=False, decimal='.', sep=';')
+            excel_buffer2.seek(0)
             
-        #     st.download_button(
-        #         label="💾 Simulationsdaten als Excel herunterladen",
-        #         data=excel_buffer2,
-        #         file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.xlsx",
-        #         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        #     )
-        # except Exception as e:
-        #     st.error(f"❌ Fehler beim Erstellen der Simulationsdaten-Excel: {str(e)}")
-        #     st.exception(e)
+            st.download_button(
+                label="💾 Simulationsdaten als Excel herunterladen",
+                data=excel_buffer2,
+                file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        except Exception as e:
+            st.error(f"❌ Fehler beim Erstellen der Simulationsdaten-Excel: {str(e)}")
+            st.exception(e)
 
         st.markdown("---")
         excel_buffer = BytesIO()

@@ -68,6 +68,14 @@ def prognose_eines_Szenarios():
         else:
             print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
     
+    while(True):
+        lastprofil_input = input("Möchten Sie die Lastprofile (E-Auto, Wärmepumpe) berücksichtigen? (ja/nein): ").lower()
+        if lastprofil_input in ["ja", "nein"]:
+            lastprofil = lastprofil_input == "ja"
+            break
+        else:
+            print("Ungültige Eingabe. Bitte geben Sie 'ja' oder 'nein' ein.")
+    
     jahr = input("Jahr für die Grafik 'Ist-Analyse' (z.B. 2026, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")
     bilder = input("Möchten Sie die Plots speichern? (ja/nein): ").lower() == "ja"
@@ -91,7 +99,8 @@ def prognose_eines_Szenarios():
             ertragsart=ertragsart,
             verbrauchsprofile=gewaehltes_profil,
             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
-            konven_anteile=konven_anteile
+            konven_anteile=konven_anteile,
+            lastprofile=lastprofil
         )
         
         #szenario_ergebnis.berechne_alle_prognosen()
@@ -127,7 +136,7 @@ def prognose_alle_Szenarien():
             print(f"Verbrauchsprofil '{verbrauch}' nicht gefunden. Bitte versuchen Sie es erneut.")
     
     while(True):
-        lastprofil_input = input("Möchten Sie das E-Auto Lastprofil berücksichtigen? (ja/nein): ").lower()
+        lastprofil_input = input("Möchten Sie die Lastprofile (E-Auto, Wärmepumpe) berücksichtigen? (ja/nein): ").lower()
         if lastprofil_input in ["ja", "nein"]:
             lastprofil = lastprofil_input == "ja"
             break

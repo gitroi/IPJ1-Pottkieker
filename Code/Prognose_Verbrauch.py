@@ -15,12 +15,6 @@ E_FAHRZEUG_JAHR_MWH = 2.25  # MWh pro E-Fahrzeug und Jahr
 
 # CSV-Dateien einmal am Anfang laden um Rechenleistung zu verringern
 
-with open(DATA_DIR / "Feste_Parameter" / "Wochenende_E_Autos.csv", "r") as f:
-    WOCHENENDE_E_AUTOS = pd.read_csv(f, sep=',',decimal='.')
-
-with open(DATA_DIR / "Feste_Parameter" / "Werktag_E_Autos.csv", "r") as f:
-    WERKTAGE_E_AUTOS = pd.read_csv(f, sep=',',decimal='.')
-
 #TODO: Richtigen Wert recherchieren
 #BEISPIELWERTE
 E_AUTOS_2025 = 2000000
@@ -146,14 +140,6 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.D
 
     df_gesamt_2045 = pd.concat([df_gesamt, prognose_2045], ignore_index=True)
     df_gesamt_2045 = df_gesamt_2045.rename(columns={"Netzlast_Prognose [MWh]": "Netzlast [MWh]"})
-
-    #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
-    df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
-    if(df_gesamt_2045.isna().any().any()):
-        print("Warnung: Es gibt fehlende Werte in der Verbrauchsprognose!"  )
-        print(df_gesamt_2045.isna().sum())
-        mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
-        print(df_gesamt_2045[mask.any(axis=1)])
     
     if lastprofil:
         df_gesamt_2045 = e_auto_Lastprofil(
@@ -163,6 +149,16 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.D
             },
             gesamt_df=df_gesamt_2045
         )
+
+    lastprofil_wärmepumpe(4555, df_gesamt_2045)
+
+    #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
+    df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
+    if(df_gesamt_2045.isna().any().any()):
+        print("Warnung: Es gibt fehlende Werte in der Verbrauchsprognose!"  )
+        print(df_gesamt_2045.isna().sum())
+        mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
+        print(df_gesamt_2045[mask.any(axis=1)])
 
     return df_gesamt_2045
 
@@ -179,18 +175,28 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
     gesamt_df["Uhrzeit"] = gesamt_df["Datum von"].dt.hour
     gesamt_df["Minute"] = gesamt_df["Datum von"].dt.minute
 
-    WOCHENENDE_E_AUTOS["Zeitstempel"] = pd.to_datetime(
-        WOCHENENDE_E_AUTOS["Zeitstempel"], format="%H:%M"
-    )
-    WOCHENENDE_E_AUTOS["Stunde"] = WOCHENENDE_E_AUTOS["Zeitstempel"].dt.hour
+    with open(DATA_DIR / "Feste_Parameter" / "Wochenende_E_Autos.csv", "r") as f:
+        wochenende_e_autos = pd.read_csv(f, sep=',',decimal='.')
 
-    WERKTAGE_E_AUTOS["Zeitstempel"] = pd.to_datetime(
-        WERKTAGE_E_AUTOS["Zeitstempel"], format="%H:%M"
-    )
-    WERKTAGE_E_AUTOS["Stunde"] = WERKTAGE_E_AUTOS["Zeitstempel"].dt.hour
+    with open(DATA_DIR / "Feste_Parameter" / "Werktag_E_Autos.csv", "r") as f:
+        werktage_e_autos = pd.read_csv(f, sep=',',decimal='.')
 
-    werktag_profil = WERKTAGE_E_AUTOS.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Werktag"})
-    wochenende_profil = WOCHENENDE_E_AUTOS.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Wochenende"})
+    if wochenende_e_autos["Zeitstempel"].str.contains("-").any():
+        wochenende_e_autos["Zeitstempel"] = wochenende_e_autos["Zeitstempel"].str.split("-").str[0]
+    wochenende_e_autos["Zeitstempel"] = pd.to_datetime(
+        wochenende_e_autos["Zeitstempel"], format="%H:%M"
+    )
+    wochenende_e_autos["Stunde"] = wochenende_e_autos["Zeitstempel"].dt.hour
+
+    if werktage_e_autos["Zeitstempel"].str.contains("-").any():
+        werktage_e_autos["Zeitstempel"] = werktage_e_autos["Zeitstempel"].str.split("-").str[0]
+    werktage_e_autos["Zeitstempel"] = pd.to_datetime(
+        werktage_e_autos["Zeitstempel"], format="%H:%M"
+    )
+    werktage_e_autos["Stunde"] = werktage_e_autos["Zeitstempel"].dt.hour
+
+    werktag_profil = werktage_e_autos.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Werktag"})
+    wochenende_profil = wochenende_e_autos.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Wochenende"})
     
     gesamt_df = gesamt_df.merge(
         werktag_profil[["Uhrzeit", "Profil_Werktag"]], 
@@ -202,6 +208,15 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
         on="Uhrzeit", 
         how="left"
     )
+    
+    # # Fehlerhaftes "s" oder andere Zeichen entfernen, falls vorhanden
+    # if gesamt_df["Profil_Werktag"].dtype == 'object':
+    #     gesamt_df["Profil_Werktag"] = gesamt_df["Profil_Werktag"].astype(str).str.replace(r'[^\d\.]', '', regex=True)
+    # if gesamt_df["Profil_Wochenende"].dtype == 'object':
+    #     gesamt_df["Profil_Wochenende"] = gesamt_df["Profil_Wochenende"].astype(str).str.replace(r'[^\d\.]', '', regex=True)
+    
+    # gesamt_df["Profil_Werktag"] = pd.to_numeric(gesamt_df["Profil_Werktag"], errors='coerce')
+    # gesamt_df["Profil_Wochenende"] = pd.to_numeric(gesamt_df["Profil_Wochenende"], errors='coerce')
     
     gesamt_df["basis_last"] = np.where(
         gesamt_df["Wochentag"] >= 5, 
@@ -222,3 +237,22 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
     gesamt_df["Netzlast [MWh]"] += gesamt_df["E-Auto Last [MWh]"]
 
     return gesamt_df.drop(columns=["Jahr", "Monat", "Wochentag", "Uhrzeit", "Minute", "E-Auto Last [MWh]"])
+
+def lastprofil_wärmepumpe(anzahl_wärmepumpen: int, gesamt_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Erstellt auf Basis eines Lastprofils die Lastprognose für Wärmepumpen.
+    :param anzahl_wärmepumpen: Anzahl der Wärmepumpen
+    :param gesamt_df: DataFrame mit der Gesamtverbrauchsprognose
+    :return: DataFrame mit der Wärmepumpen Lastprognose eingerechnet in die Gesamtverbrauchsprognose
+    """
+
+    df_2015 = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Wetter_2015.csv",sep=',',decimal='.')
+
+    df_2015['Datum'] = pd.to_datetime(
+        '2015-' + df_2015['MM'].astype(str) + '-' + 
+        df_2015['DD'].astype(str) + ' ' + 
+        df_2015['HH'].astype(str) + ':00:00'
+    )
+    df_2015.set_index('Datum', inplace=True)
+
+    print(df_2015['t'].describe())
