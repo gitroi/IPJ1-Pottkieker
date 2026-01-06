@@ -150,7 +150,7 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.D
             gesamt_df=df_gesamt_2045
         )
 
-    lastprofil_wärmepumpe(4555, df_gesamt_2045)
+    # lastprofil_wärmepumpe(4555, df_gesamt_2045)
 
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
