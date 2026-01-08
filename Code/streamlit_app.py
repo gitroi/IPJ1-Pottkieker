@@ -1040,7 +1040,7 @@ elif modus == "➕ Szenario hinzufügen":
                     help="Gesamtverbrauch im Jahr 2045 in Terawattstunden"
                 )
             
-            st.markdown("### 🔥 Wärmepumpen")
+            st.markdown("### E-Auto Annahmen")
             col3, col4 = st.columns(2)
             with col3:
                 e_autos_2030 = st.number_input(
@@ -1059,6 +1059,25 @@ elif modus == "➕ Szenario hinzufügen":
                     help="Anzahl der E-Autos im Jahr 2045"
                 )
             
+            st.markdown("### Wärmepumpen Annahmen")
+            col5, col6 = st.columns(2)
+            with col5:
+                wp_2030 = st.number_input(
+                    "Wärmepumpen 2030 (Anzahl)*", 
+                    min_value=0, 
+                    value=6000000, 
+                    step=500000,
+                    help="Anzahl der Wärmepumpen im Jahr 2030"
+                )
+            with col6:
+                wp_2045 = st.number_input(
+                    "Wärmepumpen 2045 (Anzahl)*", 
+                    min_value=0, 
+                    value=12000000, 
+                    step=500000,
+                    help="Anzahl der Wärmepumpen im Jahr 2045"
+                )
+            
             st.markdown("---")
             profil_submitted = st.form_submit_button("💾 Verbrauchsprofil speichern", type="primary", width='stretch')
             
@@ -1072,7 +1091,9 @@ elif modus == "➕ Szenario hinzufügen":
                         "Verbrauch_2030": verbrauch_2030,
                         "Verbrauch_2045": verbrauch_2045,
                         "E_Autos_2030": e_autos_2030,
-                        "E_Autos_2045": e_autos_2045
+                        "E_Autos_2045": e_autos_2045,
+                        "WP_2030": wp_2030,
+                        "WP_2045": wp_2045
                     }
                     
                     try:
