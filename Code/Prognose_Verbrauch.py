@@ -13,7 +13,6 @@ import json
 
 E_FAHRZEUG_JAHR_MWH = 2.25  # MWh pro E-Fahrzeug und Jahr
 WAERMEPUMPE_JAHR_MWH = 4
-# CSV-Dateien einmal am Anfang laden um Rechenleistung zu verringern
 
 #TODO: Richtigen Wert recherchieren
 #BEISPIELWERTE
@@ -216,15 +215,6 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame) -> pd.DataFra
         on="Uhrzeit", 
         how="left"
     )
-    
-    # # Fehlerhaftes "s" oder andere Zeichen entfernen, falls vorhanden
-    # if gesamt_df["Profil_Werktag"].dtype == 'object':
-    #     gesamt_df["Profil_Werktag"] = gesamt_df["Profil_Werktag"].astype(str).str.replace(r'[^\d\.]', '', regex=True)
-    # if gesamt_df["Profil_Wochenende"].dtype == 'object':
-    #     gesamt_df["Profil_Wochenende"] = gesamt_df["Profil_Wochenende"].astype(str).str.replace(r'[^\d\.]', '', regex=True)
-    
-    # gesamt_df["Profil_Werktag"] = pd.to_numeric(gesamt_df["Profil_Werktag"], errors='coerce')
-    # gesamt_df["Profil_Wochenende"] = pd.to_numeric(gesamt_df["Profil_Wochenende"], errors='coerce')
     
     gesamt_df["basis_last"] = np.where(
         gesamt_df["Wochentag"] >= 5, 

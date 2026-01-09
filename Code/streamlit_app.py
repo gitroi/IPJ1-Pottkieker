@@ -121,7 +121,7 @@ with st.sidebar:
     st.header("📊 Navigation")
     modus = st.radio(
         "Simulationsmodus wählen:",
-        ["🎯 Einzelnes Szenario", "📈 Szenarien vergleichen", "➕ Szenario hinzufügen","ℹ️ Über das Projekt"],
+        ["🎯 Einzelnes Szenario", "📈 Szenarien vergleichen", "➕ Szenario hinzufügen/Verändern","ℹ️ Über das Projekt"],
         index=0
     )
     
@@ -752,11 +752,11 @@ elif modus == "📈 Szenarien vergleichen":
 # Modus 3: Szenario hinzufügen
 # ============================================================================
 
-elif modus == "➕ Szenario hinzufügen":
-    st.header("➕ Szenario hinzufügen")
-    st.info("Hier können Sie neue Szenarien und Verbrauchsprofile zur Simulation hinzufügen.")
+elif modus == "➕ Szenario hinzufügen/Verändern":
+    st.header("➕ Szenario hinzufügen/Verändern")
+    st.info("Hier können Sie neue Szenarien und Verbrauchsprofile zur Simulation hinzufügen oder verändern. Wird Online nur Lokal gespeichert.")
     
-    tab1, tab2 = st.tabs(["🎯 Neues Szenario", "📊 Neues Verbrauchsprofil"])
+    tab1, tab2, tab3 = st.tabs(["🎯 Neues Szenario", "📊 Neues Verbrauchsprofil", "✏️ Szenario verändern"])
     
     # ========================================================================
     # TAB 1: NEUES SZENARIO HINZUFÜGEN
@@ -1097,27 +1097,21 @@ elif modus == "➕ Szenario hinzufügen":
                     }
                     
                     try:
-                        # JSON-Datei laden
                         with open(verbrauchsprofile_pfad, 'r', encoding='utf-8') as f:
                             alle_profile = json.load(f)
                         
-                        # Prüfen ob Name bereits existiert
                         if any(p["Name"] == profil_name for p in alle_profile):
                             st.error(f"❌ Ein Verbrauchsprofil mit dem Namen '{profil_name}' existiert bereits!")
                         else:
-                            # Neues Profil hinzufügen
                             alle_profile.append(neues_profil)
                             
-                            # JSON-Datei speichern
                             with open(verbrauchsprofile_pfad, 'w', encoding='utf-8') as f:
                                 json.dump(alle_profile, f, indent=4, ensure_ascii=False)
                             
-                            # Cache invalidieren
                             st.cache_data.clear()
                             
                             st.success(f"✅ Verbrauchsprofil '{profil_name}' erfolgreich gespeichert!")
                             
-                            # Git-Automatisierung
                             with st.spinner("📤 Speichere ins Repository..."):
                                 success, message = git_commit_and_push(
                                     verbrauchsprofile_pfad.relative_to(PROJECT_ROOT),
@@ -1135,7 +1129,241 @@ elif modus == "➕ Szenario hinzufügen":
                     except Exception as e:
                         st.error(f"❌ Fehler beim Speichern: {str(e)}")
                         st.exception(e)
+    # ========================================================================
+    # TAB 3: SZENARIO VERÄNDERN
+    # ========================================================================
+    with tab3:
+        st.subheader("✏️ Szenario verändern")
+        st.info("Wählen Sie ein Szenario aus, um dessen Daten zu bearbeiten.")
+        
+        szenario_namen = [szen["Name"] for szen in szenarien]
+        ausgewähltes_szenario_name = st.selectbox(
+            "Szenario auswählen",
+            szenario_namen
+        )
+        
+        if ausgewähltes_szenario_name:
+            szenario_to_edit = get_scenario_by_name(szenarien, ausgewähltes_szenario_name)
+            
+            if szenario_to_edit:
+                st.markdown("### Aktuelle Beschreibung")
+                st.write(szenario_to_edit["Beschreibung"])
+                
+                neue_beschreibung = st.text_area(
+                    "Neue Beschreibung eingeben",
+                    value=szenario_to_edit["Beschreibung"]
+                )
 
+                st.markdown("---")
+                st.markdown("### 🎯 Ziele 2030")
+                st.markdown("#### Ausbaustand Erneuerbare Energien (in GW)")
+                
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    pv_dach_2030 = st.number_input("PV Dach", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["pv_dach"]), 2), step=1.0, key="pv_dach_2030_edit")
+                    pv_frei_2030 = st.number_input("PV Frei", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["pv_frei"]), 2), step=1.0, key="pv_frei_2030_edit")
+                with col2:
+                    wind_onshore_2030 = st.number_input("Wind Onshore", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["wind_onshore"]), 2), step=1.0, key="wind_onshore_2030_edit")
+                    wind_offshore_2030 = st.number_input("Wind Offshore", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["wind_offshore"]), 2), step=1.0, key="wind_offshore_2030_edit")
+                with col3:
+                    biomasse_2030 = st.number_input("Biomasse", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["biomasse"]), 2), step=0.1, key="biomasse_2030_edit")
+                    wasser_2030 = st.number_input("Wasser", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["wasser"]), 2), step=0.1, key="wasser_2030_edit")
+                with col4:
+                    sonstige_2030 = st.number_input("Sonstige", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau EE"]["sonstige"]), 2), step=0.1, key="sonstige_2030_edit")
+                
+                st.markdown("#### Ausbau Speicher 2030 (in GWh)")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    batteriespeicher_2030 = st.number_input("Batteriespeicher", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau Speicher"]["batteriespeicher"]), 2), step=1.0, key="batt_2030_edit")
+                with col2:
+                    wasserstoff_2030 = st.number_input("Wasserstoff", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau Speicher"]["wasserstoff"]), 2), step=1.0, key="h2_2030_edit")
+                with col3:
+                    pumpspeicher_2030 = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau Speicher"]["pumpspeicher"]), 2), step=1.0, key="pump_2030_edit")
+                
+                st.markdown("---")
+                st.markdown("### 🎯 Ziele 2045")
+                st.markdown("#### Ausbaustand Erneuerbare Energien (in GW)")
+                
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    pv_dach_2045 = st.number_input("PV Dach", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["pv_dach"]), 2), step=1.0, key="pv_dach_2045_edit")
+                    pv_frei_2045 = st.number_input("PV Frei", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["pv_frei"]), 2), step=1.0, key="pv_frei_2045_edit")
+                with col2:
+                    wind_onshore_2045 = st.number_input("Wind Onshore", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["wind_onshore"]), 2), step=1.0, key="wind_onshore_2045_edit")
+                    wind_offshore_2045 = st.number_input("Wind Offshore", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["wind_offshore"]), 2), step=1.0, key="wind_offshore_2045_edit")
+                with col3:
+                    biomasse_2045 = st.number_input("Biomasse", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["biomasse"]), 2), step=0.1, key="biomasse_2045_edit")
+                    wasser_2045 = st.number_input("Wasser", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["wasser"]), 2), step=0.1, key="wasser_2045_edit")
+                with col4:
+                    sonstige_2045 = st.number_input("Sonstige", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau EE"]["sonstige"]), 2), step=0.1, key="sonstige_2045_edit")
+                
+                st.markdown("#### Ausbau Speicher 2045 (in GWh)")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    batteriespeicher_2045 = st.number_input("Batteriespeicher", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau Speicher"]["batteriespeicher"]), 2), step=10.0, key="batt_2045_edit")
+                with col2:
+                    wasserstoff_2045 = st.number_input("Wasserstoff", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau Speicher"]["wasserstoff"]), 2), step=10.0, key="h2_2045_edit")
+                with col3:
+                    pumpspeicher_2045 = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau Speicher"]["pumpspeicher"]), 2), step=10.0, key="pump_2045_edit")
+                
+                st.markdown("---")
+                st.markdown("### 🔧 Veränderungsfaktoren")
+                st.markdown("#### Erzeugung")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    v_pv_dach = st.number_input("PV Dach", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["pv_dach"]), 2), step=0.1, key="v_pv_dach_edit")
+                    v_pv_frei = st.number_input("PV Frei", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["pv_frei"]), 2), step=0.1, key="v_pv_frei_edit")
+                with col2:
+                    v_wind_onshore = st.number_input("Wind Onshore", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["wind_onshore"]), 2), step=0.1, key="v_wind_on_edit")
+                    v_wind_offshore = st.number_input("Wind Offshore", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["wind_offshore"]), 2), step=0.1, key="v_wind_off_edit")
+                with col3:
+                    v_biomasse = st.number_input("Biomasse", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["biomasse"]), 2), step=0.1, key="v_biomasse_edit")
+                    v_wasser = st.number_input("Wasser", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["wasser"]), 2), step=0.1, key="v_wasser_edit")
+                with col4:
+                    v_sonstige = st.number_input("Sonstige", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Erzeugung"]["sonstige"]), 2), step=0.1, key="v_sonstige_edit")
+                
+                st.markdown("#### CAPEX EE")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    c_pv_dach = st.number_input("PV Dach", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["pv_dach"]), 2), step=0.1, key="c_pv_dach_edit")
+                    c_pv_frei = st.number_input("PV Frei", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["pv_frei"]), 2), step=0.1, key="c_pv_frei_edit")
+                with col2:
+                    c_wind_onshore = st.number_input("Wind Onshore", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["wind_onshore"]), 2), step=0.1, key="c_wind_on_edit")
+                    c_wind_offshore = st.number_input("Wind Offshore", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["wind_offshore"]), 2), step=0.1, key="c_wind_off_edit")
+                with col3:
+                    c_biomasse = st.number_input("Biomasse", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["biomasse"]), 2), step=0.1, key="c_biomasse_edit")
+                    c_wasser = st.number_input("Wasser", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["wasser"]), 2), step=0.1, key="c_wasser_edit")
+                with col4:
+                    c_sonstige = st.number_input("Sonstige", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_EE"]["sonstige"]), 2), step=0.1, key="c_sonstige_edit")
+                
+                st.markdown("#### OPEX EE")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    o_pv_dach = st.number_input("PV Dach", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["pv_dach"]), 2), step=0.1, key="o_pv_dach_edit")
+                    o_pv_frei = st.number_input("PV Frei", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["pv_frei"]), 2), step=0.1, key="o_pv_frei_edit")
+                with col2:
+                    o_wind_onshore = st.number_input("Wind Onshore", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["wind_onshore"]), 2), step=0.1, key="o_wind_on_edit")
+                    o_wind_offshore = st.number_input("Wind Offshore", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["wind_offshore"]), 2), step=0.1, key="o_wind_off_edit")
+                with col3:
+                    o_biomasse = st.number_input("Biomasse", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["biomasse"]), 2), step=0.1, key="o_biomasse_edit")
+                    o_wasser = st.number_input("Wasser", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["wasser"]), 2), step=0.1, key="o_wasser_edit")
+                with col4:
+                    o_sonstige = st.number_input("Sonstige", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_EE"]["sonstige"]), 2), step=0.1, key="o_sonstige_edit")
+                
+                st.markdown("#### CAPEX Speicher")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    cs_batt = st.number_input("Batteriespeicher", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_Speicher"]["batteriespeicher"]), 2), step=0.1, key="cs_batt_edit")
+                with col2:
+                    cs_h2 = st.number_input("Wasserstoff", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_Speicher"]["wasserstoff"]), 2), step=0.1, key="cs_h2_edit")
+                with col3:
+                    cs_pump = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Capex_Speicher"]["pumpspeicher"]), 2), step=0.1, key="cs_pump_edit")
+                
+                st.markdown("#### OPEX Speicher")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    os_batt = st.number_input("Batteriespeicher", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_Speicher"]["batteriespeicher"]), 2), step=0.1, key="os_batt_edit")
+                with col2:
+                    os_h2 = st.number_input("Wasserstoff", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_Speicher"]["wasserstoff"]), 2), step=0.1, key="os_h2_edit")
+                with col3:
+                    os_pump = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_Speicher"]["pumpspeicher"]), 2), step=0.1, key="os_pump_edit")
+                
+                if st.button("💾 Änderungen speichern", type="primary", width='stretch'):
+                    try:
+                        with open(szenarien_pfad, 'r', encoding='utf-8') as f:
+                            alle_szenarien = json.load(f)
+                        
+                        for s in alle_szenarien:
+                            if s["Name"] == ausgewähltes_szenario_name:
+                                s["Beschreibung"] = neue_beschreibung
+                                
+                                s["Ziele 2030"]["Ausbau EE"]["pv_dach"] = pv_dach_2030
+                                s["Ziele 2030"]["Ausbau EE"]["pv_frei"] = pv_frei_2030
+                                s["Ziele 2030"]["Ausbau EE"]["wind_onshore"] = wind_onshore_2030
+                                s["Ziele 2030"]["Ausbau EE"]["wind_offshore"] = wind_offshore_2030
+                                s["Ziele 2030"]["Ausbau EE"]["biomasse"] = biomasse_2030
+                                s["Ziele 2030"]["Ausbau EE"]["wasser"] = wasser_2030
+                                s["Ziele 2030"]["Ausbau EE"]["sonstige"] = sonstige_2030
+                                
+                                s["Ziele 2030"]["Ausbau Speicher"]["batteriespeicher"] = batteriespeicher_2030
+                                s["Ziele 2030"]["Ausbau Speicher"]["wasserstoff"] = wasserstoff_2030
+                                s["Ziele 2030"]["Ausbau Speicher"]["pumpspeicher"] = pumpspeicher_2030
+                                
+                                # Ziele 2045 aktualisieren
+                                s["Ziele 2045"]["Ausbau EE"]["pv_dach"] = pv_dach_2045
+                                s["Ziele 2045"]["Ausbau EE"]["pv_frei"] = pv_frei_2045
+                                s["Ziele 2045"]["Ausbau EE"]["wind_onshore"] = wind_onshore_2045
+                                s["Ziele 2045"]["Ausbau EE"]["wind_offshore"] = wind_offshore_2045
+                                s["Ziele 2045"]["Ausbau EE"]["biomasse"] = biomasse_2045
+                                s["Ziele 2045"]["Ausbau EE"]["wasser"] = wasser_2045
+                                s["Ziele 2045"]["Ausbau EE"]["sonstige"] = sonstige_2045
+                                
+                                s["Ziele 2045"]["Ausbau Speicher"]["batteriespeicher"] = batteriespeicher_2045
+                                s["Ziele 2045"]["Ausbau Speicher"]["wasserstoff"] = wasserstoff_2045
+                                s["Ziele 2045"]["Ausbau Speicher"]["pumpspeicher"] = pumpspeicher_2045
+                                
+                                # Veränderungsfaktoren Erzeugung aktualisieren
+                                s["Veränderungsfaktoren"]["Erzeugung"]["pv_dach"] = v_pv_dach
+                                s["Veränderungsfaktoren"]["Erzeugung"]["pv_frei"] = v_pv_frei
+                                s["Veränderungsfaktoren"]["Erzeugung"]["wind_onshore"] = v_wind_onshore
+                                s["Veränderungsfaktoren"]["Erzeugung"]["wind_offshore"] = v_wind_offshore
+                                s["Veränderungsfaktoren"]["Erzeugung"]["biomasse"] = v_biomasse
+                                s["Veränderungsfaktoren"]["Erzeugung"]["wasser"] = v_wasser
+                                s["Veränderungsfaktoren"]["Erzeugung"]["sonstige"] = v_sonstige
+                                
+                                # CAPEX EE aktualisieren
+                                s["Veränderungsfaktoren"]["Capex_EE"]["pv_dach"] = c_pv_dach
+                                s["Veränderungsfaktoren"]["Capex_EE"]["pv_frei"] = c_pv_frei
+                                s["Veränderungsfaktoren"]["Capex_EE"]["wind_onshore"] = c_wind_onshore
+                                s["Veränderungsfaktoren"]["Capex_EE"]["wind_offshore"] = c_wind_offshore
+                                s["Veränderungsfaktoren"]["Capex_EE"]["biomasse"] = c_biomasse
+                                s["Veränderungsfaktoren"]["Capex_EE"]["wasser"] = c_wasser
+                                s["Veränderungsfaktoren"]["Capex_EE"]["sonstige"] = c_sonstige
+                                
+                                # OPEX EE aktualisieren
+                                s["Veränderungsfaktoren"]["Opex_EE"]["pv_dach"] = o_pv_dach
+                                s["Veränderungsfaktoren"]["Opex_EE"]["pv_frei"] = o_pv_frei
+                                s["Veränderungsfaktoren"]["Opex_EE"]["wind_onshore"] = o_wind_onshore
+                                s["Veränderungsfaktoren"]["Opex_EE"]["wind_offshore"] = o_wind_offshore
+                                s["Veränderungsfaktoren"]["Opex_EE"]["biomasse"] = o_biomasse
+                                s["Veränderungsfaktoren"]["Opex_EE"]["wasser"] = o_wasser
+                                s["Veränderungsfaktoren"]["Opex_EE"]["sonstige"] = o_sonstige
+                                
+                                # CAPEX Speicher aktualisieren
+                                s["Veränderungsfaktoren"]["Capex_Speicher"]["batteriespeicher"] = cs_batt
+                                s["Veränderungsfaktoren"]["Capex_Speicher"]["wasserstoff"] = cs_h2
+                                s["Veränderungsfaktoren"]["Capex_Speicher"]["pumpspeicher"] = cs_pump
+                                
+                                # OPEX Speicher aktualisieren
+                                s["Veränderungsfaktoren"]["Opex_Speicher"]["batteriespeicher"] = os_batt
+                                s["Veränderungsfaktoren"]["Opex_Speicher"]["wasserstoff"] = os_h2
+                                s["Veränderungsfaktoren"]["Opex_Speicher"]["pumpspeicher"] = os_pump
+                                
+                                break
+                        
+                        with open(szenarien_pfad, 'w', encoding='utf-8') as f:
+                            json.dump(alle_szenarien, f, indent=4, ensure_ascii=False)
+                        
+                        st.cache_data.clear()
+                        
+                        st.success(f"✅ Szenario '{ausgewähltes_szenario_name}' erfolgreich aktualisiert!")
+                        
+                        with st.spinner("📤 Speichere ins Repository..."):
+                            success, message = git_commit_and_push(
+                                szenarien_pfad.relative_to(PROJECT_ROOT),
+                                f"Szenario verändert: {ausgewähltes_szenario_name}"
+                            )
+                            if success:
+                                st.success(f"✅ {message}")
+                            else:
+                                st.warning(f"⚠️ Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
+                        
+                        st.balloons()
+                        st.info("🔄 Seite wird neu geladen, um die Änderungen zu speichern")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Fehler beim Speichern: {str(e)}")
+                        st.exception(e)
 
 
 # ============================================================================

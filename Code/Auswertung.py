@@ -30,7 +30,7 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
 
     gesamt["Jahr"] = gesamt["Datum von"].dt.year
 
-    end_df['Benötigte Energie aus Speichern [TWh]'] = (gesamt.groupby('Jahr')['Energie aus Speicher [MWh]'].sum() / 1e6).round(2).values
+    end_df['Energie aus Speichern [TWh]'] = (gesamt.groupby('Jahr')['Energie aus Speicher [MWh]'].sum() / 1e6).round(2).values
     end_df['Erzeugung Erneuerbare im Jahr [TWh]'] = (gesamt.groupby('Jahr')['Erneuerbare [MWh]'].sum() / 1e6).round(2).values
     end_df['Verbrauch [TWh]'] = (gesamt.groupby('Jahr')['Netzlast [MWh]'].sum() / 1e6).round(2).values
 
