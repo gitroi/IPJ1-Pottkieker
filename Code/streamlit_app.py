@@ -397,27 +397,33 @@ if modus == "🎯 Einzelnes Szenario":
 
             st.subheader("📈 Verlaufsdarstellung")
             st.markdown("### Verbrauch & Erzeugung im Jahr")
-            jahr_auswertung = st.slider(
-                "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1
-            )
-
-            try:
-                fig1, ax1 = plt.subplots(figsize=(12, 6))
-                verbrauch_jahr(szenario.getGesamtDF(), jahr_auswertung if jahr_auswertung else 2045, ax1)
-                st.pyplot(fig1)
-                buf_auswertung = BytesIO()
-                fig1.savefig(buf_auswertung, format='png', dpi=300, bbox_inches='tight')
-                buf_auswertung.seek(0)
-                st.download_button(
-                    label="💾 Plot herunterladen",
-                    data=buf_auswertung,
-                    file_name=f"szenario_{szenario.name}_zweierwochendiagramm_ertragsart_{szenario.ertragsart}_jahr_{jahr if jahr else 'alle'}.png",
-                    mime="image/png",
-                    on_click="ignore"
+            
+            @st.fragment
+            def render_verbrauch_jahr():
+                jahr_auswertung = st.slider(
+                    "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1,
+                    key="jahr_auswertung_slider"
                 )
-            except Exception as e:
-                st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
-                st.exception(e)    
+
+                try:
+                    fig1, ax1 = plt.subplots(figsize=(12, 6))
+                    verbrauch_jahr(szenario.getGesamtDF(), jahr_auswertung if jahr_auswertung else 2045, ax1)
+                    st.pyplot(fig1)
+                    buf_auswertung = BytesIO()
+                    fig1.savefig(buf_auswertung, format='png', dpi=300, bbox_inches='tight')
+                    buf_auswertung.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf_auswertung,
+                        file_name=f"szenario_{szenario.name}_verbrauch_jahr_ertragsart_{szenario.ertragsart}_jahr_{jahr_auswertung}.png",
+                        mime="image/png",
+                        key="download_verbrauch_jahr"
+                    )
+                except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
+                    st.exception(e)
+            
+            render_verbrauch_jahr()    
 
             st.markdown("---")
             st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")

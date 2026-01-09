@@ -611,3 +611,27 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     ax.set_ylabel('Energie [GWh]')
     ax.legend()
     ax.grid(True)
+
+# def Jahresdiagramm_Speicherladung(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
+#     """
+#     Erstellt ein Liniendiagramm des durchschnittlichen täglichen Ladestands der Speicher für ein bestimmtes Jahr.
+    
+#     Args:
+#         gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
+#         jahr (int): Das Jahr für die Analyse.
+#         ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
+#     """
+#     if not isinstance(gesamt.index, pd.DatetimeIndex):
+#         if 'Datum von' in gesamt.columns:
+#             gesamt = gesamt.set_index('Datum von')
+#         else:
+#             raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein oder eine 'Datum von' Spalte enthalten")
+    
+#     df_jahr = gesamt[gesamt.index.year == jahr]
+#     if df_jahr.empty:
+#         raise ValueError(f"Keine Daten für das Jahr {jahr} vorhanden.")
+    
+#     df_jahr = df_jahr.resample('W').sum()
+
+#     ax.stackplot(df_jahr.index,
+#                  df_jahr)
