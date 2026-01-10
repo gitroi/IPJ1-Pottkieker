@@ -291,7 +291,7 @@ if modus == "🎯 Einzelnes Szenario":
             if ergebnisse is not None and top10_fehlenergie is not None:
                 try:         
                     stromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
-                    gesamtkosten = ergebnisse["Gesamtkosten_EE_und_Speicher [Mrd. €]"].sum()   
+                    gesamtkosten = ergebnisse["Gesamtkosten Gesamt [Mrd. €]"].sum()   
                     st.header("Jahresübersicht")
                     st.dataframe(ergebnisse, width='stretch')
                     st.header("10 Viertelstunden mit größtem Energie-Defizit")
@@ -304,10 +304,12 @@ if modus == "🎯 Einzelnes Szenario":
 
             if szenario.konventionelle:
                 try:
+                    anteil_2030 = ergebnisse[ergebnisse["Jahr"]==2030]["Anteil mit Speicher mit 100% [%]"].values[0]
+                    anteil_2045 = ergebnisse[ergebnisse["Jahr"]==2045]["Anteil mit Speicher mit 100% [%]"].values[0]
+                    bestvalue = 1000 / ((gesamtkosten/1e3) * (1 + 10 * (max(0, 80 - anteil_2030) / 2)**2 + 50 * (max(0, 100 - anteil_2045) / 2)**2))
                     konv = szenario.konventionelle
-                    wert2030 = konv[2030]["Energie"]/1e3
                     wert2045 = konv[2045]["Energie"]/1e3
-                    col3.metric("Konv. Energie 2030", f"{wert2030:.1f} GWh")
+                    col3.metric("Bestvalue", f"{bestvalue:.4f}")
                     col4.metric("Konv. Energie 2045", f"{wert2045:.1f} GWh")
                 except Exception as e:
                     st.warning(f"Fehler bei konventionellen Daten: {str(e)}")

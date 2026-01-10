@@ -90,6 +90,18 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
             kosten_opex = gesamt.groupby('Jahr')[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in gesamt.columns else 0
             end_df[f"Gesamtkosten {konv_typ} [Mrd. €]"] = ((kosten_capex + kosten_opex) / 1e9).round(2).values
 
+    gesamtkosten_konventionelle_spalten = [col for col in end_df.columns if col.startswith("Gesamtkosten") and any(typ in col for typ in konventionelle_typen)]
+    if gesamtkosten_konventionelle_spalten:
+        end_df["Gesamtkosten Konventionelle [Mrd. €]"] = end_df[gesamtkosten_konventionelle_spalten].sum(axis=1).round(2)
+    else:
+        end_df["Gesamtkosten Konventionelle [Mrd. €]"] = 0.0
+
+    end_df["Gesamtkosten Gesamt [Mrd. €]"] = (
+        end_df["Gesamtkosten_EE [Mrd. €]"] + 
+        end_df["Gesamtkosten_Speicher [Mrd. €]"] + 
+        end_df["Gesamtkosten Konventionelle [Mrd. €]"]
+    ).round(2)
+
     return end_df
 
 def konventionelle_Leistung_Energie(erzeugung: pd.DataFrame) -> dict:
