@@ -8,7 +8,7 @@
                 "pv_frei": 90.0,
                 "wind_onshore": 115.0,
                 "wind_offshore": 30.0,
-                "biomasse": 10.999999999999996,
+                "biomasse": 11.0,
                 "wasser": 6.0,
                 "sonstige": 0.1
             },
@@ -20,11 +20,11 @@
         },
         "Ziele 2045": {
             "Ausbau EE": {
-                "pv_dach": 450.0,
-                "pv_frei": 250.0,
-                "wind_onshore": 300.0,
-                "wind_offshore": 150.0,
-                "biomasse": 40.0,
+                "pv_dach": 300.0,
+                "pv_frei": 169.0,
+                "wind_onshore": 180.0,
+                "wind_offshore": 73.0,
+                "biomasse": 12.0,
                 "wasser": 6.0,
                 "sonstige": 0.1
             },
