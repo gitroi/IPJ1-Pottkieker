@@ -304,10 +304,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     df_gesamtVerlauf["Fehlende Energie [MWh]"] = fehl_energie
 
     if(df_gesamtVerlauf.isna().any().any()):
-        print("Warnung: Es gibt fehlende Werte in der Speicherprognose!")
-        print(df_gesamtVerlauf.isna().sum())
-        mask = df_gesamtVerlauf.isna() | df_gesamtVerlauf.isin([np.inf, -np.inf])
-        print(df_gesamtVerlauf[mask.any(axis=1)])
+        raise ValueError("Fehlende Werte nach Speicherprognose entdeckt.")
 
     # Debug-Code
     # df_gesamtVerlauf.to_csv(DATA_DIR / 'Output' / 'debug_gesamtverlauf_neu.csv', index=False, sep=';', decimal=',',date_format='%d.%m.%Y %H:%M')

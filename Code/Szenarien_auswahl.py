@@ -86,7 +86,7 @@ def prognose_eines_Szenarios():
     if gewaehltes_szenario:
         # Konventionelle Anteile aus Szenario laden oder Standardwerte verwenden
         konven_anteile = gewaehltes_szenario.get("Konventionelle Anteile", {
-            "2030": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige": 0.1, "importe": 0.1},
+            "2038": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige": 0.1, "importe": 0.1},
             "2045": {"braun": 0.0, "erdgas": 0.6, "stein": 0.0, "sonstige": 0.2, "importe": 0.2}
         })
         

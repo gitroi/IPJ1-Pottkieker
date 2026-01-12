@@ -247,9 +247,11 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
     })
 
     if(prognose_export.isna().any().any()):
-        print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
-        print(prognose_export.isna().sum())
-        mask = prognose_export.isna() | prognose_export.isin([np.inf, -np.inf])
-        print(prognose_export[mask.any(axis=1)])
+        raise ValueError("Fehlende Werte in der Erzeugungsprognose entdeckt.")
+    
+        # print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
+        # print(prognose_export.isna().sum())
+        # mask = prognose_export.isna() | prognose_export.isin([np.inf, -np.inf])
+        # print(prognose_export[mask.any(axis=1)])
 
     return prognose_export

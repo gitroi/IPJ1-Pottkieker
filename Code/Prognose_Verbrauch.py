@@ -162,10 +162,7 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool = True) -> pd.D
 
     #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     if(df_gesamt_2045.isna().any().any()):
-        print("Warnung: Es gibt fehlende Werte in der Verbrauchsprognose!"  )
-        print(df_gesamt_2045.isna().sum())
-        mask = df_gesamt_2045.isna() | df_gesamt_2045.isin([np.inf, -np.inf])
-        print(df_gesamt_2045[mask.any(axis=1)])
+        raise ValueError("Fehlende Werte in der Verbrauchsprognose entdeckt.")
 
     return df_gesamt_2045
 

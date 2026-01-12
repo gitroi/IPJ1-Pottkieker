@@ -176,24 +176,24 @@ if modus == "🎯 Einzelnes Szenario":
     st.markdown("### ⚡ Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
     
-    with st.expander("Anteile 2030 konfigurieren", expanded=False):
+    with st.expander("Anteile 2038 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            braun_2030 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="sim_braun_2030")
+            braun_2038 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="sim_braun_2038")
         with col2:
-            erdgas_2030 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.4, step=0.05, key="sim_erdgas_2030")
+            erdgas_2038 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.4, step=0.05, key="sim_erdgas_2038")
         with col3:
-            stein_2030 = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="sim_stein_2030")
+            stein_2038 = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="sim_stein_2038")
         with col4:
-            sonstige_konv_2030 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_sonst_konv_2030")
+            sonstige_konv_2038 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_sonst_konv_2038")
         with col5:
-            importe_2030 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_importe_2030")
+            importe_2038 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_importe_2038")
         
-        summe_2030 = braun_2030 + erdgas_2030 + stein_2030 + sonstige_konv_2030 + importe_2030
-        if abs(summe_2030 - 1.0) > 0.01:
-            st.warning(f"⚠️ Summe 2030: {summe_2030:.2f} (sollte 1.0 sein)")
+        summe_2038 = braun_2038 + erdgas_2038 + stein_2038 + sonstige_konv_2038 + importe_2038
+        if abs(summe_2038 - 1.0) > 0.01:
+            st.warning(f"⚠️ Summe 2038: {summe_2038:.2f} (sollte 1.0 sein)")
         else:
-            st.success(f"✓ Summe 2030: {summe_2030:.2f}")
+            st.success(f"✓ Summe 2038: {summe_2038:.2f}")
     
     with st.expander("Anteile 2045 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -229,12 +229,12 @@ if modus == "🎯 Einzelnes Szenario":
                 try:
                     # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
-                        "2030": {
-                            "braun": braun_2030,
-                            "erdgas": erdgas_2030,
-                            "stein": stein_2030,
-                            "sonstige": sonstige_konv_2030,
-                            "importe": importe_2030
+                        "2038": {
+                            "braun": braun_2038,
+                            "erdgas": erdgas_2038,
+                            "stein": stein_2038,
+                            "sonstige": sonstige_konv_2038,
+                            "importe": importe_2038
                         },
                         "2045": {
                             "braun": braun_2045,
