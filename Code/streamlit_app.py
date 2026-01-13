@@ -215,12 +215,21 @@ if modus == "🎯 Einzelnes Szenario":
             st.success(f"✓ Summe 2045: {summe_2045:.2f}")
     
     st.markdown("### 📊 Lastprofile")
-    lastprofile_einzel = st.checkbox(
-        "Lastprofile berücksichtigen",
-        value=True,
-        help="Aktivieren, um E-Auto- und Wärmepumpen-Lastprofile in die Simulation einzubeziehen",
-        key="lastprofile_einzel"
-    )
+    with st.expander("Lastprofile konfigurieren", expanded=False):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            lastprofile_einzel = st.checkbox(
+                "Lastprofile berücksichtigen",
+                value=True,
+                help="Aktivieren, um E-Auto- und Wärmepumpen-Lastprofile in die Simulation einzubeziehen",
+                key="lastprofile_einzel"
+            )
+
+        with col2:
+            verbrauch_waermepumpe = st.number_input("Verbrauch 1 Wärmepumpe im Jahr [MWh]", min_value=0.0, max_value=20.0, value=4.0, step=0.25, key="verbrauch_wp_einzel")
+
+        with col3:
+            verbrauch_eauto = st.number_input("Verbrauch 1 E-Auto im Jahr [MWh]", min_value=0.0, max_value=30.0, value=2.25, step=0.25, key="verbrauch_eauto_einzel")    
     
     st.markdown("---")
     if st.button("🚀 Simulation starten", type="primary", width='stretch'):
@@ -245,6 +254,8 @@ if modus == "🎯 Einzelnes Szenario":
                         }
                     }
                     
+                    verbrauch = {"waermepumpe": verbrauch_waermepumpe, "e_auto": verbrauch_eauto}
+
                     szenario_key = f"{ausgewähltes_szenario_name}_{ertragsart}_{lastprofile_einzel}_{ausgewähltes_profil_name}"
                     
                     if 'szenario_key' not in st.session_state or st.session_state['szenario_key'] != szenario_key:
@@ -258,7 +269,8 @@ if modus == "🎯 Einzelnes Szenario":
                             verbrauchsprofile=gewaehltes_profil,
                             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
                             konven_anteile=konven_anteile,
-                            lastprofile=lastprofile_einzel
+                            lastprofile=lastprofile_einzel,
+                            verbrauch=verbrauch
                         )
                         
                         st.session_state['letztes_szenario'] = szenario_ergebnis
