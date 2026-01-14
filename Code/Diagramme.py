@@ -166,19 +166,29 @@ def plot_histogram_ausbauraten_EE(Zieldaten_2030,Zieldaten_2045,ax,ax2):
     ax2.set_ylim(0, max_installiert * 1.1)
     ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, integer=False))
 
-def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
+def plot_histogram_energie_nichtEE(jahreswerte: dict,gesamt_df: pd.DataFrame, ax):
     """
-    Erstellt ein Histogramm der jährlichen Energieerzeugung aus nicht-erneuerbaren Quellen.
+    Erstellt ein gestapeltes Balkendiagramm der Gesamtnetzlast, aufgeteilt in EE und Nicht-EE Energie.
     
     Args:
-        jahreswerte (dict): Dictionary mit den jährlichen Energieerzeugungswerten.
+        jahreswerte (dict): Dictionary mit den jährlichen Energieerzeugungswerten (Nicht-EE).
+        gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
         ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
     """
-    jahre = sorted(list(jahreswerte.keys()))  # Sortiert die Jahre
-    werte = [jahreswerte[jahr]["Energie"] / 1e6 for jahr in jahre] 
+    werte_df = gesamt_df[["Datum von","Netzlast [MWh]", "Realisierte Erzeugung [MWh]"]].copy()
+    werte_df["Jahr"] = werte_df["Datum von"].dt.year
+    grouped = werte_df.groupby(werte_df["Jahr"]).sum(numeric_only=True)
+
+    jahre = sorted(list(jahreswerte.keys()))
     
-    ax.bar(jahre, werte, width=0.8, color='gray', label='Nicht-EE Energie')
-    ax.set_title('Jährliche Energieerzeugung aus nicht-erneuerbaren Quellen')
+    netzlast_werte = [grouped.loc[jahr, "Netzlast [MWh]"] / 1e6 for jahr in jahre]
+    nicht_ee_werte = [jahreswerte[jahr]["Energie"] / 1e6 for jahr in jahre]
+    ee_werte = [netzlast_werte[i] - nicht_ee_werte[i] for i in range(len(jahre))]
+    
+    ax.bar(jahre, ee_werte, width=0.8, color='#4CAF50', label='EE Energie', bottom=0)
+    ax.bar(jahre, nicht_ee_werte, width=0.8, color='#757575', label='Nicht-EE Energie', bottom=ee_werte)
+    
+    ax.set_title('Jährliche Netzlast: EE vs. Nicht-EE Energie')
     ax.set_xlabel('Jahr')
     ax.set_ylabel('Energie [TWh]')
     
@@ -186,6 +196,7 @@ def plot_histogram_energie_nichtEE(jahreswerte: dict, ax):
     ax.set_xticklabels(jahre, rotation=45, ha='right')
     
     ax.legend()
+    ax.grid(axis='y', alpha=0.3)
 
 def kosten(kosten_df: pd.DataFrame, gesamt_df: pd.DataFrame, ax1, ax2):
     """
@@ -357,20 +368,30 @@ def plot_Anteil_EE_mit_ohne_Speicher(gesamt_df: pd.DataFrame, ax):
         gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
         ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
     """
-
-    jahre = list(range(2026, 2046))
-    anteile_mit_speicher = []
-    anteile_ohne_speicher = []
-
-    for jahr in jahre:
-        df_jahr = gesamt_df[gesamt_df["Datum von"].dt.year == jahr]
-        anteil_mit = df_jahr[df_jahr["Anteil Erneuerbare Speicher [%]"]>= 100].count()
-        anteil_ohne = df_jahr[df_jahr["Anteil Erneuerbare [%]"]>= 100].count()
-        anteil_mit = (anteil_mit["Anteil Erneuerbare Speicher [%]"] / len(df_jahr)) * 100 if len(df_jahr) > 0 else 0
-        anteil_ohne = (anteil_ohne["Anteil Erneuerbare [%]"] / len(df_jahr)) * 100 if len(df_jahr) > 0 else 0
-        anteile_mit_speicher.append(anteil_mit)
-        anteile_ohne_speicher.append(anteil_ohne)
-
+    df = gesamt_df.copy()
+    
+    if 'Jahr' not in df.columns:
+        df['Jahr'] = df['Datum von'].dt.year
+    
+    df["Konventionelle Energie mit Speicher [MWh]"] = (
+        df["Netzlast [MWh]"] - df["Realisierte Erzeugung [MWh]"]
+    ).clip(lower=0)
+    
+    df["Konventionelle Energie ohne Speicher [MWh]"] = (
+        df["Netzlast [MWh]"] - df["Erneuerbare [MWh]"]
+    ).clip(lower=0)
+    
+    grouped = df.groupby('Jahr').sum(numeric_only=True)
+    
+    ee_anteil_ohne = ((grouped["Netzlast [MWh]"] - grouped["Konventionelle Energie ohne Speicher [MWh]"]) / 
+                      grouped["Netzlast [MWh]"] * 100).round(2)
+    ee_anteil_mit = ((grouped["Netzlast [MWh]"] - grouped["Konventionelle Energie mit Speicher [MWh]"]) / 
+                     grouped["Netzlast [MWh]"] * 100).round(2)
+    
+    jahre = sorted(grouped.index.tolist())
+    anteile_ohne_speicher = [ee_anteil_ohne.loc[jahr] for jahr in jahre]
+    anteile_mit_speicher = [ee_anteil_mit.loc[jahr] for jahr in jahre]
+    
     x = np.arange(len(jahre))
     width = 0.35
 
@@ -611,6 +632,37 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     ax.set_ylabel('Energie [GWh]')
     ax.legend()
     ax.grid(True)
+
+def velorener_ee_ueberschuss(gesamt_df: pd.DataFrame, ax):
+    """
+    Erstellt ein gestapeltes Balkendiagramm der durch Speicher aufgenommenen Energie und der ungenutzden Energie.
+    
+    Args:
+        gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
+        ax (matplotlib.axes.Axes): Axes-Objekt für die Darstellung.
+    """
+    werte_df = gesamt_df[["Datum von","Netzlast [MWh]", "Realisierte Erzeugung [MWh]","Überschüssige Energie nach Laden [MWh]","Überschüssige Energie vor Laden [MWh]"]].copy()
+    werte_df["Jahr"] = werte_df["Datum von"].dt.year
+    werte_df["Speicheraufnahme [MWh]"] = werte_df["Überschüssige Energie vor Laden [MWh]"] - werte_df["Überschüssige Energie nach Laden [MWh]"]
+    grouped = werte_df.groupby(werte_df["Jahr"]).sum(numeric_only=True)
+
+    jahre = list(range(2026, 2046))
+    
+    verluste = [grouped.loc[jahr, "Überschüssige Energie nach Laden [MWh]"] / 1e6 for jahr in jahre]
+    speicheraufnahme = [grouped.loc[jahr, "Speicheraufnahme [MWh]"] / 1e6 for jahr in jahre]
+    
+    ax.bar(jahre, speicheraufnahme, width=0.8, color="#25A628", label='Gespeicherter Überschuss', bottom=0)
+    ax.bar(jahre, verluste, width=0.8, color="#A01717", label='Ungenutzer Überschuss', bottom=speicheraufnahme)
+    
+    ax.set_title('Jährliche Verteilung der Überschussenergie (2026-2045)')
+    ax.set_xlabel('Jahr')
+    ax.set_ylabel('Energie [TWh]')
+    
+    ax.set_xticks(jahre)
+    ax.set_xticklabels(jahre, rotation=45, ha='right')
+    
+    ax.legend()
+    ax.grid(axis='y', alpha=0.3)
 
 # def Jahresdiagramm_Speicherladung(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
 #     """

@@ -62,6 +62,8 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
         grouped["Netzlast [MWh]"].sum() * 100
     ).round(2).values
 
+    end_df['Nicht genutzte Erneuerbare Energie im Jahr [TWh]'] = (grouped['Überschüssige Energie nach Laden [MWh]'].sum() / 1e6).round(2).values
+
     end_df['Anteil virtel Stunden ohne Speicher mit 100% [%]'] = ((anzahl_100_ohne / anzahl_gesamt * 100).round(2)).values
     end_df['Anteil virtel Stunden mit Speicher mit 100% [%]'] = ((anzahl_100_mit / anzahl_gesamt * 100).round(2)).values
 

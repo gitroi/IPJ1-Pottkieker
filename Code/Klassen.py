@@ -17,7 +17,8 @@ from Diagramme import (plot_ee_anteil_histogram_overflow,plot_histogram_ausbaura
     kosten, plot_Anteil_EE_mit_ohne_Speicher,
     verbrauch_jahr,zweiwochendiagramm_stunden,
     plot_liniendiagramm_ladestand,
-    plot_liniendiagramm_ladestand_dunkelflaute
+    plot_liniendiagramm_ladestand_dunkelflaute,
+    velorener_ee_ueberschuss
 )
 from EE_Anteil_DataFrame import anteil_erneuerbare_df, anteil_erneuerbare_speicher
 from Kosten import kostenrechnung
@@ -141,6 +142,7 @@ class Szenario:
         fig8, axs8 = plt.subplots(1, figsize=(14, 6))
         fig9, axs9 = plt.subplots(1, figsize=(14, 6))
         fig10, axs10 = plt.subplots(1, figsize=(14, 6))
+        fig11, axs11 = plt.subplots(1, figsize=(14, 6))
 
         if(not jahr1):
             jahr2 = 2045
@@ -150,7 +152,7 @@ class Szenario:
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
         verbrauch_jahr(self.gesamt_df, jahr2, axs6) 
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs[1])
-        plot_histogram_energie_nichtEE(self.konventionelle,axs[0])
+        plot_histogram_energie_nichtEE(self.konventionelle, self.gesamt_df, axs[0])
         kosten(self.kosten_df, self.gesamt_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0],axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1],axs4[1]) 
@@ -158,6 +160,7 @@ class Szenario:
         plot_liniendiagramm_ladestand(self.gesamt_df, f'01-01-{jahr2}', axs8)
         plot_liniendiagramm_ladestand_dunkelflaute(self.dunkelflaute_2030_df, axs9)
         plot_liniendiagramm_ladestand_dunkelflaute(self.dunkelflaute_2045_df, axs10)
+        velorener_ee_ueberschuss(self.gesamt_df, axs11)
         plt.tight_layout()
         
         if(speichern):
@@ -171,6 +174,8 @@ class Szenario:
             fig8.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots8.png", dpi=300, bbox_inches='tight', format='png')
             fig9.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots9.png", dpi=300, bbox_inches='tight', format='png')
             fig10.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots10.png", dpi=300, bbox_inches='tight', format='png')
+            fig11.savefig(DATA_DIR/ "Output" / f"szenario_{self.name}_auswertung_ertrag_{self.ertragsart}_plots11.png", dpi=300, bbox_inches='tight', format='png')
+        
         plt.show()
 
 
@@ -193,26 +198,31 @@ class Szenario:
         fig3, axs3 = plt.subplots(1, 2, figsize=(14, 12)) 
         fig4, axs4 = plt.subplots(2, figsize=(14, 12))
         fig5, axs5 = plt.subplots(1, figsize=(14, 12))
+        fig6, axs6 = plt.subplots(1, figsize=(14, 6))
 
         plot_Anteil_EE_mit_ohne_Speicher(self.gesamt_df, axs5)
         plot_ee_anteil_histogram_overflow(self.gesamt_df, jahr1, axs1[1])
-        plot_histogram_energie_nichtEE(self.konventionelle, axs1[0])
+        plot_histogram_energie_nichtEE(self.konventionelle, self.gesamt_df, axs1[0])
         kosten(self.kosten_df, self.gesamt_df, axs2[0], axs2[1])
         plot_histogram_ausbauraten_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"], axs3[0], axs4[0])
         plot_histogram_ausbauraten_Speicher(self.szenario, axs3[1], axs4[1])
+        velorener_ee_ueberschuss(self.gesamt_df, axs6)
+
         
         fig1.tight_layout()
         fig2.tight_layout()
         fig3.tight_layout()
         fig4.tight_layout()
         fig5.tight_layout()
+        fig6.tight_layout()
         
         return {
             'fig1': fig1,  # EE-Anteil Histogram + Energie nicht-EE
             'fig2': fig2,  # Kosten-Analyse
             'fig3': fig3,  # Ausbauraten EE und Speicher (Übersicht)
             'fig4': fig4,  # Detaillierte Ausbauraten
-            'fig5': fig5   # EE-Anteil mit/ohne Speicher
+            'fig5': fig5,  # EE-Anteil mit/ohne Speicher
+            'fig6': fig6   # Velorener EE Überschuss
         }
     
     def getErgebnisse(self) -> pd.DataFrame:

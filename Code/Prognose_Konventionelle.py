@@ -59,10 +59,10 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
             prognose_konventionelle.loc[mask_2038, f'{key} [MWh]'] = (prognose_konventionelle.loc[mask_2038, 'konventionelle [MWh]'] * anteile["2038"][key]).clip(lower=0)
             prognose_konventionelle.loc[mask_2045, f'{key} [MWh]'] = (prognose_konventionelle.loc[mask_2045, 'konventionelle [MWh]'] * anteile["2045"][key]).clip(lower=0)
             prognose_konventionelle[f'{key}_opex [€]'] =  (prognose_konventionelle[f'{key} [MWh]'] * feste_parameter_konventionelle[key]['opex_MWh']).clip(lower=0)
-            prognose_konventionelle[f'{key}_capex [€]'] = 0
+            prognose_konventionelle[f'{key}_capex [€]'] = 0.0
             continue 
 
-        prognose_konventionelle[f'{key}_capex [€]'] = 0
+        prognose_konventionelle[f'{key}_capex [€]'] = 0.0
         
         installiert_vorjahr = feste_parameter_konventionelle[key]['bestand']  # Bestand 2025 als Startwert
         
@@ -85,7 +85,7 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
                 capex_pro_viertelstunde = capex_gesamt / anzahl_viertelstunden
                 prognose_konventionelle.loc[jahr_mask, f'{key}_capex [€]'] = capex_pro_viertelstunde
             else:
-                prognose_konventionelle.loc[jahr_mask, f'{key}_capex [€]'] = 0
+                prognose_konventionelle.loc[jahr_mask, f'{key}_capex [€]'] = 0.0
             
             installiert_vorjahr = installiert_aktuell
 

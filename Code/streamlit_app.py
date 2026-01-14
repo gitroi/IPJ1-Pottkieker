@@ -346,7 +346,22 @@ if modus == "🎯 Einzelnes Szenario":
                         data=buf5,
                         file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_jahr_{jahr if jahr else 'alle'}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        on_click="ignore",
+                        key="download_fig5"
+                    )
+
+                    st.markdown("### 🔋 Nutzung des EE-Überschusses")
+                    st.pyplot(figures['fig6'])
+                    buf6 = BytesIO()
+                    figures['fig6'].savefig(buf6, format='png', dpi=300, bbox_inches='tight')
+                    buf6.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf6,
+                        file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_jahr_{jahr if jahr else 'alle'}.png",
+                        mime="image/png",
+                        on_click="ignore",
+                        key="download_fig6"
                     )
 
                     st.markdown("---")
@@ -360,7 +375,8 @@ if modus == "🎯 Einzelnes Szenario":
                         data=buf1,
                         file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        on_click="ignore",
+                        key="download_fig1"
                     )
                     
                     st.markdown("---")
@@ -374,7 +390,8 @@ if modus == "🎯 Einzelnes Szenario":
                         data=buf2,
                         file_name=f"szenario_{szenario.name}_kosten_ertragsart_{szenario.ertragsart}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        on_click="ignore",
+                        key="download_fig2"
                     )
                     
                     st.markdown("---")
@@ -388,7 +405,8 @@ if modus == "🎯 Einzelnes Szenario":
                         data=buf3,
                         file_name=f"szenario_{szenario.name}_ausbauraten_ertragsart_{szenario.ertragsart}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        on_click="ignore",
+                        key="download_fig3"
                     )
                     
                     st.markdown("---")
@@ -402,7 +420,8 @@ if modus == "🎯 Einzelnes Szenario":
                         data=buf4,
                         file_name=f"szenario_{szenario.name}_installierte_leistungen_ertragsart_{szenario.ertragsart}.png",
                         mime="image/png",
-                        on_click="ignore"
+                        on_click="ignore",
+                        key="download_fig4"
                     )
                     
                 except Exception as e:
@@ -560,7 +579,8 @@ if modus == "🎯 Einzelnes Szenario":
                 data=excel_buffer2,
                 file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_simulationsdaten.csv",
                 mime="text/csv",
-                on_click="ignore"
+                on_click="ignore",
+                key="download_simulation_csv"
             )
         except Exception as e:
             st.error(f"❌ Fehler beim Erstellen der Simulationsdaten-Excel: {str(e)}")
@@ -576,7 +596,8 @@ if modus == "🎯 Einzelnes Szenario":
             data=excel_buffer,
             file_name=f"szenario_{szenario.name}_ertragsart_{szenario.ertragsart}_ergebnisse.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            on_click="ignore"
+            on_click="ignore",
+            key="download_ergebnis_excel"
         )
 
 # ============================================================================
@@ -736,7 +757,8 @@ elif modus == "📈 Szenarien vergleichen":
                     label="💾 Plot herunterladen",
                     data=buf1,
                     file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots1.png",
-                    mime="image/png"
+                    mime="image/png",
+                    key="download_vergleich_plot1"
                 )
                 st.pyplot(fig2)
                 buf2 = BytesIO()
@@ -746,7 +768,8 @@ elif modus == "📈 Szenarien vergleichen":
                     label="💾 Plot herunterladen",
                     data=buf2,
                     file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots2.png",
-                    mime="image/png"
+                    mime="image/png",
+                    key="download_vergleich_plot2"
                 )
                 
                 st.subheader("📊 Vergleichstabelle")
@@ -762,7 +785,8 @@ elif modus == "📈 Szenarien vergleichen":
                     label="💾 Gesamtergebnis als Excel herunterladen",
                     data=excel_buffer,
                     file_name=f"gesamtergebnisse_ertragsart_{ertragsart}_ergebnisse.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="download_vergleich_excel"
                 )
 
             except Exception as e:
