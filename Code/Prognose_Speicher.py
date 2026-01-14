@@ -499,7 +499,7 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     df_simulation["Ladestand pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_simulation["Energie aus Speicher [MWh]"] = zusatz_energie
     df_simulation["Fehlende Energie [MWh]"] = fehl_energie
-    df_gesamtVerlauf["Überschüssige Energie [MWh]"] = ueber_energie
+    df_simulation["Überschüssige Energie [MWh]"] = ueber_energie
     
     return df_simulation
 
