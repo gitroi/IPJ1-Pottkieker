@@ -218,6 +218,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     zusatz_energie = []
     fehl_energie = []
     ueber_energie = []
+    ueber_energie_post = []
 
     # Anfangswerte Ladestand (Annahme: 25% geladen im Januar 2026)
     aktuell_batterie = bestandBatterie * 0.25 * 1e3 
@@ -239,6 +240,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
             
             lademenge = erzeugung - netzlast[idx] * (ladegrenze / 100)
+
+            ueber_energie.append(lademenge)
 
             # Batterie laden
             aktuell_batterie, lademenge = speicher_laden(
@@ -263,6 +266,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         elif anteil_ee[idx] <= entladegrenze:  # Fehlende Energie vorhanden
 
             fehlmenge = netzlast[idx] * (entladegrenze / 100) - erzeugung
+
+            ueber_energie.append(lademenge)
 
             # Batterie entladen
             aktuell_batterie, geliefert, fehlmenge = speicher_entladen(
@@ -292,7 +297,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
         fehl_energie.append(fehlmenge)
-        ueber_energie.append(lademenge)
+        ueber_energie_post.append(lademenge)
 
         # Langzeitverluste der Speicher jede Stunde
         if idx % 4 == 0:
@@ -305,7 +310,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     df_gesamtVerlauf["Ladestand pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_gesamtVerlauf["Energie aus Speicher [MWh]"] = zusatz_energie
     df_gesamtVerlauf["Fehlende Energie [MWh]"] = fehl_energie
-    df_gesamtVerlauf["Überschüssige Energie [MWh]"] = ueber_energie
+    df_gesamtVerlauf["Überschüssige Energie vor Laden [MWh]"] = ueber_energie
+    df_gesamtVerlauf["Überschüssige Energie nach Laden [MWh]"] = ueber_energie_post
 
 
     if(df_gesamtVerlauf.isna().any().any()):
@@ -420,6 +426,7 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     zusatz_energie = []
     fehl_energie = []
     ueber_energie = []
+    ueber_energie_post = []
 
     
     # Simulation über alle Zeitpunkte im Simulationszeitraum
@@ -433,6 +440,8 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
         if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
             
             lademenge = erzeugung - netzlast[idx] * (ladegrenze / 100)
+
+            ueber_energie.append(lademenge)
 
             # Batterie laden
             aktuell_batterie, lademenge = speicher_laden(
@@ -457,6 +466,8 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
         elif anteil_ee[idx] <= entladegrenze:  # Fehlende Energie vorhanden
 
             fehlmenge = netzlast[idx] * (entladegrenze / 100) - erzeugung
+
+            ueber_energie.append(lademenge)
 
             # Batterie entladen
             aktuell_batterie, geliefert, fehlmenge = speicher_entladen(
@@ -486,6 +497,7 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
         speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
         zusatz_energie.append(aktuell_zusatz_energie)   
         fehl_energie.append(fehlmenge)
+        ueber_energie_post.append(lademenge)
 
         # Langzeitverluste der Speicher jede Stunde
         if idx % 4 == 0:
@@ -499,7 +511,8 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     df_simulation["Ladestand pumpspeicher [MWh]"] = speicherstand_pumpspeicher 
     df_simulation["Energie aus Speicher [MWh]"] = zusatz_energie
     df_simulation["Fehlende Energie [MWh]"] = fehl_energie
-    df_simulation["Überschüssige Energie [MWh]"] = ueber_energie
+    df_simulation["Überschüssige Energie vor Laden [MWh]"] = ueber_energie
+    df_simulation["Überschüssige Energie nach Laden [MWh]"] = ueber_energie_post
     
     return df_simulation
 
