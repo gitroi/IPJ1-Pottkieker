@@ -163,6 +163,69 @@ def speicher_entladen(
         neuer_bestand = min_bestand
         return neuer_bestand, lieferbar, fehlmenge - lieferbar
 
+# Hilfsfunktion zur Aufteilung der Lademenge
+def berechne_speicher_aufteilung(
+    lademenge: float,
+    platz_batterie: float,
+    platz_pumpspeicher: float,
+    platz_wasserstoff: float,
+    leistung_batterie: float,
+    leistung_pumpspeicher: float,
+    leistung_wasserstoff: float,
+    gewicht_kapazitaet: float = 0.5,
+    gewicht_leistung: float = 0.5
+) -> tuple[float, float, float]:
+    """
+    Berechnet die Aufteilung der Lademenge auf drei Speichertypen basierend auf
+    verfügbarer Kapazität und Leistung mit gewichteter Kombination.
+    Erstellt von KI Claude Sonnet 4.5.
+    
+    Args:
+        lademenge: Verfügbare Energie zum Laden in MWh
+        platz_batterie: Verfügbarer Platz im Batteriespeicher in MWh
+        platz_pumpspeicher: Verfügbarer Platz im Pumpspeicher in MWh
+        platz_wasserstoff: Verfügbarer Platz im Wasserstoffspeicher in MWh
+        leistung_batterie: Viertelstundenleistung Batterie in MW
+        leistung_pumpspeicher: Viertelstundenleistung Pumpspeicher in MW
+        leistung_wasserstoff: Viertelstundenleistung Wasserstoff in MW
+        gewicht_kapazitaet: Gewichtungsfaktor für verfügbare Kapazität (0-1)
+        gewicht_leistung: Gewichtungsfaktor für Leistung (0-1)
+    
+    Returns:
+        (anteil_batterie, anteil_pumpspeicher, anteil_wasserstoff)
+    """
+    # Gesamtwerte berechnen
+    gesamt_platz = platz_batterie + platz_pumpspeicher + platz_wasserstoff
+    gesamt_leistung = leistung_batterie + leistung_pumpspeicher + leistung_wasserstoff
+    
+    # Normalisierte Faktoren berechnen
+    norm_platz_batterie = platz_batterie / gesamt_platz if gesamt_platz > 0 else 0
+    norm_platz_pump = platz_pumpspeicher / gesamt_platz if gesamt_platz > 0 else 0
+    norm_platz_h2 = platz_wasserstoff / gesamt_platz if gesamt_platz > 0 else 0
+    
+    norm_leistung_batterie = leistung_batterie / gesamt_leistung if gesamt_leistung > 0 else 0
+    norm_leistung_pump = leistung_pumpspeicher / gesamt_leistung if gesamt_leistung > 0 else 0
+    norm_leistung_h2 = leistung_wasserstoff / gesamt_leistung if gesamt_leistung > 0 else 0
+    
+    # Gewichtete Kombination
+    gewicht_batterie = (norm_platz_batterie * gewicht_kapazitaet) * (norm_leistung_batterie * gewicht_leistung)
+    gewicht_pump = (norm_platz_pump * gewicht_kapazitaet) * (norm_leistung_pump * gewicht_leistung)
+    gewicht_h2 = (norm_platz_h2 * gewicht_kapazitaet) * (norm_leistung_h2 * gewicht_leistung)
+    
+    # Normalisieren und Lademenge aufteilen
+    gesamt_gewicht = gewicht_batterie + gewicht_pump + gewicht_h2
+    
+    if gesamt_gewicht > 0:
+        anteil_batterie = lademenge * (gewicht_batterie / gesamt_gewicht)
+        anteil_pumpspeicher = lademenge * (gewicht_pump / gesamt_gewicht)
+        anteil_wasserstoff = lademenge * (gewicht_h2 / gesamt_gewicht)
+    else:
+        # Fallback: Gleichverteilung wenn keine Gewichte berechnet werden können
+        anteil_batterie = lademenge / 3
+        anteil_pumpspeicher = lademenge / 3
+        anteil_wasserstoff = lademenge / 3
+    
+    return anteil_batterie, anteil_pumpspeicher, anteil_wasserstoff
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
 def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict ) -> pd.DataFrame:
@@ -236,6 +299,9 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         aktuell_zusatz_energie = 0
         fehlmenge = 0
         lademenge = 0
+        rest = 0 #übergebliebene Energie nach Laden
+
+        
 
         if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
             
@@ -243,23 +309,47 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
             ueber_energie.append(lademenge)
 
+            # Verfügbaren Platz berechnen
+            platz_batterie = (kap_batterie[idx] * FIXPARAMETER_BATTERIE.obergrenze) - aktuell_batterie
+            platz_pump = (kap_pumpspeicher[idx] * FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuell_pumpspeicher
+            platz_h2 = (kap_wasserstoff[idx] * FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuell_wasserstoff
+
+            # Aufteilung berechnen
+            anteil_batterie, anteil_pump, anteil_h2 = berechne_speicher_aufteilung(
+            lademenge,
+            platz_batterie,
+            platz_pump,
+            platz_h2,
+            leistung_batterie[idx],
+            leistung_pumpspeicher[idx],
+            leistung_wasserstoff[idx],
+            0.5,  # Optional: Standard ist 0.5
+            0.5      # Optional: Standard ist 0.5
+            )
+
             # Batterie laden
-            aktuell_batterie, lademenge = speicher_laden(
-                aktuell_batterie, lademenge, leistung_batterie[idx],
+            aktuell_batterie, rest = speicher_laden(
+                aktuell_batterie, anteil_batterie, leistung_batterie[idx],
                 kap_batterie[idx], FIXPARAMETER_BATTERIE.obergrenze, inputWirkungsgradBatterie
             )
             
+            lademenge -= (anteil_batterie - rest)
+
             # Pumpspeicher laden
-            aktuell_pumpspeicher, lademenge = speicher_laden(
-                aktuell_pumpspeicher, lademenge, leistung_pumpspeicher[idx],
+            aktuell_pumpspeicher, rest = speicher_laden(
+                aktuell_pumpspeicher, anteil_pump, leistung_pumpspeicher[idx],
                 kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.obergrenze, inputWirkungsgradPumpspeicher
             )
+
+            lademenge -= (anteil_pump - rest)
             
             # Wasserstoff laden
-            aktuell_wasserstoff, lademenge = speicher_laden(
-                aktuell_wasserstoff, lademenge, leistung_wasserstoff[idx],
+            aktuell_wasserstoff, rest = speicher_laden(
+                aktuell_wasserstoff, anteil_h2, leistung_wasserstoff[idx],
                 kap_wasserstoff[idx], FIXPARAMETER_WASSERSTOFF.obergrenze, inputWirkungsgradWasserstoff
             )
+
+            lademenge -= (anteil_h2 - rest)
 
             exportEnergie += lademenge #TODO: Außerhalb berechnen
 
