@@ -226,10 +226,49 @@ class Szenario:
         ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_Speicher [€]"].sum() / 1e9]
         ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9]
         
+        gesamtkosten_konventionelle = 0
+        konventionelle_typen = ["braun", "erdgas", "stein", "sonstige", "importe"]
+        for konv_typ in konventionelle_typen:
+            if f"{konv_typ} [GW]" in self.gesamt_df.columns:
+                mask_2030 = self.gesamt_df["Jahr"] == 2030
+                leistung_2030 = self.gesamt_df.loc[mask_2030, f"{konv_typ} [GW]"].iloc[0] if mask_2030.any() else 0
+                ergebnisse[f"Installierte Leistung {konv_typ} 2030 [GW]"] = [leistung_2030]
+                
+                mask_2045 = self.gesamt_df["Jahr"] == 2045
+                leistung_2045 = self.gesamt_df.loc[mask_2045, f"{konv_typ} [GW]"].iloc[0] if mask_2045.any() else 0
+                ergebnisse[f"Installierte Leistung {konv_typ} 2045 [GW]"] = [leistung_2045]
+                
+                kosten_capex = self.gesamt_df[f"{konv_typ}_capex [€]"].sum() if f"{konv_typ}_capex [€]" in self.gesamt_df.columns else 0
+                kosten_opex = self.gesamt_df[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in self.gesamt_df.columns else 0
+                kosten_gesamt = (kosten_capex + kosten_opex) / 1e6  # in Mio. €
+                ergebnisse[f"Gesamtkosten {konv_typ} [Mil. €]"] = [kosten_gesamt]
+                gesamtkosten_konventionelle += kosten_gesamt / 1e3  # in Mrd. €
+            elif konv_typ == "importe":
+                kosten_opex = self.gesamt_df[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in self.gesamt_df.columns else 0
+                kosten_gesamt = kosten_opex / 1e6  # in Mio. €
+                ergebnisse[f"Gesamtkosten {konv_typ} [Mil. €]"] = [kosten_gesamt]
+                gesamtkosten_konventionelle += kosten_gesamt / 1e3  # in Mrd. €
+        
+        ergebnisse["Gesamtkosten Konventionelle [Miliarden €]"] = [gesamtkosten_konventionelle]
+        ergebnisse["Gesamtkosten [Miliarden €]"] = [
+            ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"].iloc[0] + gesamtkosten_konventionelle
+        ]
+
         if "Jahr" not in self.ee_anteil_ohne_speicher_df.columns:
             self.ee_anteil_ohne_speicher_df["Jahr"] = self.ee_anteil_ohne_speicher_df["Datum von"].dt.year
         if "Jahr" not in self.gesamt_df.columns:
             self.gesamt_df["Jahr"] = self.gesamt_df["Datum von"].dt.year
+        
+        self.gesamt_df["Konventionelle Energie mit Speicher [MWh]"] = (
+        self.gesamt_df["Netzlast [MWh]"] - self.gesamt_df["Realisierte Erzeugung [MWh]"]
+        ).clip(lower=0)
+        
+        self.gesamt_df["Konventionelle Energie ohne Speicher [MWh]"] = (
+            self.gesamt_df["Netzlast [MWh]"] - self.gesamt_df["Erneuerbare [MWh]"]
+        ).clip(lower=0)
+
+        self.gesamt_df["EE Anteil am Stromverbrauch 2030 ohne Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Konventionelle Energie ohne Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() * 100).round(2).values
+        self.gesamt_df["EE Anteil am Stromverbrauch 2030 mit Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Konventionelle Energie mit Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() * 100).round(2).values
         
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2030 [%]"] = [
             (len(self.ee_anteil_ohne_speicher_df[(self.ee_anteil_ohne_speicher_df["Jahr"]==2030) & (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100)])) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2030]) * 100
@@ -238,6 +277,9 @@ class Szenario:
             (len(self.gesamt_df[(self.gesamt_df["Jahr"]==2030) & (self.gesamt_df["Anteil Erneuerbare Speicher [%]"] >= 100)])) / len(self.gesamt_df[self.gesamt_df["Jahr"]==2030]) * 100
         ]
 
+        self.gesamt_df["EE Anteil am Stromverbrauch 2045 ohne Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Konventionelle Energie ohne Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() * 100).round(2).values
+        self.gesamt_df["EE Anteil am Stromverbrauch 2045 mit Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Konventionelle Energie mit Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() * 100).round(2).values
+        
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2045 [%]"] = [
             (len(self.ee_anteil_ohne_speicher_df[(self.ee_anteil_ohne_speicher_df["Jahr"]==2045) & (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100)])) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2045]) * 100
         ]
@@ -258,20 +300,6 @@ class Szenario:
             self.konventionelle[2030]["Leistung"] / 1e3
         ]
 
-        konventionelle_typen = ["braun", "erdgas", "stein", "sonstige", "importe"]
-        for konv_typ in konventionelle_typen:
-            if f"{konv_typ} [GW]" in self.gesamt_df.columns:
-                mask_2030 = self.gesamt_df["Jahr"] == 2030
-                leistung_2030 = self.gesamt_df.loc[mask_2030, f"{konv_typ} [GW]"].iloc[0] if mask_2030.any() else 0
-                ergebnisse[f"Installierte Leistung {konv_typ} 2030 [GW]"] = [leistung_2030]
-                
-                mask_2045 = self.gesamt_df["Jahr"] == 2045
-                leistung_2045 = self.gesamt_df.loc[mask_2045, f"{konv_typ} [GW]"].iloc[0] if mask_2045.any() else 0
-                ergebnisse[f"Installierte Leistung {konv_typ} 2045 [GW]"] = [leistung_2045]
-                
-                kosten_capex = self.gesamt_df[f"{konv_typ}_capex [€]"].sum() if f"{konv_typ}_capex [€]" in self.gesamt_df.columns else 0
-                kosten_opex = self.gesamt_df[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in self.gesamt_df.columns else 0
-                ergebnisse[f"Gesamtkosten {konv_typ} [Mil. €]"] = [(kosten_capex + kosten_opex) / 1e6]
 
         for key in ausbauraten["zuwachsrate_2030"].keys():
             ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten["zuwachsrate_2030"][key]]
@@ -282,6 +310,17 @@ class Szenario:
             ergebnisse[f"Ausbaurate {key} 2030"] = [ausbauraten_speicher["zuwachsrate_2030"][key]]
             ergebnisse[f"Ausbaurate {key} 2045"] = [ausbauraten_speicher["zuwachsrate_2045"][key]]
             ergebnisse[f"Gesamtkosten {key} [Mil. €]"] = [self.kosten_df[f"Gesamtkosten {key} [€]"].sum() / 1e6]
+
+        konventionelle_spalten = []
+        for konv_typ in konventionelle_typen:
+            for col in ergebnisse.columns:
+                if konv_typ in col.lower() and (col.startswith("Installierte Leistung") or col.startswith("Gesamtkosten")):
+                    if "Gesamtkosten Konventionelle" not in col:  
+                        konventionelle_spalten.append(col)
+        
+        andere_spalten = [col for col in ergebnisse.columns if col not in konventionelle_spalten]
+        
+        ergebnisse = ergebnisse[andere_spalten + konventionelle_spalten]
 
         return ergebnisse
     

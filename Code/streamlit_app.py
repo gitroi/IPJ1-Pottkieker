@@ -34,6 +34,7 @@ try:
     from Klassen import Szenario
     from Szenarien_auswahl import load_scenarios, load_verbrauchsprofile, get_scenario_by_name, get_verbrauchsprofil_by_name
     from Diagramme import plot_histogram_gesamtauswertung,verbrauch_jahr,zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,plot_liniendiagramm_ladestand_dunkelflaute
+    from Auswertung import formatiere_spaltennamen
 
 except ImportError as e:
     st.error(f"❌ Import-Fehler: {str(e)}")
@@ -98,7 +99,6 @@ def git_commit_and_push(filepath, commit_message):
                 return True, "Keine Änderungen zu committen"
             return False, f"Git Commit fehlgeschlagen: {result.stderr}"
         
-        # Git Push
         result = subprocess.run(["git", "push"], 
                               capture_output=True, 
                               text=True, 
@@ -305,7 +305,9 @@ if modus == "🎯 Einzelnes Szenario":
                     stromerzeugung = ergebnisse["Erzeugung Erneuerbare im Jahr [TWh]"].sum()
                     gesamtkosten = ergebnisse["Gesamtkosten Gesamt [Mrd. €]"].sum()   
                     st.header("Jahresübersicht")
-                    st.dataframe(ergebnisse, width='stretch')
+                    # Spaltennamen sauber formatieren
+                    ergebnisse_formatiert = formatiere_spaltennamen(ergebnisse)
+                    st.dataframe(ergebnisse_formatiert, width='stretch')
                     st.header("10 Viertelstunden mit größtem Energie-Defizit")
                     st.dataframe(top10_fehlenergie, width='stretch')
                     col1.metric("Erzeugung Erneuerbare 2026-2045", f"{stromerzeugung:.1f} TWh")
@@ -316,9 +318,9 @@ if modus == "🎯 Einzelnes Szenario":
 
             if szenario.konventionelle:
                 try:
-                    anteil_2030 = ergebnisse[ergebnisse["Jahr"]==2030]["Anteil mit Speicher mit 100% [%]"].values[0]
-                    anteil_2045 = ergebnisse[ergebnisse["Jahr"]==2045]["Anteil mit Speicher mit 100% [%]"].values[0]
-                    bestvalue = 1000 / ((gesamtkosten/1e3) * (1 + 10 * (max(0, 80 - anteil_2030) / 2)**2 + 50 * (max(0, 100 - anteil_2045) / 2)**2))
+                    anteil_2030 = ergebnisse[ergebnisse["Jahr"]==2030]["EE Anteil am Stromverbrauch mit Speicher [%]"].values[0]
+                    anteil_2045 = ergebnisse[ergebnisse["Jahr"]==2045]["EE Anteil am Stromverbrauch mit Speicher [%]"].values[0]
+                    bestvalue = 1000 / ((gesamtkosten/1e3) * (1 + 10 * (max(0, 80 - anteil_2030) / 80)**2 + 50 * (max(0, 100 - anteil_2045) / 100)**2))
                     konv = szenario.konventionelle
                     wert2045 = konv[2045]["Energie"]/1e3
                     col3.metric("Bestvalue", f"{bestvalue:.4f}")
@@ -748,7 +750,9 @@ elif modus == "📈 Szenarien vergleichen":
                 )
                 
                 st.subheader("📊 Vergleichstabelle")
-                st.dataframe(alle_ergebnisse, width='stretch')
+                # Spaltennamen sauber formatieren
+                alle_ergebnisse_formatiert = formatiere_spaltennamen(alle_ergebnisse)
+                st.dataframe(alle_ergebnisse_formatiert, width='stretch')
                 st.markdown("---")
                 excel_buffer = BytesIO()
                 alle_ergebnisse.to_excel(excel_buffer, index=False, engine='openpyxl')
