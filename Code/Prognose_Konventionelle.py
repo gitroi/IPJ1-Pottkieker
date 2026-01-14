@@ -32,15 +32,15 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
     with open(f"{PROJECT_ROOT}/Daten/Feste_Parameter/konventionelle.json", "r") as file:    
         feste_parameter_konventionelle = json.load(file)
 
-    prognose_konventionelle['konventionelle [MWh]'] = prognose_konventionelle["Netzlast [MWh]"] - prognose_konventionelle["Realisierte Erzeugung [MWh]"].clip(lower=0)
+    prognose_konventionelle['konventionelle [MWh]'] = (prognose_konventionelle["Netzlast [MWh]"] - prognose_konventionelle["Realisierte Erzeugung [MWh]"]).clip(lower=0)
     
     mask_2038 = prognose_konventionelle['Jahr'] <= 2038
     mask_2045 = prognose_konventionelle['Jahr'] > 2038
     
     for key in feste_parameter_konventionelle.keys():
         if key != "importe":
-            prognose_konventionelle.loc[mask_2038, f'{key} [MWh]'] = prognose_konventionelle.loc[mask_2038, 'konventionelle [MWh]'] * anteile["2038"][key]
-            prognose_konventionelle.loc[mask_2045, f'{key} [MWh]'] = prognose_konventionelle.loc[mask_2045, 'konventionelle [MWh]'] * anteile["2045"][key]
+            prognose_konventionelle.loc[mask_2038, f'{key} [MWh]'] = (prognose_konventionelle.loc[mask_2038, 'konventionelle [MWh]'] * anteile["2038"][key]).clip(lower=0)
+            prognose_konventionelle.loc[mask_2045, f'{key} [MWh]'] = (prognose_konventionelle.loc[mask_2045, 'konventionelle [MWh]'] * anteile["2045"][key]).clip(lower=0)
             
             for jahr in prognose_konventionelle['Jahr'].unique():
                 jahr_mask = prognose_konventionelle['Jahr'] == jahr
@@ -49,22 +49,21 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
                 prognose_konventionelle.loc[jahr_mask, f'{key} [MW]'] = leistung_gw * 1e3  # in MW speichern
                 anzahl_viertelstunden_jahr = jahr_mask.sum()
                 
-                # OPEX Leistung: €/kW/Jahr → verteilt auf alle Viertelstunden des Jahres
                 opex_leistung_jahr = leistung_gw * 1e6 * feste_parameter_konventionelle[key]['opex_kw']  # GW → kW
                 opex_leistung_pro_viertelstunde = opex_leistung_jahr / anzahl_viertelstunden_jahr
                 
-                # OPEX Energie: €/MWh × MWh pro Viertelstunde
                 opex_energie = prognose_konventionelle.loc[jahr_mask, f'{key} [MWh]'] * feste_parameter_konventionelle[key]['opex_MWh']
                 
-                prognose_konventionelle.loc[jahr_mask, f'{key}_opex [€]'] = opex_leistung_pro_viertelstunde + opex_energie
+                prognose_konventionelle.loc[jahr_mask, f'{key}_opex [€]'] = (opex_leistung_pro_viertelstunde + opex_energie).clip(lower=0)
         else:
-            prognose_konventionelle.loc[mask_2038, f'{key} [MWh]'] = prognose_konventionelle.loc[mask_2038, 'konventionelle [MWh]'] * anteile["2038"][key]
-            prognose_konventionelle.loc[mask_2045, f'{key} [MWh]'] = prognose_konventionelle.loc[mask_2045, 'konventionelle [MWh]'] * anteile["2045"][key]
-            prognose_konventionelle[f'{key}_opex [€]'] =  (prognose_konventionelle[f'{key} [MWh]'] * feste_parameter_konventionelle[key]['opex_MWh'])
+            prognose_konventionelle.loc[mask_2038, f'{key} [MWh]'] = (prognose_konventionelle.loc[mask_2038, 'konventionelle [MWh]'] * anteile["2038"][key]).clip(lower=0)
+            prognose_konventionelle.loc[mask_2045, f'{key} [MWh]'] = (prognose_konventionelle.loc[mask_2045, 'konventionelle [MWh]'] * anteile["2045"][key]).clip(lower=0)
+            prognose_konventionelle[f'{key}_opex [€]'] =  (prognose_konventionelle[f'{key} [MWh]'] * feste_parameter_konventionelle[key]['opex_MWh']).clip(lower=0)
             prognose_konventionelle[f'{key}_capex [€]'] = 0
-            continue  # Überspringe die CAPEX-Berechnung für Importe
+            continue 
 
-        # CAPEX-Berechnung nur für nicht-Importe (Kraftwerke mit installierter Leistung)
+        prognose_konventionelle[f'{key}_capex [€]'] = 0
+        
         installiert_vorjahr = feste_parameter_konventionelle[key]['bestand']  # Bestand 2025 als Startwert
         
         for jahr in sorted(prognose_konventionelle['Jahr'].unique()):
