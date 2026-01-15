@@ -241,36 +241,57 @@ def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame) -
     :return: DataFrame mit der Wärmepumpen Lastprognose eingerechnet in die Gesamtverbrauchsprognose
     """
 
-    df_2015 = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Wetter_2015.csv",sep=',',decimal='.')
+    df_aktuell = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Wetter_aktuell.csv",sep=',',decimal='.')
+    df_prognose = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Wetter_prognose.csv",sep=',',decimal='.')
 
-    df_2015['Datum'] = (
-        '2015-' + df_2015['MM'].astype(str) + '-' + 
-        df_2015['DD'].astype(str) + ' ' + 
-        (df_2015['HH']-1).astype(str) + ':00'
+    df_aktuell['Datum'] = (
+        '2025-' + df_aktuell['MM'].astype(str) + '-' + 
+        df_aktuell['DD'].astype(str) + ' ' + 
+        (df_aktuell['HH']-1).astype(str) + ':00'
+    )
+
+    df_prognose['Datum'] = (
+        '2031-' + df_prognose['MM'].astype(str) + '-' + 
+        df_prognose['DD'].astype(str) + ' ' + 
+        (df_prognose['HH']-1).astype(str) + ':00'
     )
 
     lastprofil = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Lastprofil_waermepumpe.csv", sep=';', decimal=',')
     lastprofil[['Uhrzeit', 'Minute']] = lastprofil['Zeit'].str.split('-', expand=True)[0].str.split(':', expand=True).astype(int)
 
 
-    df_2015['Datum'] = pd.to_datetime(df_2015['Datum'])
-    df_2015 = df_2015.drop(columns=['RW','HW','MM','DD','HH','N','x','RF','B','D','A','E','IL','p','WR','WG'])
+    df_aktuell['Datum'] = pd.to_datetime(df_aktuell['Datum'])
+    df_aktuell = df_aktuell.drop(columns=['RW','HW','MM','DD','HH','N','x','RF','B','D','A','E','IL','p','WR','WG'])
+    df_prognose['Datum'] = pd.to_datetime(df_prognose['Datum'])
+    df_prognose = df_prognose.drop(columns=['RW','HW','MM','DD','HH','N','x','RF','B','D','A','E','IL','p','WR','WG'])
 
-    tages_temp = df_2015.groupby(df_2015['Datum'].dt.date)['t'].mean().reset_index()
-    tages_temp.columns = ['Datum', 'Tages_Mittel_Temp']
-    tages_temp['Datum'] = pd.to_datetime(tages_temp['Datum'])
-    tages_temp['Monat'] = tages_temp['Datum'].dt.month
-    tages_temp['Tag'] = tages_temp['Datum'].dt.day
+    tages_temp_aktuell = df_aktuell.groupby(df_aktuell['Datum'].dt.date)['t'].mean().reset_index()
+    tages_temp_aktuell.columns = ['Datum', 'Tages_Mittel_Temp']
+    tages_temp_aktuell['Datum'] = pd.to_datetime(tages_temp_aktuell['Datum'])
+    tages_temp_aktuell['Monat'] = tages_temp_aktuell['Datum'].dt.month
+    tages_temp_aktuell['Tag'] = tages_temp_aktuell['Datum'].dt.day
+    tages_temp_aktuell['Temp_Spalte'] = tages_temp_aktuell['Tages_Mittel_Temp'].clip(-14, 18).round().astype(int)
     
-    tages_temp['Temp_Spalte'] = tages_temp['Tages_Mittel_Temp'].clip(-14, 18).round().astype(int)
-    
-    # 29. Februar ergänzen (falls 2015 kein Schaltjahr): Nutze Werte vom 28. Februar
-    if not ((tages_temp['Monat'] == 2) & (tages_temp['Tag'] == 29)).any():
-        feb28 = tages_temp[(tages_temp['Monat'] == 2) & (tages_temp['Tag'] == 28)].copy()
+    # 29. Februar ergänzen (falls nicht vorhanden): Nutze Werte vom 28. Februar
+    if not ((tages_temp_aktuell['Monat'] == 2) & (tages_temp_aktuell['Tag'] == 29)).any():
+        feb28 = tages_temp_aktuell[(tages_temp_aktuell['Monat'] == 2) & (tages_temp_aktuell['Tag'] == 28)].copy()
         feb28['Tag'] = 29
-        tages_temp = pd.concat([tages_temp, feb28], ignore_index=True)
+        tages_temp_aktuell = pd.concat([tages_temp_aktuell, feb28], ignore_index=True)
+    
+    tages_temp_prognose = df_prognose.groupby(df_prognose['Datum'].dt.date)['t'].mean().reset_index()
+    tages_temp_prognose.columns = ['Datum', 'Tages_Mittel_Temp']
+    tages_temp_prognose['Datum'] = pd.to_datetime(tages_temp_prognose['Datum'])
+    tages_temp_prognose['Monat'] = tages_temp_prognose['Datum'].dt.month
+    tages_temp_prognose['Tag'] = tages_temp_prognose['Datum'].dt.day
+    tages_temp_prognose['Temp_Spalte'] = tages_temp_prognose['Tages_Mittel_Temp'].clip(-14, 18).round().astype(int)
+    
+    # 29. Februar ergänzen (falls nicht vorhanden)
+    if not ((tages_temp_prognose['Monat'] == 2) & (tages_temp_prognose['Tag'] == 29)).any():
+        feb28 = tages_temp_prognose[(tages_temp_prognose['Monat'] == 2) & (tages_temp_prognose['Tag'] == 28)].copy()
+        feb28['Tag'] = 29
+        tages_temp_prognose = pd.concat([tages_temp_prognose, feb28], ignore_index=True)
 
-    tmz_summe_jahr = np.maximum(19 - tages_temp['Tages_Mittel_Temp'], 1).sum()
+    tmz_summe_jahr = np.maximum(19 - tages_temp_aktuell['Tages_Mittel_Temp'], 1).sum()
     a_wp = WAERMEPUMPE_JAHR_MWH / tmz_summe_jahr
 
     gesamt_df['Jahr'] = gesamt_df['Datum von'].dt.year
@@ -285,11 +306,22 @@ def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame) -
         anzahl_wärmepumpen[2030] + (anzahl_wärmepumpen[2045] - anzahl_wärmepumpen[2030]) * (gesamt_df["Jahr"] - 2030) / (2045 - 2030)
     )
 
-    gesamt_df = gesamt_df.merge(
-        tages_temp[['Monat', 'Tag', 'Temp_Spalte']],
+    gesamt_df_bis_2030 = gesamt_df[gesamt_df['Jahr'] <= 2030].copy()
+    gesamt_df_ab_2031 = gesamt_df[gesamt_df['Jahr'] >= 2031].copy()
+    
+    gesamt_df_bis_2030 = gesamt_df_bis_2030.merge(
+        tages_temp_aktuell[['Monat', 'Tag', 'Temp_Spalte']],
         on=['Monat', 'Tag'],
         how='left'
     )
+    
+    gesamt_df_ab_2031 = gesamt_df_ab_2031.merge(
+        tages_temp_prognose[['Monat', 'Tag', 'Temp_Spalte']],
+        on=['Monat', 'Tag'],
+        how='left'
+    )
+    
+    gesamt_df = pd.concat([gesamt_df_bis_2030, gesamt_df_ab_2031], ignore_index=True).sort_values('Datum von').reset_index(drop=True)
 
     lastprofil = lastprofil.drop(columns=['Zeit'])
     
