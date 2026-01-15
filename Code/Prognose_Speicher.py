@@ -274,6 +274,20 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     kap_wasserstoff = df_gesamtVerlauf["Speicherkapazität wasserstoff [MWh]"].values
     kap_pumpspeicher = df_gesamtVerlauf["Speicherkapazität pumpspeicher [MWh]"].values
 
+    datum_series = pd.to_datetime(df_gesamtVerlauf["Datum von"])
+    monate = datum_series.dt.month.values
+
+    # Untergrenze-Array erstellen
+    untergrenzen_h2 = np.where(
+        (monate >= 11) | (monate <= 2),  # Winter
+        0.00,
+        np.where(
+            (monate >= 3) & (monate <= 10),  # nicht Winter
+            0.50,
+            FIXPARAMETER_WASSERSTOFF.untergrenze  # Standard
+        )
+    )
+
     # Listen für Ergebnisse initialisieren
     speicherstand_batterie = []
     speicherstand_wasserstoff = []
@@ -376,7 +390,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
             # Wasserstoff entladen
             aktuell_wasserstoff, geliefert, fehlmenge = speicher_entladen(
                 aktuell_wasserstoff, fehlmenge, leistung_wasserstoff[idx],
-                kap_wasserstoff[idx], FIXPARAMETER_WASSERSTOFF.untergrenze, outputWirkungsgradWasserstoff
+                kap_wasserstoff[idx], untergrenzen_h2[idx], outputWirkungsgradWasserstoff
             )
             aktuell_zusatz_energie += geliefert
 
