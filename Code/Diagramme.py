@@ -668,10 +668,11 @@ def ee_anteil_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     """
     Erstellt ein Histogramm zum Vergleich des Anteils der Erneuerbaren Energien
     mit und ohne Speicher für jedes Jahr von 2026 bis 2045.
+    Gruppiert nach Winter (Nov-Feb) und restlichen Monaten (Mär-Okt).
     
     Args:
         gesamt (pd.DataFrame): DataFrame mit den Gesamtdaten.
-    ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
+        ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
     """
     df = gesamt.copy()
     
@@ -690,27 +691,42 @@ def ee_anteil_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     ).clip(lower=0)
     
     df = df[df['Jahr'] == jahr]
-    grouped = df.groupby('Monat').sum(numeric_only=True)
+    
+    # Saison-Spalte hinzufügen: Winter (Nov-Feb) vs. Rest (Mär-Okt)
+    df['Saison'] = df['Monat'].apply(lambda m: 'Winter (Nov-Feb)' if m in [11, 12, 1, 2] else 'Rest (Mär-Okt)')
+    
+    grouped = df.groupby('Saison').sum(numeric_only=True)
     
     ee_anteil_ohne = ((grouped["Netzlast [MWh]"] - grouped["Konventionelle Energie ohne Speicher [MWh]"]) / 
                       grouped["Netzlast [MWh]"] * 100).round(2)
     ee_anteil_mit = ((grouped["Netzlast [MWh]"] - grouped["Konventionelle Energie mit Speicher [MWh]"]) / 
                      grouped["Netzlast [MWh]"] * 100).round(2)
     
-    monate = sorted(grouped.index.tolist())
-    anteile_ohne_speicher = [ee_anteil_ohne.loc[monat] for monat in monate]
-    anteile_mit_speicher = [ee_anteil_mit.loc[monat] for monat in monate]
+    # Saisonale Reihenfolge festlegen
+    saisonen = ['Rest (Mär-Okt)', 'Winter (Nov-Feb)']
+    anteile_ohne_speicher = [ee_anteil_ohne.loc[saison] if saison in ee_anteil_ohne.index else 0 for saison in saisonen]
+    anteile_mit_speicher = [ee_anteil_mit.loc[saison] if saison in ee_anteil_mit.index else 0 for saison in saisonen]
     
-    x = np.arange(len(monate))
+    x = np.arange(len(saisonen))
     width = 0.35
 
     ax.bar(x - width/2, anteile_ohne_speicher, width, label='Ohne Speicher', color='lightgreen', edgecolor='white')
     ax.bar(x + width/2, anteile_mit_speicher, width, label='Mit Speicher', color='green', edgecolor='white')
+    
+    # Prozentwerte in die Balken schreiben
+    for i in range(len(saisonen)):
+        # Ohne Speicher
+        ax.text(x[i] - width/2, anteile_ohne_speicher[i]/2, f'{anteile_ohne_speicher[i]:.1f}%', 
+                ha='center', va='center', fontsize=10, fontweight='bold', color='black')
+        # Mit Speicher
+        ax.text(x[i] + width/2, anteile_mit_speicher[i]/2, f'{anteile_mit_speicher[i]:.1f}%', 
+                ha='center', va='center', fontsize=10, fontweight='bold', color='white')
+    
     ax.set_xticks(x)
-    ax.set_xticklabels(monate, rotation=45, ha='right')
-    ax.set_title('Anteil der Erneuerbaren Energien (2026-2045)')
+    ax.set_xticklabels(saisonen, rotation=0, ha='center')
+    ax.set_title(f'Anteil der Erneuerbaren Energien im Jahr {jahr}')
     ax.set_ylabel('Anteil [%]')
-    ax.set_xlabel('Monat')
+    ax.set_xlabel('Zeitraum')
     ax.legend()
 
 # def Jahresdiagramm_Speicherladung(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
