@@ -33,7 +33,11 @@ try:
     from config import DATA_DIR, PROJECT_ROOT as PR
     from Klassen import Szenario
     from Szenarien_auswahl import load_scenarios, load_verbrauchsprofile, get_scenario_by_name, get_verbrauchsprofil_by_name
-    from Diagramme import plot_histogram_gesamtauswertung,verbrauch_jahr,zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,plot_liniendiagramm_ladestand_dunkelflaute
+    from Diagramme import (
+        plot_histogram_gesamtauswertung,verbrauch_jahr,
+        zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,
+        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr
+    )
     from Auswertung import formatiere_spaltennamen
 
 except ImportError as e:
@@ -447,7 +451,34 @@ if modus == "🎯 Einzelnes Szenario":
                     st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
                     st.exception(e)
             
-            render_verbrauch_jahr()    
+            render_verbrauch_jahr()  
+
+            @st.fragment
+            def render_ee_anteil_jahr():
+                jahr = st.slider(
+                    "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1,
+                    key="jahr_slider"
+                )
+
+                try:
+                    fig1, ax1 = plt.subplots(figsize=(12, 6))
+                    ee_anteil_jahr(szenario.getGesamtDF(), jahr if jahr else 2045, ax1)
+                    st.pyplot(fig1)
+                    buf_auswertung = BytesIO()
+                    fig1.savefig(buf_auswertung, format='png', dpi=300, bbox_inches='tight')
+                    buf_auswertung.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf_auswertung,
+                        file_name=f"szenario_{szenario.name}_ee_anteil_jahr_ertragsart_{szenario.ertragsart}_jahr_{jahr}.png",
+                        mime="image/png",
+                        key="download_ee_anteil_jahr"
+                    )
+                except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
+                    st.exception(e)
+            
+            render_ee_anteil_jahr()      
 
             st.markdown("---")
             st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")

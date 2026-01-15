@@ -664,6 +664,55 @@ def velorener_ee_ueberschuss(gesamt_df: pd.DataFrame, ax):
     ax.legend()
     ax.grid(axis='y', alpha=0.3)
 
+def ee_anteil_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
+    """
+    Erstellt ein Histogramm zum Vergleich des Anteils der Erneuerbaren Energien
+    mit und ohne Speicher für jedes Jahr von 2026 bis 2045.
+    
+    Args:
+        gesamt (pd.DataFrame): DataFrame mit den Gesamtdaten.
+    ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
+    """
+    df = gesamt.copy()
+    
+    if 'Jahr' not in df.columns:
+        df['Jahr'] = df['Datum von'].dt.year
+    
+    if 'Monat' not in df.columns:
+        df['Monat'] = df['Datum von'].dt.month
+
+    df["Konventionelle Energie mit Speicher [MWh]"] = (
+        df["Netzlast [MWh]"] - df["Realisierte Erzeugung [MWh]"]
+    ).clip(lower=0)
+    
+    df["Konventionelle Energie ohne Speicher [MWh]"] = (
+        df["Netzlast [MWh]"] - df["Erneuerbare [MWh]"]
+    ).clip(lower=0)
+    
+    df = df[df['Jahr'] == jahr]
+    grouped = df.groupby('Monat').sum(numeric_only=True)
+    
+    ee_anteil_ohne = ((grouped["Netzlast [MWh]"] - grouped["Konventionelle Energie ohne Speicher [MWh]"]) / 
+                      grouped["Netzlast [MWh]"] * 100).round(2)
+    ee_anteil_mit = ((grouped["Netzlast [MWh]"] - grouped["Konventionelle Energie mit Speicher [MWh]"]) / 
+                     grouped["Netzlast [MWh]"] * 100).round(2)
+    
+    monate = sorted(grouped.index.tolist())
+    anteile_ohne_speicher = [ee_anteil_ohne.loc[monat] for monat in monate]
+    anteile_mit_speicher = [ee_anteil_mit.loc[monat] for monat in monate]
+    
+    x = np.arange(len(monate))
+    width = 0.35
+
+    ax.bar(x - width/2, anteile_ohne_speicher, width, label='Ohne Speicher', color='lightgreen', edgecolor='white')
+    ax.bar(x + width/2, anteile_mit_speicher, width, label='Mit Speicher', color='green', edgecolor='white')
+    ax.set_xticks(x)
+    ax.set_xticklabels(monate, rotation=45, ha='right')
+    ax.set_title('Anteil der Erneuerbaren Energien (2026-2045)')
+    ax.set_ylabel('Anteil [%]')
+    ax.set_xlabel('Monat')
+    ax.legend()
+
 # def Jahresdiagramm_Speicherladung(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
 #     """
 #     Erstellt ein Liniendiagramm des durchschnittlichen täglichen Ladestands der Speicher für ein bestimmtes Jahr.
