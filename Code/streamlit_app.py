@@ -179,15 +179,15 @@ if modus == "🎯 Einzelnes Szenario":
     with st.expander("Anteile 2038 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            braun_2038 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="sim_braun_2038")
+            braun_2038 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.40, step=0.05, key="sim_braun_2038")
         with col2:
-            erdgas_2038 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.4, step=0.05, key="sim_erdgas_2038")
+            erdgas_2038 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.35, step=0.05, key="sim_erdgas_2038")
         with col3:
             stein_2038 = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="sim_stein_2038")
         with col4:
-            sonstige_konv_2038 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_sonst_konv_2038")
+            sonstige_konv_2038 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.07, step=0.05, key="sim_sonst_konv_2038")
         with col5:
-            importe_2038 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_importe_2038")
+            importe_2038 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.03, step=0.05, key="sim_importe_2038")
         
         summe_2038 = braun_2038 + erdgas_2038 + stein_2038 + sonstige_konv_2038 + importe_2038
         if abs(summe_2038 - 1.0) > 0.01:
@@ -200,13 +200,13 @@ if modus == "🎯 Einzelnes Szenario":
         with col1:
             braun_2045 = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="sim_braun_2045")
         with col2:
-            erdgas_2045 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.6, step=0.05, key="sim_erdgas_2045")
+            erdgas_2045 = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.85, step=0.05, key="sim_erdgas_2045")
         with col3:
             stein_2045 = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.0, step=0.05, key="sim_stein_2045")
         with col4:
-            sonstige_konv_2045 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="sim_sonst_konv_2045")
+            sonstige_konv_2045 = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="sim_sonst_konv_2045")
         with col5:
-            importe_2045 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.2, step=0.05, key="sim_importe_2045")
+            importe_2045 = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.05, step=0.05, key="sim_importe_2045")
         
         summe_2045 = braun_2045 + erdgas_2045 + stein_2045 + sonstige_konv_2045 + importe_2045
         if abs(summe_2045 - 1.0) > 0.01:
