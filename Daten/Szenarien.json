@@ -1276,7 +1276,7 @@
     },
     {
             "Name": "Best_Case",
-            "Beschreibung": "Ausgewogen mit Fokus auf Versorgungssicherheit, aber trotzdem öknomisch greifbar",
+            "Beschreibung": "Ausgewogen mit Fokus auf Versorgungssicherheit, aber trotzdem ökonomisch greifbar",
             "Ziele 2030": {
                 "Ausbau EE": {
                     "pv_dach": 120,
@@ -1501,7 +1501,7 @@
         },
         {
             "Name": "Resilient",
-            "Beschreibung": "massiven Speicherausbau zur Vermeidung von Versorgungslücken.",
+            "Beschreibung": "Massiver Speicherausbau zur Vermeidung von Versorgungslücken.",
             "Ziele 2030": {
                 "Ausbau EE": {
                     "pv_dach": 120.0,
