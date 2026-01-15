@@ -615,14 +615,14 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     woche_df = woche_df.resample('h').sum()
 
     ax.stackplot(woche_df.index, 
-                 woche_df["Photovoltaik [MWh] Originalauflösungen"]/1e3,
-                 woche_df["Wind Onshore [MWh] Originalauflösungen"]/1e3,
-                 woche_df["Wind Offshore [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Sonstige Erneuerbare [MWh] Originalauflösungen"]/1e3,
                  woche_df["Biomasse [MWh] Originalauflösungen"]/1e3,
                  woche_df["Wasserkraft [MWh] Originalauflösungen"]/1e3,
-                 woche_df["Sonstige Erneuerbare [MWh] Originalauflösungen"]/1e3,
-                 labels=["PV", "Wind Onshore", "Wind Offshore", "Biomasse", "Wasserkraft", "Sonstige"],
-                 colors=['#F9BF02', '#87CEEB', '#4169E1', '#228B22', '#00CED1', '#FF8C00'],
+                 woche_df["Wind Onshore [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Wind Offshore [MWh] Originalauflösungen"]/1e3,
+                 woche_df["Photovoltaik [MWh] Originalauflösungen"]/1e3,
+                 labels=["Sonstige", "Biomasse", "Wasserkraft", "Wind Onshore", "Wind Offshore", "PV"],
+                 colors=['#FF8C00', '#228B22', '#00CED1', '#87CEEB', '#4169E1', '#F9BF02'],
                  alpha=0.8)
     
     ax.plot(woche_df.index, woche_df["Netzlast [MWh]"]/1e3, label="Netzlast", color='red', linewidth=2, linestyle='--')
