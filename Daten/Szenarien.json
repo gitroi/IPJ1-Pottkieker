@@ -13,8 +13,8 @@
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 120.0,
-                "wasserstoff": 70.0,
+                "batteriespeicher": 200.0,
+                "wasserstoff": 90.0,
                 "pumpspeicher": 50.0
             }
         },
@@ -29,9 +29,9 @@
                 "sonstige": 0.1
             },
             "Ausbau Speicher": {
-                "batteriespeicher": 1000.0,
-                "wasserstoff": 1000.0,
-                "pumpspeicher": 300.0
+                "batteriespeicher": 2000.0,
+                "wasserstoff": 1500.0,
+                "pumpspeicher": 350.0
             }
         },
         "Veränderungsfaktoren": {
