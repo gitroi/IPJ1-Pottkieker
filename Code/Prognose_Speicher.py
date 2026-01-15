@@ -324,7 +324,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
             leistung_pumpspeicher[idx],
             leistung_wasserstoff[idx],
             0.5,  # Optional: Standard ist 0.5
-            0.5      # Optional: Standard ist 0.5
+            0.5   # Optional: Standard ist 0.5
             )
 
             # Batterie laden
