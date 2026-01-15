@@ -245,15 +245,15 @@ def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame) -
     df_prognose = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Wetter_prognose.csv",sep=',',decimal='.')
 
     df_aktuell['Datum'] = (
-        '2025-' + df_aktuell['MM'].astype(str) + '-' + 
-        df_aktuell['DD'].astype(str) + ' ' + 
-        (df_aktuell['HH']-1).astype(str) + ':00'
+        '2025-' + df_aktuell['MM'].astype(int).astype(str) + '-' + 
+        df_aktuell['DD'].astype(int).astype(str) + ' ' + 
+        (df_aktuell['HH']-1).astype(int).astype(str) + ':00'
     )
 
     df_prognose['Datum'] = (
-        '2031-' + df_prognose['MM'].astype(str) + '-' + 
-        df_prognose['DD'].astype(str) + ' ' + 
-        (df_prognose['HH']-1).astype(str) + ':00'
+        '2031-' + df_prognose['MM'].astype(int).astype(str) + '-' + 
+        df_prognose['DD'].astype(int).astype(str) + ' ' + 
+        (df_prognose['HH']-1).astype(int).astype(str) + ':00'
     )
 
     lastprofil = pd.read_csv(DATA_DIR / "Feste_Parameter" / "Lastprofil_waermepumpe.csv", sep=';', decimal=',')
