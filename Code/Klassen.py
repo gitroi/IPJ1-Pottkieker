@@ -39,6 +39,7 @@ class Szenario:
     veränderungsfaktoren: dict
     konven_anteile: dict
     lastprofile: bool
+    untergrenze_h2: float = 50.0
     
     erzeugung_df: Optional[pd.DataFrame] = None
     verbrauch_df: Optional[pd.DataFrame] = None
@@ -78,7 +79,7 @@ class Szenario:
         
         self.kosten_df = kostenrechnung(self.szenario)
         
-        self.speicher_df = speicher.Verlauf_Speicher(self.ee_anteil_ohne_speicher_df, 100, 100, self.ziele_2030, self.ziele_2045)
+        self.speicher_df = speicher.Verlauf_Speicher(self.ee_anteil_ohne_speicher_df, 100, 100, self.ziele_2030, self.ziele_2045, self.untergrenze_h2)
 
         self.dunkelflaute_2030_df = speicher.Simulation_Dunkelflaute(self.speicher_df, 2030)
         self.dunkelflaute_2045_df = speicher.Simulation_Dunkelflaute(self.speicher_df, 2045)

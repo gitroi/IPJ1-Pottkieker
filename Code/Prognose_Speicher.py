@@ -228,10 +228,13 @@ def berechne_speicher_aufteilung(
     return anteil_batterie, anteil_pumpspeicher, anteil_wasserstoff
 
 #TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
-def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict ) -> pd.DataFrame:
+def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict, untergrenze_h2_prozent: float = 50.0) -> pd.DataFrame:
     """
     Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
     (Optimierte Version mit Hilfsfunktionen und NumPy-Arrays)
+    
+    Args:
+        untergrenze_h2_prozent: Winterladestand für Wasserstoffspeicher in Prozent (0-100)
     """
 
     bestandBatterie = FIXPARAMETER_BATTERIE.bestand
@@ -283,7 +286,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
         0.00,
         np.where(
             (monate >= 3) & (monate <= 10),  # nicht Winter
-            0.50,
+            untergrenze_h2_prozent / 100,
             FIXPARAMETER_WASSERSTOFF.untergrenze  # Standard
         )
     )

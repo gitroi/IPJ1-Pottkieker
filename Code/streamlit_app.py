@@ -168,15 +168,28 @@ if modus == "🎯 Einzelnes Szenario":
             st.info(f"📝 {gewaehltes_profil.get('Beschreibung', 'Verbrauchsprofil für die Simulation')}")
     
     st.subheader("⚙️ Simulationsparameter")
-    col3 = st.columns(1)[0]
     
-    with col3:
+    col1, col2 = st.columns(2)
+    
+    with col1:
         ertragsart = st.selectbox(
             "Ertragsart:",
             ["mittel", "schlecht", "gut"],
             help="Ertragsniveau für erneuerbare Energien"
         )
     
+    with col2:
+        untergrenze_h2 = st.slider(
+            "Winterladestand Wasserstoffspeicher:",
+            min_value=0,
+            max_value=100,
+            value=50,
+            step=1,
+            format="%d%%",
+            help="Prozentualer Anteil der H₂-Gesamtkapazität"
+        )
+    
+
     st.markdown("### ⚡ Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
     
@@ -250,7 +263,7 @@ if modus == "🎯 Einzelnes Szenario":
                         }
                     }
 
-                    szenario_key = f"{ausgewähltes_szenario_name}_{ertragsart}_{lastprofile_einzel}_{ausgewähltes_profil_name}"
+                    szenario_key = f"{ausgewähltes_szenario_name}_{ertragsart}_{lastprofile_einzel}_{ausgewähltes_profil_name}_{untergrenze_h2}"
                     
                     if 'szenario_key' not in st.session_state or st.session_state['szenario_key'] != szenario_key:
                         szenario_ergebnis = Szenario(
@@ -263,7 +276,8 @@ if modus == "🎯 Einzelnes Szenario":
                             verbrauchsprofile=gewaehltes_profil,
                             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
                             konven_anteile=konven_anteile,
-                            lastprofile=lastprofile_einzel
+                            lastprofile=lastprofile_einzel,
+                            untergrenze_h2=untergrenze_h2
                         )
                         
                         st.session_state['letztes_szenario'] = szenario_ergebnis
