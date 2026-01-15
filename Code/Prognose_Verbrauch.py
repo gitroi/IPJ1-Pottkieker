@@ -166,7 +166,7 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
 
     return df_gesamt_2045
 
-def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame , verbrauch_Jahr ) -> pd.DataFrame:
+def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame  ) -> pd.DataFrame:
     """
     Erstelltt auf basis eines Lastprofils die Lastprognose für E-Autos.
     :param anzahl_e_autos: dict mit Anzahl der E-Autos pro Jahr in 2030 und 2045 z.B. {2030: 1000000, 2045: 5000000}
@@ -233,7 +233,7 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame , verbrauch_Ja
 
     return gesamt_df.drop(columns=["Jahr", "Monat", "Wochentag", "Uhrzeit", "Minute", "E-Auto Last [MWh]"])
 
-def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame, verbrauch_jahr) -> pd.DataFrame:
+def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame) -> pd.DataFrame:
     """
     Erstellt auf Basis eines Lastprofils die Lastprognose für Wärmepumpen.
     :param anzahl_wärmepumpen: dict mit Anzahl der Wärmepumpen pro Jahr z.B. {2030: 5000000, 2045: 10000000}
