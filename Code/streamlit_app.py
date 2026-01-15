@@ -284,7 +284,7 @@ if modus == "🎯 Einzelnes Szenario":
         szenario = st.session_state['letztes_szenario']
         jahr = st.session_state.get('jahr')
         
-        tab1, tab2, tab3 = st.tabs(["ℹ️ Übersicht", "📊 Plots","📈 Verlaufsdarstellung"])
+        tab1, tab2, tab3 = st.tabs(["ℹ️ Übersicht", "📊 Visualisierungen","📈 Verlaufsdarstellung"])
         
         with tab1:
             st.subheader("Zusammenfassung")
@@ -417,6 +417,36 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_fig4"
                     )
                     
+                    st.markdown("---")
+                    st.markdown("### 📊 EE-Anteil nach Saison")
+                    
+                    @st.fragment
+                    def render_ee_anteil_jahr_tab2():
+                        jahr_tab2 = st.slider(
+                            "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1,
+                            key="jahr_slider_tab2"
+                        )
+
+                        try:
+                            fig_ee, ax_ee = plt.subplots(figsize=(12, 6))
+                            ee_anteil_jahr(szenario.getGesamtDF(), jahr_tab2, ax_ee)
+                            st.pyplot(fig_ee)
+                            buf_ee = BytesIO()
+                            fig_ee.savefig(buf_ee, format='png', dpi=300, bbox_inches='tight')
+                            buf_ee.seek(0)
+                            st.download_button(
+                                label="💾 Plot herunterladen",
+                                data=buf_ee,
+                                file_name=f"szenario_{szenario.name}_ee_anteil_saison_ertragsart_{szenario.ertragsart}_jahr_{jahr_tab2}.png",
+                                mime="image/png",
+                                key="download_ee_anteil_jahr_tab2"
+                            )
+                        except Exception as e:
+                            st.error(f"❌ Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
+                            st.exception(e)
+                    
+                    render_ee_anteil_jahr_tab2()
+                    
                 except Exception as e:
                     st.error(f"❌ Fehler beim Erstellen der Plots: {str(e)}")
                     st.exception(e)
@@ -452,33 +482,6 @@ if modus == "🎯 Einzelnes Szenario":
                     st.exception(e)
             
             render_verbrauch_jahr()  
-
-            @st.fragment
-            def render_ee_anteil_jahr():
-                jahr = st.slider(
-                    "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1,
-                    key="jahr_slider"
-                )
-
-                try:
-                    fig1, ax1 = plt.subplots(figsize=(12, 6))
-                    ee_anteil_jahr(szenario.getGesamtDF(), jahr if jahr else 2045, ax1)
-                    st.pyplot(fig1)
-                    buf_auswertung = BytesIO()
-                    fig1.savefig(buf_auswertung, format='png', dpi=300, bbox_inches='tight')
-                    buf_auswertung.seek(0)
-                    st.download_button(
-                        label="💾 Plot herunterladen",
-                        data=buf_auswertung,
-                        file_name=f"szenario_{szenario.name}_ee_anteil_jahr_ertragsart_{szenario.ertragsart}_jahr_{jahr}.png",
-                        mime="image/png",
-                        key="download_ee_anteil_jahr"
-                    )
-                except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
-                    st.exception(e)
-            
-            render_ee_anteil_jahr()      
 
             st.markdown("---")
             st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")
