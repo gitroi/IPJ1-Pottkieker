@@ -19,7 +19,7 @@ WAERMEPUMPE_JAHR_MWH = 4
 E_AUTOS_2025 = 2000000
 WAERMEPUMPEN_2025 = 1500000
 
-def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool , verbrauch_lastprofil: dict) -> pd.DataFrame:
+def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFrame:
     
 
 
@@ -27,9 +27,9 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool , verbrauch_las
     verbrauch_2030_MWh = verbrauchsprofil["Verbrauch_2030"] * 1e6
     verbrauch_2045_MWh = verbrauchsprofil["Verbrauch_2045"] * 1e6
 
-    if not lastprofil:
-        verbrauch_2030_MWh += ((verbrauchsprofil["E_Autos_2030"] * E_FAHRZEUG_JAHR_MWH) + (verbrauchsprofil["WP_2030"] * WAERMEPUMPE_JAHR_MWH))
-        verbrauch_2045_MWh += ((verbrauchsprofil["E_Autos_2045"] * E_FAHRZEUG_JAHR_MWH) + (verbrauchsprofil["WP_2045"] * WAERMEPUMPE_JAHR_MWH))
+    if  lastprofil:
+        verbrauch_2030_MWh -= ((verbrauchsprofil["E_Autos_2030"] * E_FAHRZEUG_JAHR_MWH) + (verbrauchsprofil["WP_2030"] * WAERMEPUMPE_JAHR_MWH))
+        verbrauch_2045_MWh -= ((verbrauchsprofil["E_Autos_2045"] * E_FAHRZEUG_JAHR_MWH) + (verbrauchsprofil["WP_2045"] * WAERMEPUMPE_JAHR_MWH))
 
 
 
@@ -146,8 +146,7 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool , verbrauch_las
                 2030: verbrauchsprofil["E_Autos_2030"],
                 2045: verbrauchsprofil["E_Autos_2045"]
             },
-            gesamt_df=df_gesamt_2045,
-            verbrauch_Jahr=verbrauch_lastprofil["e_auto"]
+            gesamt_df=df_gesamt_2045
         )
 
         df_gesamt_2045 = lastprofil_wärmepumpe(
@@ -155,8 +154,7 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool , verbrauch_las
                 2030: verbrauchsprofil["WP_2030"],
                 2045: verbrauchsprofil["WP_2045"]
             },
-            gesamt_df=df_gesamt_2045,
-            verbrauch_jahr=verbrauch_lastprofil["waermepumpe"]
+            gesamt_df=df_gesamt_2045
         )
 
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
@@ -219,7 +217,7 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame , verbrauch_Ja
         gesamt_df["Wochentag"] >= 5, 
         gesamt_df["Profil_Wochenende"], 
         gesamt_df["Profil_Werktag"]
-    ) * verbrauch_Jahr / (365 * 4)
+    ) * E_FAHRZEUG_JAHR_MWH / (365 * 4)
     
     gesamt_df["anzahl_autos"] = np.where(
         gesamt_df["Jahr"] <= 2030,
@@ -273,7 +271,7 @@ def lastprofil_wärmepumpe(anzahl_wärmepumpen: dict, gesamt_df: pd.DataFrame, v
         tages_temp = pd.concat([tages_temp, feb28], ignore_index=True)
 
     tmz_summe_jahr = np.maximum(19 - tages_temp['Tages_Mittel_Temp'], 1).sum()
-    a_wp = verbrauch_jahr / tmz_summe_jahr
+    a_wp = WAERMEPUMPE_JAHR_MWH / tmz_summe_jahr
 
     gesamt_df['Jahr'] = gesamt_df['Datum von'].dt.year
     gesamt_df['Monat'] = gesamt_df['Datum von'].dt.month

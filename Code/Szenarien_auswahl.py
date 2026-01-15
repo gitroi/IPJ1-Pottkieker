@@ -88,9 +88,7 @@ def prognose_eines_Szenarios():
         konven_anteile = gewaehltes_szenario.get("Konventionelle Anteile", {
             "2038": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige": 0.1, "importe": 0.1},
             "2045": {"braun": 0.0, "erdgas": 0.6, "stein": 0.0, "sonstige": 0.2, "importe": 0.2}
-        })
-
-        verbrauch = {"waermepumpe": 4, "e_auto": 2.25}  
+        }) 
         
         szenario_ergebnis = Szenario(
             name=auswahl,
@@ -102,8 +100,7 @@ def prognose_eines_Szenarios():
             verbrauchsprofile=gewaehltes_profil,
             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
             konven_anteile=konven_anteile,
-            lastprofile=lastprofil,
-            verbrauch=verbrauch
+            lastprofile=lastprofil
         )
         
         #szenario_ergebnis.berechne_alle_prognosen()
