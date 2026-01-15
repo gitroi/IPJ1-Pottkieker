@@ -131,10 +131,10 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
     """
     
     virtelstunden_pro_jahr = 365.25 * 24 * 4
-    ausbau_2030_GW = szenario["Ziele 2030"]["Ausbau Speicher"]
-    ausbau_2045_GW = szenario["Ziele 2045"]["Ausbau Speicher"]
+    ausbau_2030_GWh = szenario["Ziele 2030"]["Ausbau Speicher"]
+    ausbau_2045_GWh = szenario["Ziele 2045"]["Ausbau Speicher"]
 
-    #=== Einlesen der Kostendaten mit werten in €/KW bzw. €/KWh ===
+    #=== Einlesen der Kostendaten mit werten in Mio. €/GWh bzw. Mio. €/(GW *a) ===
     kostendaten_pfad = DATA_DIR / "Feste_Parameter" / "speicherarten.json"
     with open(kostendaten_pfad, "r") as file:
         kostendaten = json.load(file)
@@ -159,8 +159,8 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
     for key in kostendaten.keys():
         mask1 = kosten_df["Jahr"] <= 2030 
         mask2 = kosten_df["Jahr"] > 2030
-        kosten_df.loc[mask1,f"Ausbaurate {key}"] = (ausbau_2030_GW[key]-kostendaten[key]["bestand"])  / len(kosten_df[mask1])
-        kosten_df.loc[mask2,f"Ausbaurate {key}"] = (ausbau_2045_GW[key]-ausbau_2030_GW[key])  / len(kosten_df[mask2])
+        kosten_df.loc[mask1,f"Ausbaurate {key}"] = (ausbau_2030_GWh[key]-kostendaten[key]["bestand"])  / len(kosten_df[mask1])
+        kosten_df.loc[mask2,f"Ausbaurate {key}"] = (ausbau_2045_GWh[key]-ausbau_2030_GWh[key])  / len(kosten_df[mask2])
         mask3 = kosten_df[f"Ausbaurate {key}"] > 0
         kosten_df.loc[mask3,f"Capex {key} [€]"] = 1e6 * kosten_df[f"Ausbaurate {key}"] * kostendaten[key]["capex"] 
         kosten_df.loc[~mask3,f"Capex {key} [€]"] = 0
@@ -168,14 +168,14 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
         kosten_df[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"].round(2)
 
     #=== OpEx Berechnung ===
-    installierte_speicher = Prognose_Gesamt_Ausbau_(kostendaten["batteriespeicher"]["bestand"], kostendaten["wasserstoff"]["bestand"],kostendaten["pumpspeicher"]["bestand"], ausbau_2030_GW["batteriespeicher"], ausbau_2045_GW["batteriespeicher"], ausbau_2030_GW["wasserstoff"], ausbau_2045_GW["wasserstoff"], ausbau_2030_GW["pumpspeicher"], ausbau_2045_GW["pumpspeicher"])
+    installierte_speicher = Prognose_Gesamt_Ausbau_(kostendaten["batteriespeicher"]["bestand"], kostendaten["wasserstoff"]["bestand"],kostendaten["pumpspeicher"]["bestand"], ausbau_2030_GWh["batteriespeicher"], ausbau_2045_GWh["batteriespeicher"], ausbau_2030_GWh["wasserstoff"], ausbau_2045_GWh["wasserstoff"], ausbau_2030_GWh["pumpspeicher"], ausbau_2045_GWh["pumpspeicher"])
     kosten_df = pd.merge(kosten_df, installierte_speicher, on="Datum von", how="left")
 
-    for key in kostendaten.keys():
-        kosten_df[f"Opex {key} [€]"] = 1e3 * kostendaten[key]["opex"] * kosten_df[f"Speicherkapazität {key} [MWh]"] * kostendaten[key]["leistung"] / virtelstunden_pro_jahr
+    for key in kostendaten.keys():      # (MWh/1e3) * (GW/GWh) * (Mio. €/(GW*a)) *1e6 / virtelstunden_pro_jahr  = € / virtelstunde
+        kosten_df[f"Opex {key} [€]"] = (1e3 * kostendaten[key]["opex"] * kosten_df[f"Speicherkapazität {key} [MWh]"] * kostendaten[key]["leistung"]) / virtelstunden_pro_jahr
         kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"] * (virtelstunden_opex[key] ** (kosten_df['Jahr'] - 2025))
         kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"].round(2)
-
+        
         kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Capex {key} [€]"] + kosten_df[f"Opex {key} [€]"]
         spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
         kosten_df[spalten_kosten] = kosten_df[spalten_kosten].round(2)
