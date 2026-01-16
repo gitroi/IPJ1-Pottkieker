@@ -36,8 +36,7 @@ try:
     from Diagramme import (
         plot_histogram_gesamtauswertung,verbrauch_jahr,
         zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,
-        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr,
-        ee_anteil_jahr_monatlich
+        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr
     )
     from Auswertung import formatiere_spaltennamen
 
@@ -170,7 +169,7 @@ if modus == "🎯 Einzelnes Szenario":
     
     st.subheader("⚙️ Simulationsparameter")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         ertragsart = st.selectbox(
@@ -189,6 +188,13 @@ if modus == "🎯 Einzelnes Szenario":
             format="%d%%",
             help="Prozentualer Anteil der H₂-Gesamtkapazität"
         )
+    
+    with col3:
+        langzeit_kurzzeit = st.checkbox(
+        "Batteriespeicher durch Wasserstoffspeicher laden",
+        value=False,
+        help="Aktivieren, um, wenn möglich, die Batteriespeicher auf Leistungsniveau durch Laden aus Wasserstoffspeicher zu bringen"
+    )
     
 
     st.markdown("### ⚡ Konventionelle Anteile")
@@ -264,7 +270,7 @@ if modus == "🎯 Einzelnes Szenario":
                         }
                     }
 
-                    szenario_key = f"{ausgewähltes_szenario_name}_{ertragsart}_{lastprofile_einzel}_{ausgewähltes_profil_name}_{untergrenze_h2}"
+                    szenario_key = f"{ausgewähltes_szenario_name}_{ertragsart}_{lastprofile_einzel}_{ausgewähltes_profil_name}_{untergrenze_h2}_{langzeit_kurzzeit}"
                     
                     if 'szenario_key' not in st.session_state or st.session_state['szenario_key'] != szenario_key:
                         szenario_ergebnis = Szenario(
@@ -278,7 +284,8 @@ if modus == "🎯 Einzelnes Szenario":
                             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
                             konven_anteile=konven_anteile,
                             lastprofile=lastprofile_einzel,
-                            untergrenze_h2=untergrenze_h2
+                            untergrenze_h2=untergrenze_h2,
+                            langzeit_kurzzeit=langzeit_kurzzeit
                         )
                         
                         st.session_state['letztes_szenario'] = szenario_ergebnis
@@ -470,7 +477,7 @@ if modus == "🎯 Einzelnes Szenario":
 
             st.subheader("📈 Verlaufsdarstellung")
             st.markdown("### Verbrauch & Erzeugung im Jahr")
-
+            
             @st.fragment
             def render_verbrauch_jahr():
                 jahr_auswertung = st.slider(
@@ -497,36 +504,6 @@ if modus == "🎯 Einzelnes Szenario":
                     st.exception(e)
             
             render_verbrauch_jahr()  
-
-            st.markdown("---")
-            st.markdown("### 📊 EE-Anteil nach Monat")
-            
-            @st.fragment
-            def render_ee_anteil_jahr_monat():
-                jahr_monat = st.slider(
-                    "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1,
-                    key="jahr_slider_monat"
-                )
-
-                try:
-                    fig_ee, ax_ee = plt.subplots(figsize=(12, 6))
-                    ee_anteil_jahr_monatlich(szenario.getGesamtDF(), jahr_monat, ax_ee)
-                    st.pyplot(fig_ee)
-                    buf_ee = BytesIO()
-                    fig_ee.savefig(buf_ee, format='png', dpi=300, bbox_inches='tight')
-                    buf_ee.seek(0)
-                    st.download_button(
-                        label="💾 Plot herunterladen",
-                        data=buf_ee,
-                        file_name=f"szenario_{szenario.name}_ee_anteil_saison_ertragsart_{szenario.ertragsart}_jahr_{jahr_monat}.png",
-                        mime="image/png",
-                        key="download_ee_anteil_jahr_monat"         
-                    )
-                except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
-                    st.exception(e)
-            
-            render_ee_anteil_jahr_monat()
 
             st.markdown("---")
             st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")

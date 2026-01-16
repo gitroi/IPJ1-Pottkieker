@@ -87,8 +87,10 @@ def speicher_laden(
     max_bestand = kapazitaet * obergrenze
     
     # Prüfen ob Speicher noch Platz hat
-    if aktueller_bestand > (max_bestand - leistung):
-        return aktueller_bestand, lademenge  # Keine Änderung
+    if aktueller_bestand > (max_bestand - leistung): 
+        lademenge = lademenge - ((max_bestand - aktueller_bestand) / wirkungsgrad)
+        aktueller_bestand = max_bestand
+        return aktueller_bestand, lademenge  
     
     if lademenge <= 0:
         return aktueller_bestand, lademenge
@@ -227,8 +229,8 @@ def berechne_speicher_aufteilung(
     
     return anteil_batterie, anteil_pumpspeicher, anteil_wasserstoff
 
-#TODO : Andere Grenzen für 2026-2030 und 2031-2045 einbauen?
-def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict, untergrenze_h2_prozent: float = 50.0) -> pd.DataFrame:
+
+def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze: float, ziele_2030: dict, ziele_2045: dict, untergrenze_h2_prozent: float, langzeit_kurzzeit: bool) -> pd.DataFrame:
     """
     Simuliert den Verlauf mit Erzeugung, Verbrauch und Speichern.
     (Optimierte Version mit Hilfsfunktionen und NumPy-Arrays)
@@ -309,108 +311,227 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     exportEnergie = 0
     importEnergie = 0
 
+    # Debug-Zählvariable für das Laden der Kurzzeitspeicher aus Langzeitspeicher
+    # debug_kurzzeitladen = 0
+
     # Simulation über alle Zeitpunkte
-    for idx in range(len(erneuerbare)):
+    if langzeit_kurzzeit:
+        # Version MIT Batterie-aus-H2-Laden
+        for idx in range(len(erneuerbare)):
+            
+            erzeugung = erneuerbare[idx]
+            aktuell_zusatz_energie = 0
+            fehlmenge = 0
+            lademenge = 0
+            rest = 0 #übergebliebene Energie nach Laden
+            geliefert = 0 #gelieferte Energie beim Entladen
+            verbrauchte_leistung_batterie = 0 #Tracking für gegenseitiges Speicherladen
+            verbrauchte_leistung_wasserstoff = 0 #Tracking für gegenseitiges Speicherladen
+
+            
+            # Speicher laden
+            if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
+            
+                lademenge = erzeugung - netzlast[idx] * (ladegrenze / 100)
+
+                ueber_energie.append(lademenge)
+
+                # Verfügbaren Platz berechnen
+                platz_batterie = (kap_batterie[idx] * FIXPARAMETER_BATTERIE.obergrenze) - aktuell_batterie
+                platz_pump = (kap_pumpspeicher[idx] * FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuell_pumpspeicher
+                platz_h2 = (kap_wasserstoff[idx] * FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuell_wasserstoff
+
+                # Aufteilung berechnen
+                anteil_batterie, anteil_pump, anteil_h2 = berechne_speicher_aufteilung(
+                lademenge,
+                platz_batterie,
+                platz_pump,
+                platz_h2,
+                leistung_batterie[idx],
+                leistung_pumpspeicher[idx],
+                leistung_wasserstoff[idx],
+                0.5,  # Optional: Standard ist 0.5
+                0.5   # Optional: Standard ist 0.5
+                )
+
+                # Batterie laden
+                aktuell_batterie, rest = speicher_laden(
+                    aktuell_batterie, anteil_batterie, leistung_batterie[idx],
+                    kap_batterie[idx], FIXPARAMETER_BATTERIE.obergrenze, inputWirkungsgradBatterie
+                )
+                
+                verbrauchte_leistung_batterie = (anteil_batterie - rest) / inputWirkungsgradBatterie
+                lademenge -= (anteil_batterie - rest)
+
+                # Pumpspeicher laden
+                aktuell_pumpspeicher, rest = speicher_laden(
+                    aktuell_pumpspeicher, anteil_pump, leistung_pumpspeicher[idx],
+                    kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.obergrenze, inputWirkungsgradPumpspeicher
+                )
+
+                lademenge -= (anteil_pump - rest)
+                
+                # Wasserstoff laden
+                aktuell_wasserstoff, rest = speicher_laden(
+                    aktuell_wasserstoff, anteil_h2, leistung_wasserstoff[idx],
+                    kap_wasserstoff[idx], FIXPARAMETER_WASSERSTOFF.obergrenze, inputWirkungsgradWasserstoff
+                )
+
+                lademenge -= (anteil_h2 - rest)
+
+            # Speicher entladen
+            elif anteil_ee[idx] <= entladegrenze:  # Fehlende Energie vorhanden
+
+                fehlmenge = netzlast[idx] * (entladegrenze / 100) - erzeugung
+
+                ueber_energie.append(lademenge)
+
+                # Batterie entladen
+                aktuell_batterie, geliefert, fehlmenge = speicher_entladen(
+                    aktuell_batterie, fehlmenge, leistung_batterie[idx],
+                    kap_batterie[idx], FIXPARAMETER_BATTERIE.untergrenze, outputWirkungsgradBatterie
+                )
+                aktuell_zusatz_energie += geliefert
+                
+                # Pumpspeicher entladen
+                aktuell_pumpspeicher, geliefert, fehlmenge = speicher_entladen(
+                    aktuell_pumpspeicher, fehlmenge, leistung_pumpspeicher[idx],
+                    kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.untergrenze, outputWirkungsgradPumpspeicher
+                )
+                aktuell_zusatz_energie += geliefert
+                
+                # Wasserstoff entladen
+                aktuell_wasserstoff, geliefert, fehlmenge = speicher_entladen(
+                    aktuell_wasserstoff, fehlmenge, leistung_wasserstoff[idx],
+                    kap_wasserstoff[idx], untergrenzen_h2[idx], outputWirkungsgradWasserstoff
+                )
+
+                verbrauchte_leistung_wasserstoff = geliefert 
+                aktuell_zusatz_energie += geliefert
+
         
-        erzeugung = erneuerbare[idx]
-        aktuell_zusatz_energie = 0
-        fehlmenge = 0
-        lademenge = 0
-        rest = 0 #übergebliebene Energie nach Laden
+            # Kurzzeitspeicher aus Langzeitspeicher auffüllen
+            if (
+                aktuell_batterie < (1.1 * leistung_batterie[idx] / FIXPARAMETER_BATTERIE.wirkungsgrad) and 
+                aktuell_wasserstoff > (FIXPARAMETER_WASSERSTOFF.untergrenze * kap_wasserstoff[idx]) and
+                (leistung_wasserstoff[idx] - verbrauchte_leistung_wasserstoff) > 0 and
+                (leistung_batterie[idx] - verbrauchte_leistung_batterie) > 0
+                ):
 
-        
+                fehlmenge_batterie = (1.1 * leistung_batterie[idx] / FIXPARAMETER_BATTERIE.wirkungsgrad) - aktuell_batterie
+                geliefert = 0 #sicherheitshalber zurücksetzen
 
-        if anteil_ee[idx] > ladegrenze:  # Überschüssige Energie vorhanden
-            
-            lademenge = erzeugung - netzlast[idx] * (ladegrenze / 100)
+                # Wasserstoff entladen um Batterie zu füllen
+                aktuell_wasserstoff, geliefert, fehlmenge_batterie = speicher_entladen(
+                    aktuell_wasserstoff, fehlmenge_batterie, (leistung_wasserstoff[idx] - verbrauchte_leistung_wasserstoff),
+                    kap_wasserstoff[idx], untergrenzen_h2[idx], outputWirkungsgradWasserstoff
+                )
+                
+                # Batterie laden mit gelieferter Energie
+                aktuell_batterie, rest = speicher_laden(
+                    aktuell_batterie, geliefert, (leistung_batterie[idx]-verbrauchte_leistung_batterie),
+                    kap_batterie[idx], FIXPARAMETER_BATTERIE.obergrenze, inputWirkungsgradBatterie
+                )
 
-            ueber_energie.append(lademenge)
-
-            # Verfügbaren Platz berechnen
-            platz_batterie = (kap_batterie[idx] * FIXPARAMETER_BATTERIE.obergrenze) - aktuell_batterie
-            platz_pump = (kap_pumpspeicher[idx] * FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuell_pumpspeicher
-            platz_h2 = (kap_wasserstoff[idx] * FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuell_wasserstoff
-
-            # Aufteilung berechnen
-            anteil_batterie, anteil_pump, anteil_h2 = berechne_speicher_aufteilung(
-            lademenge,
-            platz_batterie,
-            platz_pump,
-            platz_h2,
-            leistung_batterie[idx],
-            leistung_pumpspeicher[idx],
-            leistung_wasserstoff[idx],
-            0.5,  # Optional: Standard ist 0.5
-            0.5   # Optional: Standard ist 0.5
-            )
-
-            # Batterie laden
-            aktuell_batterie, rest = speicher_laden(
-                aktuell_batterie, anteil_batterie, leistung_batterie[idx],
-                kap_batterie[idx], FIXPARAMETER_BATTERIE.obergrenze, inputWirkungsgradBatterie
-            )
-            
-            lademenge -= (anteil_batterie - rest)
-
-            # Pumpspeicher laden
-            aktuell_pumpspeicher, rest = speicher_laden(
-                aktuell_pumpspeicher, anteil_pump, leistung_pumpspeicher[idx],
-                kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.obergrenze, inputWirkungsgradPumpspeicher
-            )
-
-            lademenge -= (anteil_pump - rest)
-            
-            # Wasserstoff laden
-            aktuell_wasserstoff, rest = speicher_laden(
-                aktuell_wasserstoff, anteil_h2, leistung_wasserstoff[idx],
-                kap_wasserstoff[idx], FIXPARAMETER_WASSERSTOFF.obergrenze, inputWirkungsgradWasserstoff
-            )
-
-            lademenge -= (anteil_h2 - rest)
+            # debug_kurzzeitladen += 1
+            # print(f"Anzahl Kurzzeitladen aus Langzeitspeicher: {debug_kurzzeitladen}", end='\n')
 
             exportEnergie += lademenge #TODO: Außerhalb berechnen
-
-        elif anteil_ee[idx] <= entladegrenze:  # Fehlende Energie vorhanden
-
-            fehlmenge = netzlast[idx] * (entladegrenze / 100) - erzeugung
-
-            ueber_energie.append(lademenge)
-
-            # Batterie entladen
-            aktuell_batterie, geliefert, fehlmenge = speicher_entladen(
-                aktuell_batterie, fehlmenge, leistung_batterie[idx],
-                kap_batterie[idx], FIXPARAMETER_BATTERIE.untergrenze, outputWirkungsgradBatterie
-            )
-            aktuell_zusatz_energie += geliefert
-            
-            # Pumpspeicher entladen
-            aktuell_pumpspeicher, geliefert, fehlmenge = speicher_entladen(
-                aktuell_pumpspeicher, fehlmenge, leistung_pumpspeicher[idx],
-                kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.untergrenze, outputWirkungsgradPumpspeicher
-            )
-            aktuell_zusatz_energie += geliefert
-            
-            # Wasserstoff entladen
-            aktuell_wasserstoff, geliefert, fehlmenge = speicher_entladen(
-                aktuell_wasserstoff, fehlmenge, leistung_wasserstoff[idx],
-                kap_wasserstoff[idx], untergrenzen_h2[idx], outputWirkungsgradWasserstoff
-            )
-            aktuell_zusatz_energie += geliefert
-
             importEnergie += fehlmenge #TODO: Außerhalb berechnen
-        
-        speicherstand_batterie.append(aktuell_batterie)
-        speicherstand_wasserstoff.append(aktuell_wasserstoff)   
-        speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
-        zusatz_energie.append(aktuell_zusatz_energie)   
-        fehl_energie.append(fehlmenge)
-        ueber_energie_post.append(lademenge)
 
-        # Langzeitverluste der Speicher jede Stunde
-        if idx % 4 == 0:
-            aktuell_batterie -= ((FIXPARAMETER_BATTERIE.verluste/100) * aktuell_batterie)
-            aktuell_wasserstoff -= ((FIXPARAMETER_WASSERSTOFF.verluste/100) * aktuell_wasserstoff)
-            aktuell_pumpspeicher -= ((FIXPARAMETER_PUMPSPEICHER.verluste/100) * aktuell_pumpspeicher)
+            speicherstand_batterie.append(aktuell_batterie)
+            speicherstand_wasserstoff.append(aktuell_wasserstoff)   
+            speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
+            zusatz_energie.append(aktuell_zusatz_energie)   
+            fehl_energie.append(fehlmenge)
+            ueber_energie_post.append(lademenge)
+
+            # Langzeitverluste der Speicher jede Stunde
+            if idx % 4 == 0:
+                aktuell_batterie -= ((FIXPARAMETER_BATTERIE.verluste/100) * aktuell_batterie)
+                aktuell_wasserstoff -= ((FIXPARAMETER_WASSERSTOFF.verluste/100) * aktuell_wasserstoff)
+                aktuell_pumpspeicher -= ((FIXPARAMETER_PUMPSPEICHER.verluste/100) * aktuell_pumpspeicher)
+    else:
+        # Version OHNE Batterie-aus-H2-Laden (effizienter)
+        for idx in range(len(erneuerbare)):
+            
+            erzeugung = erneuerbare[idx]
+            aktuell_zusatz_energie = 0
+            fehlmenge = 0
+            lademenge = 0
+            rest = 0
+            geliefert = 0
+
+            # Speicher laden
+            if anteil_ee[idx] > ladegrenze:
+                
+                lademenge = erzeugung - netzlast[idx] * (ladegrenze / 100)
+                ueber_energie.append(lademenge)
+
+                platz_batterie = (kap_batterie[idx] * FIXPARAMETER_BATTERIE.obergrenze) - aktuell_batterie
+                platz_pump = (kap_pumpspeicher[idx] * FIXPARAMETER_PUMPSPEICHER.obergrenze) - aktuell_pumpspeicher
+                platz_h2 = (kap_wasserstoff[idx] * FIXPARAMETER_WASSERSTOFF.obergrenze) - aktuell_wasserstoff
+
+                anteil_batterie, anteil_pump, anteil_h2 = berechne_speicher_aufteilung(
+                    lademenge, platz_batterie, platz_pump, platz_h2,
+                    leistung_batterie[idx], leistung_pumpspeicher[idx], leistung_wasserstoff[idx], 0.5, 0.5
+                )
+
+                aktuell_batterie, rest = speicher_laden(
+                    aktuell_batterie, anteil_batterie, leistung_batterie[idx],
+                    kap_batterie[idx], FIXPARAMETER_BATTERIE.obergrenze, inputWirkungsgradBatterie
+                )
+                lademenge -= (anteil_batterie - rest)
+
+                aktuell_pumpspeicher, rest = speicher_laden(
+                    aktuell_pumpspeicher, anteil_pump, leistung_pumpspeicher[idx],
+                    kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.obergrenze, inputWirkungsgradPumpspeicher
+                )
+                lademenge -= (anteil_pump - rest)
+                
+                aktuell_wasserstoff, rest = speicher_laden(
+                    aktuell_wasserstoff, anteil_h2, leistung_wasserstoff[idx],
+                    kap_wasserstoff[idx], FIXPARAMETER_WASSERSTOFF.obergrenze, inputWirkungsgradWasserstoff
+                )
+                lademenge -= (anteil_h2 - rest)
+
+            elif anteil_ee[idx] <= entladegrenze:
+                
+                fehlmenge = netzlast[idx] * (entladegrenze / 100) - erzeugung
+                ueber_energie.append(lademenge)
+
+                aktuell_batterie, geliefert, fehlmenge = speicher_entladen(
+                    aktuell_batterie, fehlmenge, leistung_batterie[idx],
+                    kap_batterie[idx], FIXPARAMETER_BATTERIE.untergrenze, outputWirkungsgradBatterie
+                )
+                aktuell_zusatz_energie += geliefert
+                
+                aktuell_pumpspeicher, geliefert, fehlmenge = speicher_entladen(
+                    aktuell_pumpspeicher, fehlmenge, leistung_pumpspeicher[idx],
+                    kap_pumpspeicher[idx], FIXPARAMETER_PUMPSPEICHER.untergrenze, outputWirkungsgradPumpspeicher
+                )
+                aktuell_zusatz_energie += geliefert
+                
+                aktuell_wasserstoff, geliefert, fehlmenge = speicher_entladen(
+                    aktuell_wasserstoff, fehlmenge, leistung_wasserstoff[idx],
+                    kap_wasserstoff[idx], untergrenzen_h2[idx], outputWirkungsgradWasserstoff
+                )
+                aktuell_zusatz_energie += geliefert
+
+            exportEnergie += lademenge
+            importEnergie += fehlmenge
+
+            speicherstand_batterie.append(aktuell_batterie)
+            speicherstand_wasserstoff.append(aktuell_wasserstoff)   
+            speicherstand_pumpspeicher.append(aktuell_pumpspeicher)  
+            zusatz_energie.append(aktuell_zusatz_energie)   
+            fehl_energie.append(fehlmenge)
+            ueber_energie_post.append(lademenge)
+
+            if idx % 4 == 0:
+                aktuell_batterie -= ((FIXPARAMETER_BATTERIE.verluste/100) * aktuell_batterie)
+                aktuell_wasserstoff -= ((FIXPARAMETER_WASSERSTOFF.verluste/100) * aktuell_wasserstoff)
+                aktuell_pumpspeicher -= ((FIXPARAMETER_PUMPSPEICHER.verluste/100) * aktuell_pumpspeicher)
 
     df_gesamtVerlauf["Ladestand batteriespeicher [MWh]"] = speicherstand_batterie
     df_gesamtVerlauf["Ladestand wasserstoff [MWh]"] = speicherstand_wasserstoff
