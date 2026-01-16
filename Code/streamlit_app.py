@@ -183,7 +183,7 @@ if modus == "🎯 Einzelnes Szenario":
             "Winterladestand Wasserstoffspeicher:",
             min_value=0,
             max_value=100,
-            value=50,
+            value=0,
             step=1,
             format="%d%%",
             help="Prozentualer Anteil der H₂-Gesamtkapazität"

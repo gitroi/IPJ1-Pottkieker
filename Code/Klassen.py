@@ -39,7 +39,7 @@ class Szenario:
     veränderungsfaktoren: dict
     konven_anteile: dict
     lastprofile: bool
-    untergrenze_h2: float = 50.0
+    untergrenze_h2: float = 0.0
     
     erzeugung_df: Optional[pd.DataFrame] = None
     verbrauch_df: Optional[pd.DataFrame] = None
