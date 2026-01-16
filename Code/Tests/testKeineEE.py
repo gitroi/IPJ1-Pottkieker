@@ -1,5 +1,6 @@
 """
 Tested die Simulation bei Extremwerten der Eingabedaten.
+Erstellt durch Joris Bürger mit hilfe von inline GitHub Copilot.
 """
 
 import sys

@@ -1,6 +1,6 @@
 """
 Tests für die Softwaremodule.
-Hier können Unit-Tests und Integrationstests hinzugefügt werden.
+Erstellt durch Joris Bürger mit Hilfe von inline GitHub Copilot.
 """
 
 import sys

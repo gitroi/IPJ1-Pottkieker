@@ -1,8 +1,13 @@
 """
 Unit Tests für Prognose_Erzeugung.py
 Testet die Funktionen zur Erzeugungsprognose von Erneuerbaren Energien.
-Erstellt mit GitHub Copilot
+Erstellt durch GitHub Copilot
 """
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
 import pandas as pd

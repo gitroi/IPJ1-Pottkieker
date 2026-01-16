@@ -36,7 +36,8 @@ try:
     from Diagramme import (
         plot_histogram_gesamtauswertung,verbrauch_jahr,
         zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,
-        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr
+        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr,
+        ee_anteil_jahr_monatlich
     )
     from Auswertung import formatiere_spaltennamen
 
@@ -469,7 +470,7 @@ if modus == "🎯 Einzelnes Szenario":
 
             st.subheader("📈 Verlaufsdarstellung")
             st.markdown("### Verbrauch & Erzeugung im Jahr")
-            
+
             @st.fragment
             def render_verbrauch_jahr():
                 jahr_auswertung = st.slider(
@@ -496,6 +497,36 @@ if modus == "🎯 Einzelnes Szenario":
                     st.exception(e)
             
             render_verbrauch_jahr()  
+
+            st.markdown("---")
+            st.markdown("### 📊 EE-Anteil nach Monat")
+            
+            @st.fragment
+            def render_ee_anteil_jahr_monat():
+                jahr_monat = st.slider(
+                    "Jahr auswählen:", min_value=2026, max_value=2045, value=2045, step=1,
+                    key="jahr_slider_monat"
+                )
+
+                try:
+                    fig_ee, ax_ee = plt.subplots(figsize=(12, 6))
+                    ee_anteil_jahr_monatlich(szenario.getGesamtDF(), jahr_monat, ax_ee)
+                    st.pyplot(fig_ee)
+                    buf_ee = BytesIO()
+                    fig_ee.savefig(buf_ee, format='png', dpi=300, bbox_inches='tight')
+                    buf_ee.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf_ee,
+                        file_name=f"szenario_{szenario.name}_ee_anteil_saison_ertragsart_{szenario.ertragsart}_jahr_{jahr_monat}.png",
+                        mime="image/png",
+                        key="download_ee_anteil_jahr_monat"         
+                    )
+                except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
+                    st.exception(e)
+            
+            render_ee_anteil_jahr_monat()
 
             st.markdown("---")
             st.markdown("### Zwei-Wochen-Diagramm Stundenwerte")

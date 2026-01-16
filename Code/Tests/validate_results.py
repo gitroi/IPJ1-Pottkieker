@@ -4,6 +4,12 @@ Prüft die Plausibilität und Konsistenz der Simulationsergebnisse.
 Programmiert von GitHub Copilot
 """
 
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import sys
 import os
 from pathlib import Path
@@ -428,16 +434,6 @@ def validate_kosten(df: pd.DataFrame):
     if not negative_found:
         check_pass("Keine negativen Kostenwerte")
     
-    # 2. Prüfe Gesamtkosten
-    print_subheader("Gesamtkosten")
-    kosten_cols = [col for col in df.columns if "kosten" in col.lower() or "euro" in col.lower() or "€" in col]
-    
-    for col in kosten_cols:
-        total = df[col].sum()
-        mean = df[col].mean()
-        print(f"  {col}:")
-        print(f"    Gesamt: {total:,.2f}")
-        print(f"    Mittelwert: {mean:,.2f}")
 
 def validate_dunkelflaute(df: pd.DataFrame, jahr: int):
     """Validiert die Dunkelflaute-Analyse"""

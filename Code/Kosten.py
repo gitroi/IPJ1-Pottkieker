@@ -41,11 +41,10 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
 
     
     #=== DataFrame für die Kosten erstellen ===
-    date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min',tz='UTC') 
+    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC') 
     kosten_df = pd.DataFrame({"Datum von": date_range})
     kosten_df["Jahr"] = kosten_df["Datum von"].dt.year
     kosten_df["Monat"]= kosten_df["Datum von"].dt.month
-    kosten_df = kosten_df.drop_duplicates().reset_index(drop=True)
     
     #=== Capex Berechnung ===
 
@@ -139,12 +138,11 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
     with open(kostendaten_pfad, "r") as file:
         kostendaten = json.load(file)
 
-    date_range = pd.date_range(start='01-01-2026', end='31-12-2045', freq='15min',tz='UTC') 
+    date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC') 
     kosten_df = pd.DataFrame({"Datum von": date_range})
 
     kosten_df["Jahr"] = kosten_df["Datum von"].dt.year
     kosten_df["Monat"]= kosten_df["Datum von"].dt.month
-    kosten_df = kosten_df.drop_duplicates().reset_index(drop=True)
 
     capex_wachstum  = szenario["Veränderungsfaktoren"]["Capex_Speicher"]
     opex_wachstum = szenario["Veränderungsfaktoren"]["Opex_Speicher"]
