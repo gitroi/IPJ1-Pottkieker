@@ -199,8 +199,8 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame  ) -> pd.DataF
     )
     werktage_e_autos["Stunde"] = werktage_e_autos["Zeitstempel"].dt.hour
 
-    werktag_profil = werktage_e_autos.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Werktag"})
-    wochenende_profil = wochenende_e_autos.rename(columns={"Stunde": "Uhrzeit", "Szenario_C": "Profil_Wochenende"})
+    werktag_profil = werktage_e_autos.rename(columns={"Stunde": "Uhrzeit", "Szenario_B": "Profil_Werktag"})
+    wochenende_profil = wochenende_e_autos.rename(columns={"Stunde": "Uhrzeit", "Szenario_B": "Profil_Wochenende"})
     
     gesamt_df = gesamt_df.merge(
         werktag_profil[["Uhrzeit", "Profil_Werktag"]], 
