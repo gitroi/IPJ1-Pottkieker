@@ -39,8 +39,8 @@ class Szenario:
     veränderungsfaktoren: dict
     konven_anteile: dict
     lastprofile: bool
-    untergrenze_h2: float
-    langzeit_kurzzeit: bool
+    untergrenze_h2: float = 0.0
+    langzeit_kurzzeit: bool = False
     
     erzeugung_df: Optional[pd.DataFrame] = None
     verbrauch_df: Optional[pd.DataFrame] = None

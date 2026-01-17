@@ -79,6 +79,8 @@ def prognose_eines_Szenarios():
     jahr = input("Jahr für die Grafik 'Ist-Analyse' (z.B. 2026, leer für alle): ")
     ertragsart = input("Ertragsart (schlecht, mittel, gut): ")
     bilder = input("Möchten Sie die Plots speichern? (ja/nein): ").lower() == "ja"
+    untergrenze_h2 = int(input("Geben Sie die Untergrenze für Wasserstoffspeicher in % ein (0-100): "))
+    langzeit_kurzzeit = input("Möchten Sie den Batteriespeicher durch Wasserstoffspeicher laden? (ja/nein): ").lower() == "ja"
 
     gewaehltes_szenario = get_scenario_by_name(szenarien, auswahl)
     gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
@@ -100,7 +102,9 @@ def prognose_eines_Szenarios():
             verbrauchsprofile=gewaehltes_profil,
             veränderungsfaktoren=gewaehltes_szenario["Veränderungsfaktoren"]["Erzeugung"],
             konven_anteile=konven_anteile,
-            lastprofile=lastprofil
+            lastprofile=lastprofil,
+            untergrenze_h2=untergrenze_h2,
+            langzeit_kurzzeit=langzeit_kurzzeit
         )
         
         #szenario_ergebnis.berechne_alle_prognosen()
