@@ -693,7 +693,7 @@ elif modus == "📈 Szenarien vergleichen":
         options=szenarien_dict.keys()
     )
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         profil_namen = [p["Name"] for p in verbrauchsprofile]
@@ -707,6 +707,24 @@ elif modus == "📈 Szenarien vergleichen":
             "Ertragsart für alle Szenarien:",
             ["mittel", "schlecht", "gut"]
         )
+    
+    with col3:
+        untergrenze_h2 = st.slider(
+            "Winterladestand Wasserstoffspeicher:",
+            min_value=0,
+            max_value=100,
+            value=0,
+            step=1,
+            format="%d%%",
+            help="Prozentualer Anteil der H₂-Gesamtkapazität"
+        )
+    
+    with col4:
+        langzeit_kurzzeit = st.checkbox(
+        "Batteriespeicher durch Wasserstoffspeicher laden",
+        value=False,
+        help="Aktivieren, um, wenn möglich, die Batteriespeicher auf Leistungsniveau durch Laden aus Wasserstoffspeicher zu bringen"
+    )
     
     st.markdown("### ⚡ Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
@@ -802,7 +820,9 @@ elif modus == "📈 Szenarien vergleichen":
                         verbrauchsprofile=gewaehltes_profil,
                         veränderungsfaktoren=szenario_data["Veränderungsfaktoren"]["Erzeugung"],
                         konven_anteile=konven_anteile,
-                        lastprofile=lastprofile_vergleich
+                        lastprofile=lastprofile_vergleich,
+                        untergrenze_h2=untergrenze_h2,
+                        langzeit_kurzzeit=langzeit_kurzzeit
                     )
                     
                     #szenario_ergebnis.berechne_alle_prognosen()
