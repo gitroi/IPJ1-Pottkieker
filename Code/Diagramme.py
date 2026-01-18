@@ -278,7 +278,7 @@ def kosten(kosten_df: pd.DataFrame, gesamt_df: pd.DataFrame, ax1, ax2):
 
     ax2.pie(anteil_gesamtkosten, labels=technologien, autopct='%1.1f%%', startangle=140, colors=colors)
     ax2.set_title('Anteil der Gesamtkosten nach Technologie')
-
+ 
 #FIXME: Daten aus Dataframe lesen um Rechenleistung zu vermindern
 def plot_histogram_ausbauraten_Speicher(szenario, ax, ax2):
     """ 
@@ -621,8 +621,14 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
                  woche_df["Wind Onshore [MWh] Originalauflösungen"]/1e3,
                  woche_df["Wind Offshore [MWh] Originalauflösungen"]/1e3,
                  woche_df["Photovoltaik [MWh] Originalauflösungen"]/1e3,
-                 labels=["Sonstige", "Biomasse", "Wasserkraft", "Wind Onshore", "Wind Offshore", "PV"],
-                 colors=['#FF8C00', '#228B22', '#00CED1', '#87CEEB', '#4169E1', '#F9BF02'],
+                 woche_df["Energie aus Speicher [MWh]"]/1e3,
+                 woche_df["braun [MWh]"]/1e3,
+                 woche_df["erdgas [MWh]"]/1e3,
+                 woche_df["stein [MWh]"]/1e3,
+                 woche_df["sonstige [MWh]"]/1e3,
+                 woche_df["importe [MWh]"]/1e3,
+                 labels=["Sonstige", "Biomasse", "Wasserkraft", "Wind Onshore", "Wind Offshore", "PV", "Speicher", "Braunkohle","Erdgas","Steinkohle","Sonstige Konv.","Importe"],
+                 colors=['#FF8C00', '#228B22', '#00CED1', '#87CEEB', '#4169E1', '#F9BF02', '#00FF00', '#8B4513',"#DCAE76",'#708090','#D3D3D3','#000000'],
                  alpha=0.8)
     
     ax.plot(woche_df.index, woche_df["Netzlast [MWh]"]/1e3, label="Netzlast", color='red', linewidth=2, linestyle='--')
