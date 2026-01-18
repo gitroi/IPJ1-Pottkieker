@@ -1,0 +1,55 @@
+
+@startuml E-Autos Lastprofil Berechnung
+skinparam ActivityFontSize 28
+skinparam NoteFontSize 20
+
+!define CALC #LightBlue
+!define DATA #LightGreen
+!define OUTPUT #LightCoral
+
+start
+
+:Eingabeparameter;
+note right
+  • anzahl_e_autos: {2030: X, 2045: Y}
+  • gesamt_df: Gesamtverbrauch DataFrame
+end note
+
+partition "Daten laden" DATA {
+  :Lade E-Auto Lastverteilungsprofil;
+  
+  :Erstelle Datum-, Uhrzeit-, Minuten-Spalten;
+}
+
+partition "Berechnung der Last" CALC {
+  :Berechnung der Last eines
+  E-Autos pro Viertelstunde;
+  note right
+    verbrauch = jahresverbrauch * profil_wert / (365 * 4)
+  end note
+  
+ :Interpoliere Anzahl E-Autos
+  linear für jedes Jahr;
+  note right
+    2025-2030: 
+    E-Autos = E_Autos_2025 + (E_Autos_2030 - E_Autos_2025) × (Jahr - 2025) / 5
+    
+    2031-2045:
+    E-Autos = E_Autos_2030 + (E_Autos_2045 - E_Autos_2030) × (Jahr - 2030) / 15
+  end note
+
+  :Multipliziere mit Anzahl E-Autos;
+  note right
+    E-Auto Last [MWh] = verbrauch × anzahl_e_autos 
+  end note
+
+    :Addiere zur Netzlast;
+
+}
+
+:Rückgabe: gesamt_df 
+mit relevanten Spalten;
+
+stop
+
+@enduml

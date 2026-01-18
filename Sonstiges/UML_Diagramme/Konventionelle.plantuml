@@ -1,0 +1,49 @@
+@startuml Konventionelle Kosten und installationsberechnung
+skinparam ActivityFontSize 28
+skinparam NoteFontSize 20
+
+!define CALC #LightBlue
+!define DATA #LightGreen
+!define OUTPUT #LightCoral
+
+start
+
+:Eingabeparameter;
+note right
+  • gesamt_df: Gesamtverlauf DataFrame
+  • anteile: Anteile jeder konventionellen Technologie
+  • Konventionelle: Benötigte Leistung und Energie pro Jahr
+end note
+
+partition "Berechnung der einzelnen konventionellen Technologien" CALC {
+  :Berechnung der Erzeugung je Technologie
+  anhand der Anteile;
+  note right    
+    z.B. erzeugung Braunkohle = benötigte 
+    konventionelle Energie × anteil_braunkohle
+  end note
+  
+  :Berechnung der installierten Leistung
+  je Technologie;
+    note right    
+        z.B. installierte Leistung Braunkohle = 
+        benötigte konventionelle Leistung × anteil_braunkohle
+    end note
+
+  :Kostenberechnung je Technologie;
+  note right
+    Capex: Bei zubau im vergleich zum Vorjahr
+    Opex: Jährliche Betriebskosten der Anlage & Brennstoffkosten
+  end note
+
+    :Summiere Kosten aller Technologien;
+
+
+}
+
+:Rückgabe: gesamt_df 
+mit relevanten Spalten;
+
+stop
+
+@enduml

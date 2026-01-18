@@ -1,0 +1,92 @@
+
+@startuml Wärmepumpen Lastprofil Berechnung
+skinparam ActivityFontSize 28
+skinparam NoteFontSize 20
+title Berechnungsablauf: Wärmepumpen Lastprofil
+
+!define CALC #LightBlue
+!define DATA #LightGreen
+!define MERGE #LightYellow
+!define OUTPUT #LightCoral
+
+start
+
+:Eingabeparameter;
+note right
+  • anzahl_wärmepumpen: {2030: X, 2045: Y}
+  • gesamt_df: Gesamtverbrauch DataFrame
+end note
+
+partition "Daten laden" DATA {
+  :Lade Wetterdaten
+  Lade Lastprofildaten;
+  
+  :Erstelle Datum-, Uhrzeit-, Minuten-Spalten;
+
+  :Lösche unnötige Spalten;
+}
+
+partition "Temperaturmaßzahl & spezifische elektrische Arbeit berechnen" CALC {
+  :Berechne Tagesmittel aus stündlichen Werten
+  für aktuelles Wetter und Prognose-Wetter;
+  note right
+    Mittelwert der Temperatur t im bereich -14°C bis +18°C
+  end note
+  
+  :Ergänze 29. Februar
+  (falls nicht vorhanden);
+  note right
+    Nutze Werte vom 28. Februar
+  end note
+
+  :Berechnung TMZ pro Tag;
+  note right
+    TMZ = max(19°C - Tagesmittel, 1°C)
+    über alle Tage des Jahres
+  end note
+
+  :Berechne Spezifische elektrische Arbeit a_wp;
+  note right
+    a_wp = Jahresenergie / Σ TMZ eines Jahres
+  end note
+}
+
+partition "Last berechnen" CALC {
+    :Interpoliere Anzahl Wärmepumpen
+  linear für jedes Jahr;
+  note right
+    2025-2030: 
+    WP = WP₂₀₂₅ + (WP₂₀₃₀ - WP₂₀₂₅) × (Jahr - 2025) / 5
+    
+    2031-2045:
+    WP = WP₂₀₃₀ + (WP₂₀₄₅ - WP₂₀₃₀) × (Jahr - 2030) / 15
+  end note
+
+  :Teile DataFrame in zwei Teile:
+  • bis 2030 → nutzt Wetter_aktuell
+  • ab 2031 → nutzt Wetter_prognose;
+
+  :Berechne Wärmepumpen-Last;
+  note right
+    Wärmepumpe Last [MWh] = 
+    profil_wert × a_wp × anzahl_wp / 4
+    
+    Erklärung:
+    • profil_wert: Normiertes Lastprofil [K/h]
+    • a_wp: spezifische elektrische Arbeit (MWh/K)
+    • anzahl_wp: Anzahl installierter WP
+    • /4: Viertelstundenwerte → Stundenwerte
+  end note
+  
+  :Addiere zur Netzlast;
+  note right
+    Netzlast [MWh] += Wärmepumpe Last [MWh]
+  end note
+}
+
+:Rückgabe: gesamt_df 
+mit relevanten Spalten;
+
+stop
+
+@enduml

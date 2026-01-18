@@ -213,6 +213,8 @@ def e_auto_Lastprofil(anzahl_e_autos:dict, gesamt_df:pd.DataFrame  ) -> pd.DataF
         how="left"
     )
     
+    # Profil enthält 24 Stundenwerte, die sich zu 1.0 pro Tag summieren
+    # Für eine Viertelstunde: Profilwert × Jahresverbrauch / (365 Tage × 4 Viertelstunden pro Stunde)
     gesamt_df["basis_last"] = np.where(
         gesamt_df["Wochentag"] >= 5, 
         gesamt_df["Profil_Wochenende"], 
