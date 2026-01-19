@@ -31,13 +31,12 @@ os.chdir(str(PROJECT_ROOT))
 
 try:
     from config import DATA_DIR, PROJECT_ROOT as PR
-    from Klassen import Szenario
     from Szenarien_auswahl import load_scenarios, load_verbrauchsprofile, get_scenario_by_name, get_verbrauchsprofil_by_name
+    from Klassen import Szenario
     from Diagramme import (
         plot_histogram_gesamtauswertung,verbrauch_jahr,
         zweiwochendiagramm_stunden,plot_liniendiagramm_ladestand,
-        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr,
-        ee_anteil_jahr_monatlich
+        plot_liniendiagramm_ladestand_dunkelflaute,ee_anteil_jahr
     )
     from Auswertung import formatiere_spaltennamen
 
@@ -255,6 +254,7 @@ if modus == "🎯 Einzelnes Szenario":
                 try:
                     # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
+                        "2038": {
                         "2030": {
                             "braun": braun_2038,
                             "erdgas": erdgas_2038,
@@ -892,48 +892,7 @@ elif modus == "📈 Szenarien vergleichen":
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     key="download_vergleich_excel"
                 )
-            
-            progress_bar.empty()
-            status_text.empty()
-
-# ============================================================================
-# Modus 3: Szenario hinzufügen
-# ============================================================================
-
-elif modus == "➕ Szenario hinzufügen/Verändern":
-    st.header("➕ Szenario hinzufügen/Verändern")
-    st.info("Hier können Sie neue Szenarien und Verbrauchsprofile zur Simulation hinzufügen oder verändern. Wird Online nur Lokal gespeichert.")
-    
-    tab1, tab2, tab3 = st.tabs(["🎯 Neues Szenario", "📊 Neues Verbrauchsprofil", "✏️ Szenario verändern"])
-    
-    # ========================================================================
-    # TAB 1: NEUES SZENARIO HINZUFÜGEN
-    # ========================================================================
-    with tab1:
-        st.subheader("🎯 Neues Szenario erstellen")
-        
-        with st.form("neues_szenario_form"):
-            st.markdown("### Grunddaten")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                name = st.text_input("Szenario-Name*", placeholder="z.B. Optimistisches Szenario")
-            with col2:
-                beschreibung = st.text_area("Beschreibung*", placeholder="Kurze Beschreibung des Szenarios")
-            
-            st.markdown("---")
-            st.markdown("### 🎯 Ziele 2030")
-            st.markdown("#### Ausbau Erneuerbare Energien (in GW)")
-            
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                pv_dach_2030 = st.number_input("PV Dach", min_value=0.0, value=125.0, step=1.0, key="pv_dach_2030")
-                pv_frei_2030 = st.number_input("PV Frei", min_value=0.0, value=90.0, step=1.0, key="pv_frei_2030")
-            with col2:
-                wind_onshore_2030 = st.number_input("Wind Onshore", min_value=0.0, value=115.0, step=1.0, key="wind_onshore_2030")
-                wind_offshore_2030 = st.number_input("Wind Offshore", min_value=0.0, value=30.0, step=1.0, key="wind_offshore_2030")
-            with col3:
-                biomasse_2030 = st.number_input("Biomasse", min_value=0.0, value=10.0, step=0.1, key="biomasse_2030")
+mber_input("Biomasse", min_value=0.0, value=10.0, step=0.1, key="biomasse_2030")
                 wasser_2030 = st.number_input("Wasser", min_value=0.0, value=6.0, step=0.1, key="wasser_2030")
             with col4:
                 sonstige_2030 = st.number_input("Sonstige", min_value=0.0, value=0.1, step=0.1, key="sonstige_2030")
