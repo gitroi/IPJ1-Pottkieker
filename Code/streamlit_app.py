@@ -255,7 +255,7 @@ if modus == "🎯 Einzelnes Szenario":
                 try:
                     # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
-                        "2038": {
+                        "2030": {
                             "braun": braun_2038,
                             "erdgas": erdgas_2038,
                             "stein": stein_2038,
@@ -729,24 +729,24 @@ elif modus == "📈 Szenarien vergleichen":
     st.markdown("### ⚡ Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
     
-    with st.expander("Anteile bis 2030 konfigurieren", expanded=False):
+    with st.expander("Anteile bis 2038 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            braun_2030_vgl = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.25, step=0.05, key="vgl_braun_2030")
+            braun_2038_vgl = st.number_input("Braunkohle", min_value=0.0, max_value=1.0, value=0.40, step=0.05, key="vgl_braun_2038")
         with col2:
-            erdgas_2030_vgl = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.4, step=0.05, key="vgl_erdgas_2030")
+            erdgas_2038_vgl = st.number_input("Erdgas", min_value=0.0, max_value=1.0, value=0.35, step=0.05, key="vgl_erdgas_2038")
         with col3:
-            stein_2030_vgl = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="vgl_stein_2030")
+            stein_2038_vgl = st.number_input("Steinkohle", min_value=0.0, max_value=1.0, value=0.15, step=0.05, key="vgl_stein_2038")
         with col4:
-            sonstige_konv_2030_vgl = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="vgl_sonst_konv_2030")
+            sonstige_konv_2038_vgl = st.number_input("Sonstige", min_value=0.0, max_value=1.0, value=0.07, step=0.05, key="vgl_sonst_konv_2038")
         with col5:
-            importe_2030_vgl = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.1, step=0.05, key="vgl_importe_2030")
+            importe_2038_vgl = st.number_input("Importe", min_value=0.0, max_value=1.0, value=0.03, step=0.05, key="vgl_importe_2038")
         
-        summe_2030_vgl = braun_2030_vgl + erdgas_2030_vgl + stein_2030_vgl + sonstige_konv_2030_vgl + importe_2030_vgl
-        if abs(summe_2030_vgl - 1.0) > 0.01:
-            st.warning(f"⚠️ Summe 2030: {summe_2030_vgl:.2f} (sollte 1.0 sein)")
+        summe_2038_vgl = braun_2038_vgl + erdgas_2038_vgl + stein_2038_vgl + sonstige_konv_2038_vgl + importe_2038_vgl
+        if abs(summe_2038_vgl - 1.0) > 0.01:
+            st.warning(f"⚠️ Summe 2038: {summe_2038_vgl:.2f} (sollte 1.0 sein)")
         else:
-            st.success(f"✓ Summe 2030: {summe_2030_vgl:.2f}")
+            st.success(f"✓ Summe 2038: {summe_2038_vgl:.2f}")
     
     with st.expander("Anteile bis 2045 konfigurieren", expanded=False):
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -794,12 +794,12 @@ elif modus == "📈 Szenarien vergleichen":
                 try:
                     # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
-                        "2030": {
-                            "braun": braun_2030_vgl,
-                            "erdgas": erdgas_2030_vgl,
-                            "stein": stein_2030_vgl,
-                            "sonstige": sonstige_konv_2030_vgl,
-                            "importe": importe_2030_vgl
+                        "2038": {
+                            "braun": braun_2038_vgl,
+                            "erdgas": erdgas_2038_vgl,
+                            "stein": stein_2038_vgl,
+                            "sonstige": sonstige_konv_2038_vgl,
+                            "importe": importe_2038_vgl
                         },
                         "2045": {
                             "braun": braun_2045_vgl,
@@ -836,38 +836,46 @@ elif modus == "📈 Szenarien vergleichen":
             
             status_text.text("Erstelle Vergleichsvisualisierungen...")
             
-            fig1, ax1 = plt.subplots(1, 2, figsize=(12, 6))
-            fig2, ax2 = plt.subplots(1, 2, figsize=(12, 6))
+            if not alle_ergebnisse.empty and "Name" in alle_ergebnisse.columns:
+                fig1, ax1 = plt.subplots(1, 2, figsize=(12, 6))
+                fig2, ax2 = plt.subplots(1, 2, figsize=(12, 6))
+                
+                try:
+                    plot_histogram_gesamtauswertung(alle_ergebnisse, ax1[0], ax1[1], ax2[0], ax2[1])
+                    plt.tight_layout()
+                    
+                    st.success("✅ Alle Szenarien erfolgreich berechnet!")
+                    
+                    st.pyplot(fig1)
+                    buf1 = BytesIO()
+                    fig1.savefig(buf1, format='png', dpi=300, bbox_inches='tight')
+                    buf1.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf1,
+                        file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots1.png",
+                        mime="image/png",
+                        key="download_vergleich_plot1"
+                    )
+                    st.pyplot(fig2)
+                    buf2 = BytesIO()
+                    fig2.savefig(buf2, format='png', dpi=300, bbox_inches='tight')
+                    buf2.seek(0)
+                    st.download_button(
+                        label="💾 Plot herunterladen",
+                        data=buf2,
+                        file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots2.png",
+                        mime="image/png",
+                        key="download_vergleich_plot2"
+                    )
+                    
+                except Exception as e:
+                    st.error(f"❌ Fehler beim Erstellen der Vergleichsvisualisierungen: {str(e)}")
+                    
+            else:
+                st.warning("⚠️ Keine Ergebnisse zum Visualisieren vorhanden. Bitte überprüfen Sie, ob die Szenarien korrekt berechnet wurden.")
             
-            try:
-                plot_histogram_gesamtauswertung(alle_ergebnisse, ax1[0], ax1[1], ax2[0], ax2[1])
-                plt.tight_layout()
-                
-                st.success("✅ Alle Szenarien erfolgreich berechnet!")
-                
-                st.pyplot(fig1)
-                buf1 = BytesIO()
-                fig1.savefig(buf1, format='png', dpi=300, bbox_inches='tight')
-                buf1.seek(0)
-                st.download_button(
-                    label="💾 Plot herunterladen",
-                    data=buf1,
-                    file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots1.png",
-                    mime="image/png",
-                    key="download_vergleich_plot1"
-                )
-                st.pyplot(fig2)
-                buf2 = BytesIO()
-                fig2.savefig(buf2, format='png', dpi=300, bbox_inches='tight')
-                buf2.seek(0)
-                st.download_button(
-                    label="💾 Plot herunterladen",
-                    data=buf2,
-                    file_name=f"vergleich_aller_szenarien_ertragsart_{ertragsart}_plots2.png",
-                    mime="image/png",
-                    key="download_vergleich_plot2"
-                )
-                
+            if not alle_ergebnisse.empty:
                 st.subheader("📊 Vergleichstabelle")
                 # Spaltennamen sauber formatieren
                 alle_ergebnisse_formatiert = formatiere_spaltennamen(alle_ergebnisse)
@@ -884,10 +892,6 @@ elif modus == "📈 Szenarien vergleichen":
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     key="download_vergleich_excel"
                 )
-
-            except Exception as e:
-                st.error(f"Fehler bei der Visualisierung: {str(e)}")
-                st.exception(e)
             
             progress_bar.empty()
             status_text.empty()

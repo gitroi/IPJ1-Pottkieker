@@ -232,6 +232,11 @@ class Szenario:
         ausbauraten = Jährlicher_Zuwachs_EE(self.ziele_2030["Ausbau EE"], self.ziele_2045["Ausbau EE"])
         ausbauraten_speicher = speicher.ausbaurate_GWh_Jahr(self.szenario)
         
+        if "Jahr" not in self.ee_anteil_ohne_speicher_df.columns:
+            self.ee_anteil_ohne_speicher_df["Jahr"] = self.ee_anteil_ohne_speicher_df["Datum von"].dt.year
+        if "Jahr" not in self.gesamt_df.columns:
+            self.gesamt_df["Jahr"] = self.gesamt_df["Datum von"].dt.year
+        
         ergebnisse["Gesamtkosten_EE [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE [€]"].sum() / 1e9]
         ergebnisse["Gesamtkosten_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_Speicher [€]"].sum() / 1e9]
         ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"] = [self.kosten_df["Gesamtkosten_EE_und_Speicher [€]"].sum() / 1e9]
@@ -263,11 +268,6 @@ class Szenario:
         ergebnisse["Gesamtkosten [Miliarden €]"] = [
             ergebnisse["Gesamtkosten_EE_und_Speicher [Miliarden €]"].iloc[0] + gesamtkosten_konventionelle
         ]
-
-        if "Jahr" not in self.ee_anteil_ohne_speicher_df.columns:
-            self.ee_anteil_ohne_speicher_df["Jahr"] = self.ee_anteil_ohne_speicher_df["Datum von"].dt.year
-        if "Jahr" not in self.gesamt_df.columns:
-            self.gesamt_df["Jahr"] = self.gesamt_df["Datum von"].dt.year
         
         self.gesamt_df["Konventionelle Energie mit Speicher [MWh]"] = (
         self.gesamt_df["Netzlast [MWh]"] - self.gesamt_df["Realisierte Erzeugung [MWh]"]
@@ -277,8 +277,8 @@ class Szenario:
             self.gesamt_df["Netzlast [MWh]"] - self.gesamt_df["Erneuerbare [MWh]"]
         ).clip(lower=0)
 
-        self.gesamt_df["EE Anteil am Stromverbrauch 2030 ohne Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Konventionelle Energie ohne Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() * 100).round(2).values
-        self.gesamt_df["EE Anteil am Stromverbrauch 2030 mit Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Konventionelle Energie mit Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() * 100).round(2).values
+        self.gesamt_df["EE Anteil am Stromverbrauch 2030 ohne Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Konventionelle Energie ohne Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() * 100).round(2)
+        self.gesamt_df["EE Anteil am Stromverbrauch 2030 mit Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Konventionelle Energie mit Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2030]["Netzlast [MWh]"].sum() * 100).round(2)
         
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2030 [%]"] = [
             (len(self.ee_anteil_ohne_speicher_df[(self.ee_anteil_ohne_speicher_df["Jahr"]==2030) & (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100)])) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2030]) * 100
@@ -287,8 +287,8 @@ class Szenario:
             (len(self.gesamt_df[(self.gesamt_df["Jahr"]==2030) & (self.gesamt_df["Anteil Erneuerbare Speicher [%]"] >= 100)])) / len(self.gesamt_df[self.gesamt_df["Jahr"]==2030]) * 100
         ]
 
-        self.gesamt_df["EE Anteil am Stromverbrauch 2045 ohne Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Konventionelle Energie ohne Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() * 100).round(2).values
-        self.gesamt_df["EE Anteil am Stromverbrauch 2045 mit Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Konventionelle Energie mit Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() * 100).round(2).values
+        self.gesamt_df["EE Anteil am Stromverbrauch 2045 ohne Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Konventionelle Energie ohne Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() * 100).round(2)
+        self.gesamt_df["EE Anteil am Stromverbrauch 2045 mit Speicher [%]"] = ((self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() - self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Konventionelle Energie mit Speicher [MWh]"].sum()) / self.gesamt_df[self.gesamt_df["Jahr"]==2045]["Netzlast [MWh]"].sum() * 100).round(2)
         
         ergebnisse[f"Anteil virtel Stunden mit >=100% EE ohne Speicher 2045 [%]"] = [
             (len(self.ee_anteil_ohne_speicher_df[(self.ee_anteil_ohne_speicher_df["Jahr"]==2045) & (self.ee_anteil_ohne_speicher_df["Anteil Erneuerbare [%]"] >= 100)])) / len(self.ee_anteil_ohne_speicher_df[self.ee_anteil_ohne_speicher_df["Jahr"]==2045]) * 100
