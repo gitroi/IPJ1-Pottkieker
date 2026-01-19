@@ -255,7 +255,7 @@ if modus == "🎯 Einzelnes Szenario":
                 try:
                     # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
-                        "2030": {
+                        "2038": {
                             "braun": braun_2038,
                             "erdgas": erdgas_2038,
                             "stein": stein_2038,
