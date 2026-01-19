@@ -209,7 +209,7 @@ def berechne_speicher_aufteilung(
     norm_leistung_pump = leistung_pumpspeicher / gesamt_leistung if gesamt_leistung > 0 else 0
     norm_leistung_h2 = leistung_wasserstoff / gesamt_leistung if gesamt_leistung > 0 else 0
     
-    # Gewichtete Kombination
+    # Gewichtete Kombination TODO: GEWICHTUNG WIRKT SO ÜBERHAUPT NICHT, NACH MS5 ANPASSEN
     gewicht_batterie = (norm_platz_batterie * gewicht_kapazitaet) * (norm_leistung_batterie * gewicht_leistung)
     gewicht_pump = (norm_platz_pump * gewicht_kapazitaet) * (norm_leistung_pump * gewicht_leistung)
     gewicht_h2 = (norm_platz_h2 * gewicht_kapazitaet) * (norm_leistung_h2 * gewicht_leistung)
