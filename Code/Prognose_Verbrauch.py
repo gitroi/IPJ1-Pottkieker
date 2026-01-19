@@ -85,8 +85,10 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
     #=== Verbrauchsprognose berechnen ===
     
     # Berechne Anzahl Viertelstunden pro Jahr (Schaltjahre berücksichtigen)
-    df_gesamt["Viertelstunden_im_Jahr"] = df_gesamt["Jahr"].apply(
-        lambda jahr: 366 * 96 if (jahr % 4 == 0 and (jahr % 100 != 0 or jahr % 400 == 0)) else 365 * 96
+    df_gesamt["Viertelstunden_im_Jahr"] = np.where(
+        (df_gesamt["Jahr"] % 4 == 0) & ((df_gesamt["Jahr"] % 100 != 0) | (df_gesamt["Jahr"] % 400 == 0)),
+        366 * 96,
+        365 * 96
     )
 
     df_gesamt["Netzlast_Prognose [MWh]"] = (
@@ -124,8 +126,10 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
         ], how='left'
     )
 
-    prognose_2045["Viertelstunden_im_Jahr"] = prognose_2045["Jahr"].apply(
-        lambda jahr: 366 * 96 if (jahr % 4 == 0 and (jahr % 100 != 0 or jahr % 400 == 0)) else 365 * 96
+    prognose_2045["Viertelstunden_im_Jahr"] = np.where(
+        (prognose_2045["Jahr"] % 4 == 0) & ((prognose_2045["Jahr"] % 100 != 0) | (prognose_2045["Jahr"] % 400 == 0)),
+        366 * 96,
+        365 * 96
     )
 
     prognose_2045["Netzlast_Prognose [MWh]"] = (
