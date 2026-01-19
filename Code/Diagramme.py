@@ -33,7 +33,19 @@ def plot_ee_anteil_histogram_overflow(gesamt,jahr:int,ax):
     """
 
     gesamt["Jahr"] = gesamt["Datum von"].dt.year
-    if(jahr):
+    if jahr:
+        try:
+            jahr = int(jahr)
+            verfuegbare_jahre = gesamt["Jahr"].unique()
+            if jahr not in verfuegbare_jahre:
+                print(f"Warnung: Jahr {jahr} nicht in Daten vorhanden. Verfügbare Jahre: {sorted(verfuegbare_jahre)}")
+                print(f"Verwende alle verfügbaren Jahre.")
+                jahr = None
+        except (ValueError, TypeError) as e:
+            print(f"Warnung: Ungültiges Jahr '{jahr}'. Verwende alle verfügbaren Jahre.")
+            jahr = None
+    
+    if jahr:
         title = f'Anteil der Erneuerbaren Energien am Stromverbrauch im Jahr {jahr}'
         gesamt = gesamt[gesamt["Jahr"] == jahr]
     else:
@@ -478,7 +490,11 @@ def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes
     if start_datum is None:
         start = gesamt.index[0]
     else:
-        start = pd.to_datetime(start_datum, dayfirst=True)
+        try:
+            start = pd.to_datetime(start_datum, dayfirst=True)
+        except (ValueError, TypeError) as e:
+            print(f"Warnung: Ungültiges Datum '{start_datum}'. Verwende ersten verfügbaren Zeitpunkt.")
+            start = gesamt.index[0]
         if gesamt.index.tz is not None:
             if start.tz is None:
                 start = start.tz_localize(gesamt.index.tz)
@@ -561,10 +577,23 @@ def verbrauch_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     Erstellt ein Liniendiagramm des Gesamtenergieverbrauchs für ein bestimmtes Jahr mit Wochenwerten.
     Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
-    if(not jahr):
+    if not jahr:
         jahr = 2045
+    else:
+        try:
+            jahr = int(jahr)
+        except (ValueError, TypeError):
+            print(f"Warnung: Ungültiges Jahr '{jahr}'. Verwende Standardjahr 2045.")
+            jahr = 2045
 
     verbrauch_zeitraum = gesamt.set_index('Datum von')
+    
+    verfuegbare_jahre = verbrauch_zeitraum.index.year.unique()
+    if jahr not in verfuegbare_jahre:
+        print(f"Warnung: Jahr {jahr} nicht in Daten vorhanden. Verfügbare Jahre: {sorted(verfuegbare_jahre)}")
+        jahr = max(verfuegbare_jahre)
+        print(f"Verwende Jahr {jahr}.")
+    
     verbrauch_zeitraum = verbrauch_zeitraum[verbrauch_zeitraum.index.year == jahr]
     verbrauch_woechentlich = verbrauch_zeitraum.resample('W').sum()
 
@@ -600,10 +629,14 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     if start_datum is None:
         start = gesamt.index[0]
     else:
-        start = pd.to_datetime(start_datum, dayfirst=True)
-        if gesamt.index.tz is not None:
-            if start.tz is None:
-                start = start.tz_localize(gesamt.index.tz)
+        try:
+            start = pd.to_datetime(start_datum, dayfirst=True)
+        except (ValueError, TypeError) as e:
+            print(f"Warnung: Ungültiges Datum '{start_datum}'. Verwende ersten verfügbaren Zeitpunkt.")
+            start = gesamt.index[0]
+    if gesamt.index.tz is not None:
+        if start.tz is None:
+            start = start.tz_localize(gesamt.index.tz)
     
     ende = start + pd.Timedelta(days=14)
     
@@ -688,6 +721,17 @@ def ee_anteil_jahr(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     if 'Monat' not in df.columns:
         df['Monat'] = df['Datum von'].dt.month
 
+    try:
+        jahr = int(jahr)
+        verfuegbare_jahre = df['Jahr'].unique()
+        if jahr not in verfuegbare_jahre:
+            print(f"Warnung: Jahr {jahr} nicht in Daten vorhanden. Verfügbare Jahre: {sorted(verfuegbare_jahre)}")
+            jahr = max(verfuegbare_jahre)
+            print(f"Verwende Jahr {jahr}.")
+    except (ValueError, TypeError):
+        print(f"Warnung: Ungültiges Jahr '{jahr}'. Verwende letztes verfügbares Jahr.")
+        jahr = df['Jahr'].max()
+
     df["Konventionelle Energie mit Speicher [MWh]"] = (
         df["Netzlast [MWh]"] - df["Realisierte Erzeugung [MWh]"]
     ).clip(lower=0)
@@ -753,6 +797,17 @@ def ee_anteil_jahr_monatlich(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     if 'Monat' not in df.columns:
         df['Monat'] = df['Datum von'].dt.month
 
+    try:
+        jahr = int(jahr)
+        verfuegbare_jahre = df['Jahr'].unique()
+        if jahr not in verfuegbare_jahre:
+            print(f"Warnung: Jahr {jahr} nicht in Daten vorhanden. Verfügbare Jahre: {sorted(verfuegbare_jahre)}")
+            jahr = max(verfuegbare_jahre)
+            print(f"Verwende Jahr {jahr}.")
+    except (ValueError, TypeError):
+        print(f"Warnung: Ungültiges Jahr '{jahr}'. Verwende letztes verfügbares Jahr.")
+        jahr = df['Jahr'].max()
+
     df = df[df['Jahr'] == jahr]
 
     df["Konventionelle Energie mit Speicher [MWh]"] = (
@@ -777,12 +832,9 @@ def ee_anteil_jahr_monatlich(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     ax.bar(x - width/2, ee_anteil_ohne.values, width, label='Ohne Speicher', color='lightgreen', edgecolor='white')
     ax.bar(x + width/2, ee_anteil_mit.values, width, label='Mit Speicher', color='green', edgecolor='white')
     
-    # Prozentwerte in die Balken schreiben
     for i in range(len(ee_anteil_ohne)):
-        # Ohne Speicher
         ax.text(x[i] - width/2, ee_anteil_ohne.values[i]/2, f'{ee_anteil_ohne.values[i]:.1f}%', 
                 ha='center', va='center', fontsize=10, fontweight='bold', color='black')
-        # Mit Speicher
         ax.text(x[i] + width/2, ee_anteil_mit.values[i]/2, f'{ee_anteil_mit.values[i]:.1f}%', 
                 ha='center', va='center', fontsize=10, fontweight='bold', color='white')
     
@@ -792,27 +844,3 @@ def ee_anteil_jahr_monatlich(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
     ax.set_ylabel('Anteil [%]')
     ax.set_xlabel('Monat')
     ax.legend()
-
-# def Jahresdiagramm_Speicherladung(gesamt: pd.DataFrame, jahr: int, ax: plt.Axes):
-#     """
-#     Erstellt ein Liniendiagramm des durchschnittlichen täglichen Ladestands der Speicher für ein bestimmtes Jahr.
-    
-#     Args:
-#         gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
-#         jahr (int): Das Jahr für die Analyse.
-#         ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.
-#     """
-#     if not isinstance(gesamt.index, pd.DatetimeIndex):
-#         if 'Datum von' in gesamt.columns:
-#             gesamt = gesamt.set_index('Datum von')
-#         else:
-#             raise ValueError("Der DataFrame-Index muss ein DatetimeIndex sein oder eine 'Datum von' Spalte enthalten")
-    
-#     df_jahr = gesamt[gesamt.index.year == jahr]
-#     if df_jahr.empty:
-#         raise ValueError(f"Keine Daten für das Jahr {jahr} vorhanden.")
-    
-#     df_jahr = df_jahr.resample('W').sum()
-
-#     ax.stackplot(df_jahr.index,
-#                  df_jahr)
