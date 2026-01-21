@@ -3,8 +3,16 @@ Test zur Validierung der Erzeugungsprognose gegen die Agora-Studie "Klimaneutral
 Vergleicht die prognostizierten Erzeugungsmengen für PV und Wind mit den Studien-Zielwerten:
 - 2030: 507 TWh
 - 2045: 1087 TWh
-
+Erstellt durch Joris Bürger
 Programmiert durch KI unter Verwendung von OpenAI GPT-4
+(Kannst du mir einen Test ergenzen, der die Funktion Prognose_erzeugung 
+mit folgenden installierten Leistungen: 
+2030: PV_dach= 115GW, PV_frei = 100GW, wind_on=98GW, Windof = 26GW, 
+2045: PV_dach= 300GW, PV_frei = 169GW, wind_on=180GW, Windof = 79GW 
+berechnet und dann die Summe nur von diesen Technologien mit den 
+erzeugungsprognosen aus der studie Klimanuetrale Deutschland von Agora 
+mit den erzeugerwerten von 507TWH in 2030 und 1087 TWh in 2045 für
+die ertragsarten gut, mittel und schlecht verlgeicht?)
 """
 import sys
 from pathlib import Path

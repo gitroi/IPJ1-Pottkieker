@@ -1,9 +1,10 @@
 """
 Validierungsskript für das IPJ1-Pottkieker Projekt.
 Prüft die Plausibilität und Konsistenz der Simulationsergebnisse.
+Erstellt durch Joris Bürger
 Programmiert von GitHub Copilot
 """
-
+    
 
 import sys
 from pathlib import Path

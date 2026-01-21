@@ -1,1 +1,6 @@
 Quellen sind nicht vollständig, da erst am 15.11.25 angefangen wurde Quellen zu Dokumentieren
+
+Die Meisten Stammen aus dem Team Recherche und wurden uns über die Szenarien-Excel übergeben
+Hier zu zählen zum Beispiel die Lastprofile, Wetterdaten sowie die speziellen Daten für die Speicher- und Erzeuger-Daten
+
+Installierte Leistungen Erneuerbare: https://www.dashboard-deutschland.de/indicator/tile_1722432860129 

@@ -1,6 +1,7 @@
 """
 Backtesting des Verbrauchsprognosemoduls.
 Verlgeicht den Simulierten Verbrauch mit dem realen Verbrauch aus 2025
+Programmiert von Joris Bürger 
 """
 
 import sys

@@ -1,7 +1,8 @@
 """
 Unit Tests für Prognose_Erzeugung.py
 Testet die Funktionen zur Erzeugungsprognose von Erneuerbaren Energien.
-Erstellt durch GitHub Copilot
+Erstellt mit GitHub Copilot
+(Kannst du mir einen Test ergenzen, der die Funktion Prognose_erzeugung testet)
 """
 
 import sys
