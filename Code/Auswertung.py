@@ -191,3 +191,43 @@ def top10_fehlenergie_berechnen(gesamt_df: pd.DataFrame) -> pd.DataFrame:
 
     return top10_Fehlenergie_df
 
+def formatiere_spaltennamen(df):
+    """Formatiert DataFrame-Spaltennamen für bessere Lesbarkeit"""
+    df_formatiert = df.copy()
+    
+    # Mapping für spezifische Ersetzungen
+    ersetzungen = {
+        'virtel': 'Viertel',
+        'Miliarden': 'Mrd.',
+        'Konventioenelle': 'Konventionelle',
+        'Mil.': 'Mio.',
+        'pv': 'PV',
+        'PV_dach': 'PV-Dach',
+        'PV_freifläche': 'PV-Freifläche',
+        'wind_onshore': 'Wind-Onshore',
+        'wind_offshore': 'Wind-Offshore',
+        '_': ' ',  # Unterstriche durch Leerzeichen ersetzen
+    }
+    
+    neue_spalten = []
+    for col in df_formatiert.columns:
+        neuer_name = col
+        
+        for alt, neu in ersetzungen.items():
+            if alt != '_':  
+                neuer_name = neuer_name.replace(alt, neu)
+        
+        
+        if '[' in neuer_name:
+            teile = neuer_name.split('[')
+            teile[0] = teile[0].replace('_', ' ')
+            neuer_name = '['.join(teile)
+        else:
+            neuer_name = neuer_name.replace('_', ' ')
+        
+        neuer_name = ' '.join(neuer_name.split())
+        
+        neue_spalten.append(neuer_name)
+    
+    df_formatiert.columns = neue_spalten
+    return df_formatiert
