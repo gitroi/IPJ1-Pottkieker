@@ -1131,7 +1131,7 @@
 
     },
     {
-            "Name": "Kosteneffizienz_Auswertung",
+            "Name": "Kosteneffizienz",
             "Beschreibung": "Fokus auf die günstigsten Technologien",
             "Ziele 2030": {
                 "Ausbau EE": {
@@ -1206,7 +1206,7 @@
         }
     },
     {
-            "Name": "Flächenschutz_Auswertung",
+            "Name": "Flächenschutz",
             "Beschreibung": "Minimierung des Flächenverbrauchs durch Fokus auf PV-Dach und Offshore-Wind bei reduziertem Onshore-Ausbau.",
             "Ziele 2030": {
                 "Ausbau EE": {
