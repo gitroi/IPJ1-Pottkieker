@@ -1,3 +1,9 @@
+# Software Starten
+
+Um die Software zu starten in der Komandozeile streamlit run Code\streamlit_app.py eingeben.
+Streamlit startet lokal und läuft sicher.
+Andernfalls Onlineapp nutzen: https://pottkieker.streamlit.app 
+
 # IPJ1 - Team Pottkieker
 
 Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in Deutschland bis 2030/2045
