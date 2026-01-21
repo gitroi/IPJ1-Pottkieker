@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from fractions import Fraction
 from config import DATA_DIR
 
-#TODO: Klasse in Klassen.py?
 @dataclass
 class Speicher:
     bestand: float
@@ -200,19 +199,19 @@ def berechne_speicher_aufteilung(
     gesamt_platz = platz_batterie + platz_pumpspeicher + platz_wasserstoff
     gesamt_leistung = leistung_batterie + leistung_pumpspeicher + leistung_wasserstoff
     
-    # Normalisierte Faktoren berechnen
-    norm_platz_batterie = platz_batterie / gesamt_platz if gesamt_platz > 0 else 0
-    norm_platz_pump = platz_pumpspeicher / gesamt_platz if gesamt_platz > 0 else 0
-    norm_platz_h2 = platz_wasserstoff / gesamt_platz if gesamt_platz > 0 else 0
+    # Anteil berechnen
+    anteil_platz_batterie = platz_batterie / gesamt_platz if gesamt_platz > 0 else 0
+    anteil_platz_pump = platz_pumpspeicher / gesamt_platz if gesamt_platz > 0 else 0
+    anteil_platz_h2 = platz_wasserstoff / gesamt_platz if gesamt_platz > 0 else 0
     
-    norm_leistung_batterie = leistung_batterie / gesamt_leistung if gesamt_leistung > 0 else 0
-    norm_leistung_pump = leistung_pumpspeicher / gesamt_leistung if gesamt_leistung > 0 else 0
-    norm_leistung_h2 = leistung_wasserstoff / gesamt_leistung if gesamt_leistung > 0 else 0
+    anteil_leistung_batterie = leistung_batterie / gesamt_leistung if gesamt_leistung > 0 else 0
+    anteil_leistung_pump = leistung_pumpspeicher / gesamt_leistung if gesamt_leistung > 0 else 0
+    anteil_leistung_h2 = leistung_wasserstoff / gesamt_leistung if gesamt_leistung > 0 else 0
     
-    # Gewichtete Kombination TODO: GEWICHTUNG WIRKT SO ÜBERHAUPT NICHT, NACH MS5 ANPASSEN
-    gewicht_batterie = (norm_platz_batterie * gewicht_kapazitaet) * (norm_leistung_batterie * gewicht_leistung)
-    gewicht_pump = (norm_platz_pump * gewicht_kapazitaet) * (norm_leistung_pump * gewicht_leistung)
-    gewicht_h2 = (norm_platz_h2 * gewicht_kapazitaet) * (norm_leistung_h2 * gewicht_leistung)
+    # Gewichtete Kombination TODO: Gewichtung war in Formel irrelevant, nach MS5 anpassen?
+    gewicht_batterie = anteil_platz_batterie * anteil_leistung_batterie
+    gewicht_pump = anteil_platz_pump * anteil_leistung_pump
+    gewicht_h2 = anteil_platz_h2 * anteil_leistung_h2
     
     # Normalisieren und Lademenge aufteilen
     gesamt_gewicht = gewicht_batterie + gewicht_pump + gewicht_h2
@@ -628,9 +627,8 @@ def Simulation_Dunkelflaute(df_verlauf: pd.DataFrame, jahr: int):
     outputWirkungsgradWasserstoff = Fraction(inputWirkungsgradWasserstoff.numerator - 1, inputWirkungsgradWasserstoff.denominator - 1)
     outputWirkungsgradPumpspeicher = Fraction(inputWirkungsgradPumpspeicher.numerator - 1, inputWirkungsgradPumpspeicher.denominator - 1)
     
-    # TODO: Diese Parameter sollten als Funktionsargumente übergeben werden
-    ladegrenze = 100  # Platzhalter - sollte übergeben werden
-    entladegrenze = 100  # Platzhalter - sollte übergeben werden
+    ladegrenze = 100  # Platzhalter - sollte übergeben werden, in der Dunkelflaute allerdings irrelevant
+    entladegrenze = 100  # Platzhalter - sollte übergeben werden, in der Dunkelflaute allerdings irrelevant
     exportEnergie = 0
     importEnergie = 0
     
