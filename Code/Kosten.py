@@ -1,11 +1,14 @@
 """
+Dieses Modul berechnet die Kosten für den Ausbau der Erneuerbaren Energien und Speicher 
+basierend auf den Zielwerten und Veränderungsfaktoren in einem gegebenen Szenario.
+
 Programmiert von Joris Bürger
+Unterstützt durch Inline-Sugsestions von Claude Sonnet
 """
 
 from Prognose_Speicher import Prognose_Gesamt_Ausbau_
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from config import DATA_DIR
-# from Szenarien_auswahl import json_objekt_bearbeiten
 import pandas as pd
 import numpy as np
 import json
@@ -22,7 +25,6 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         pd.DataFrame: DataFrame mit den jährlichen Ausbaukosten.
     """
     
-    #((df_2030['Datum von'] - df_2030['Datum von'].min()).dt.days + 1)
     virtelstunden_pro_jahr = 365.25 * 24 * 4 
 
     capex_wachstum = zieldaten["Veränderungsfaktoren"]["Capex_EE"]
@@ -73,7 +75,7 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         kosten_df.loc[mask2, f"Capex {key} [€]"] = baukosten_EE_2045
                 
         #=== OpEx Berechnung ===
-        
+        #FIXME: Daten aus Dataframe lesen um Rechenleistung zu vermindern
         #=== Opex Bestand in df berechnen ===
         zuwachsraten = {"zuwachs_2030": {}, "zuwachs_2045": {}}
         

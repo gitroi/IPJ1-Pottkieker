@@ -6,7 +6,7 @@ Programmiert von Joris Bürger
 import json
 import pandas as pd
 import numpy as np
-from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich
+from config import PROJECT_ROOT 
 
 def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict) -> pd.DataFrame:
     """

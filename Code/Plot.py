@@ -18,7 +18,7 @@ def plot_ee_erzeugung_jaehrlich():
     """
     # Pfad zur CSV-Datei mit Erzeugungsdaten
     erzeugungpfad = PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv"
-    erzeugungpfad2 = PROJECT_ROOT / "Daten" / "erzeugung_2019.csv"
+    erzeugungpfad2 = PROJECT_ROOT / "Daten" / "SMARD-Daten" / "erzeugung_2019.csv"
     
     # Lese die CSV-Datei ein
     erzeugung_df = pd.read_csv(erzeugungpfad2, sep=";", dtype=str)
@@ -72,7 +72,6 @@ def plot_ee_erzeugung_jaehrlich():
     plt.legend()
     plt.grid()
     plt.show()
-
 
 def plot_verbrauch(gesamt:pd.DataFrame):
     """

@@ -505,9 +505,6 @@ def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes
     
     if woche_df.empty:
         raise ValueError("Keine Daten im angegebenen Zeitraum.")
-    # woche_df.to_csv("ladestand_debug.csv",sep=";",decimal=",")
-    # woche_df = woche_df.resample('h').sum()
-    # woche_df.to_csv("ladestand_debug2.csv",sep=";",decimal=",")
     
     woche_df['EE_Status'] = (woche_df["Anteil Erneuerbare [%]"] >= 100).astype(int)
     

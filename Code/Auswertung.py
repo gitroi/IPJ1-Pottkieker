@@ -105,7 +105,6 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
     ).round(2)
 
     for key in Keys_Erzeugung:
-        # Überspringe, wenn bereits als konventionelle Spalte existiert
         if f"Gesamtkosten {key} [Mrd. €]" not in end_df.columns:
             end_df[f"Gesamtkosten {key} [Mrd. €]"] = (grouped[f"Gesamtkosten {key} [€]"].sum() / 1e9).round(2).values
 

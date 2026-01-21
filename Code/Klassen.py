@@ -178,7 +178,6 @@ class Szenario:
         
         plt.show()
 
-
     def gebe_plots(self, jahr1=None):
         """
         Erstellt alle Plots und gibt sie als Dictionary von Figure-Objekten zurück.
@@ -191,6 +190,7 @@ class Szenario:
                 - 'fig3': Ausbauraten EE und Speicher
                 - 'fig4': Detaillierte Ausbauraten
                 - 'fig5': EE-Anteil mit/ohne Speicher
+                - 'fig6': Velorener EE Überschuss
         """
 
         fig1, axs1 = plt.subplots(2, figsize=(14, 12)) 
@@ -334,7 +334,5 @@ class Szenario:
 
         return ergebnisse
     
-    def get_jahresdiagramme(self, jahr: int) -> plt.Figure:
-        """Gibt die Jahresdiagramme für ein bestimmtes Jahr zurück"""
         
         

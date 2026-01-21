@@ -7,7 +7,7 @@ Programmiert von Joris Bürger
 import json
 import pandas as pd
 import numpy as np
-from config import PROJECT_ROOT #Ordnerverzeichnis in Config-Datei festgelegt, damit auf allen Geräten gleich
+from config import PROJECT_ROOT 
 
 def Jährlicher_Zuwachs_EE( zielwert_2030:dict, zielwert_2045:dict ) -> dict:
     """
@@ -107,7 +107,6 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
 
     erzeugung_df = erzeugung_df[["Datum von", "Photovoltaik [MWh] Originalauflösungen","Wind Onshore [MWh] Originalauflösungen","Wind Offshore [MWh] Originalauflösungen","Biomasse [MWh] Originalauflösungen","Wasserkraft [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]]
 
-    # WICHTIG: Kein inplace=True mit Zuweisung verwenden, da dies None zurückgibt
     erzeugung_df = erzeugung_df.rename(columns={
         "Photovoltaik [MWh] Originalauflösungen": "PV [MWh]",
         "Wind Onshore [MWh] Originalauflösungen": "Wind Onshore [MWh]",
@@ -232,7 +231,6 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
     prognose['Wasser_Prognose_MWh'] = prognose['Wasser_Prognose_MWh'].round(2)
     prognose['Sonstige_Prognose_MWh'] = prognose['Sonstige_Prognose_MWh'].round(2)
    
-    # Speichere Prognose
     prognose_export = prognose[['Datum von', 'PV_Prognose_MWh', 'Wind_Onshore_Prognose_MWh', 'Wind_Offshore_Prognose_MWh',
                                  'Biomasse_Prognose_MWh', 'Wasser_Prognose_MWh', 'Sonstige_Prognose_MWh',
                                  'Installierte PV_GW', 'Installierte Wind_Onshore_GW', 'Installierte Wind_Offshore_GW',
@@ -248,10 +246,5 @@ def Prognose_erzeugung(installierte_2030: dict, installierte_2045: dict,steigeru
 
     if(prognose_export.isna().any().any()):
         raise ValueError("Fehlende Werte in der Erzeugungsprognose entdeckt.")
-    
-        # print("Warnung: Es gibt fehlende Werte in der Erzeugungsprognose!"  )
-        # print(prognose_export.isna().sum())
-        # mask = prognose_export.isna() | prognose_export.isin([np.inf, -np.inf])
-        # print(prognose_export[mask.any(axis=1)])
 
     return prognose_export

@@ -11,12 +11,10 @@ import matplotlib.pyplot as plt
 from config import PROJECT_ROOT, DATA_DIR
 import json
 
-E_FAHRZEUG_JAHR_MWH = 2.25  # MWh pro E-Fahrzeug und Jahr
+E_FAHRZEUG_JAHR_MWH = 2.25  
 WAERMEPUMPE_JAHR_MWH = 4
 
-#TODO: Richtigen Wert recherchieren
-#BEISPIELWERTE
-E_AUTOS_2025 = 2000000
+E_AUTOS_2025 = 2200000
 WAERMEPUMPEN_2025 = 1500000
 
 def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFrame:
