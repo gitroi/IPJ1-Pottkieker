@@ -15,7 +15,7 @@
         "capex": 1200,
         "opex": 100,
         "verluste": 0.0006944,
-        "leistung": 0.5,
+        "leistung": 0.00214,
         "obergrenze": 1.0,
         "untergrenze": 0.0
     },
