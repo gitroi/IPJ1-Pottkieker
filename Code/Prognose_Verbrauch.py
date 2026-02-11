@@ -14,8 +14,8 @@ import json
 E_FAHRZEUG_JAHR_MWH = 2.25  
 WAERMEPUMPE_JAHR_MWH = 4
 
-E_AUTOS_2025 = 2200000
-WAERMEPUMPEN_2025 = 1500000
+E_AUTOS_2025 = 1700000
+WAERMEPUMPEN_2025 = 1950000
 
 def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFrame:
     

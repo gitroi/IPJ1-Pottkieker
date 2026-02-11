@@ -7,6 +7,7 @@ Programmiert von Joris Bürger
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from config import DATA_DIR
 
 def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrauch):
     """
@@ -91,3 +92,10 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
 
     return gesamt
 
+ergebniss = analyse_erneuerbare_anteil(
+    pfaderzeugung=f"{DATA_DIR}\Ist_Analyse\Erzeugung.csv",
+    pfadverbrauch=f"{DATA_DIR}\Ist_Analyse\Verbrauch.csv",
+    spaltenname_verbrauch="Netzlast [MWh] Originalauflösungen",
+)
+
+print(ergebniss["Anteil Erneuerbare [MWh]"].mean())
