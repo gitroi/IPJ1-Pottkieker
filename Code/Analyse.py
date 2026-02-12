@@ -92,10 +92,10 @@ def analyse_erneuerbare_anteil(pfaderzeugung, pfadverbrauch, spaltenname_verbrau
 
     return gesamt
 
-ergebniss = analyse_erneuerbare_anteil(
-    pfaderzeugung=f"{DATA_DIR}\Ist_Analyse\Erzeugung.csv",
-    pfadverbrauch=f"{DATA_DIR}\Ist_Analyse\Verbrauch.csv",
-    spaltenname_verbrauch="Netzlast [MWh] Originalauflösungen",
-)
+# ergebniss = analyse_erneuerbare_anteil(
+#     pfaderzeugung=f"{DATA_DIR}\Ist_Analyse\Erzeugung.csv",
+#     pfadverbrauch=f"{DATA_DIR}\Ist_Analyse\Verbrauch.csv",
+#     spaltenname_verbrauch="Netzlast [MWh] Originalauflösungen",
+# )
 
-print(ergebniss["Anteil Erneuerbare [MWh]"].mean())
+# print(ergebniss["Anteil Erneuerbare [MWh]"].mean())
