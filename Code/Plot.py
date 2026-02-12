@@ -17,7 +17,7 @@ def plot_ee_erzeugung_jaehrlich():
     Ünterstützt durch KI (GPT-4.1 Inline Suggestions)
     """
     # Pfad zur CSV-Datei mit Erzeugungsdaten
-    erzeugungpfad = PROJECT_ROOT / "Daten" / "Ist_Analyse" / "Erzeugung.csv"
+    erzeugungpfad = PROJECT_ROOT / "Daten" / "Ist_Analyse" / "erzeugung.csv"
     erzeugungpfad2 = PROJECT_ROOT / "Daten" / "SMARD-Daten" / "erzeugung_2019.csv"
     
     # Lese die CSV-Datei ein

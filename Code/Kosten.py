@@ -6,21 +6,19 @@ Programmiert von Joris Bürger
 Unterstützt durch Inline-Sugsestions von Claude Sonnet
 """
 
-from Prognose_Speicher import Prognose_Gesamt_Ausbau_
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE
 from config import DATA_DIR
 import pandas as pd
 import numpy as np
 import json
 
-def Kosten_EE(zieldaten: json)-> pd.DataFrame:
+def Kosten_EE(zieldaten: json, erzeugung_df: pd.DataFrame)-> pd.DataFrame:
     """
     Berechnet die Kosten für den Ausbau der Erneuerbaren Energien basierend auf den Zielwerten für 2030 und 2045.
     
     Args:
-        zielwerte_2030 (dict): Zielwerte für 2030 in GW.
-        zielwerte_2045 (dict): Zielwerte für 2045 in GW.
-        
+        zieldaten (dict): Szenario mit Zielwerten für 2030 und 2045.
+        erzeugung_df (pd.DataFrame): DataFrame mit bereits berechneten installierten Leistungen.
     Returns:
         pd.DataFrame: DataFrame mit den jährlichen Ausbaukosten.
     """
@@ -75,29 +73,40 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
         kosten_df.loc[mask2, f"Capex {key} [€]"] = baukosten_EE_2045
                 
         #=== OpEx Berechnung ===
-        #FIXME: Daten aus Dataframe lesen um Rechenleistung zu vermindern
-        #=== Opex Bestand in df berechnen ===
-        zuwachsraten = {"zuwachs_2030": {}, "zuwachs_2045": {}}
+        spalten_mapping = {
+            'wind_onshore': 'Installierte Wind_Onshore_GW',
+            'wind_offshore': 'Installierte Wind_Offshore_GW',
+            'biomasse': 'Installierte Biomasse_GW',
+            'wasser': 'Installierte Wasser_GW',
+            'sonstige': 'Installierte Sonstige_GW'
+        }
         
-        zuwachsraten["zuwachs_2030"][key] = jährliche_raten["zuwachsrate_2030"][key] / 12
-        zuwachsraten["zuwachs_2045"][key] = jährliche_raten["zuwachsrate_2045"][key] / 12
-        
-        date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', freq='15min',tz='UTC')
-        prognose = pd.DataFrame({'Datum von': date_range})
-        
-        prognose['Monat'] = prognose['Datum von'].dt.month
-        prognose['Tag'] = prognose['Datum von'].dt.day
-        prognose['Stunde'] = prognose['Datum von'].dt.hour
-        prognose['Minute'] = prognose['Datum von'].dt.minute
-        prognose['Jahr'] = prognose['Datum von'].dt.year
+        # Für PV separate Berechnung (pv_dach und pv_frei haben unterschiedliche OPEX)
+        if key in ['pv_dach', 'pv_frei']:
+            zuwachsraten = {"zuwachs_2030": {}, "zuwachs_2045": {}}
+            zuwachsraten["zuwachs_2030"][key] = jährliche_raten["zuwachsrate_2030"][key] / 12
+            zuwachsraten["zuwachs_2045"][key] = jährliche_raten["zuwachsrate_2045"][key] / 12
+            
+            prognose = pd.DataFrame({'Datum von': kosten_df['Datum von']})
+            prognose['Monat'] = prognose['Datum von'].dt.month
+            prognose['Jahr'] = prognose['Datum von'].dt.year
 
-        maske_2030 = prognose["Jahr"] <= 2030
-        maske_2045 = prognose["Jahr"] > 2030
-        
-        prognose.loc[maske_2030, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2030"][key] * ((prognose.loc[maske_2030, "Jahr"] - 2026) * 12 + prognose.loc[maske_2030, "Monat"]))
-        prognose.loc[maske_2045, f"Installierte {key}"] = zieldaten["Ziele 2030"]["Ausbau EE"][key]+ (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
+            maske_2030 = prognose["Jahr"] <= 2030
+            maske_2045 = prognose["Jahr"] > 2030
+            
+            prognose.loc[maske_2030, f"Installierte {key}"] = kostendaten[key]["bestand"] + (zuwachsraten["zuwachs_2030"][key] * ((prognose.loc[maske_2030, "Jahr"] - 2026) * 12 + prognose.loc[maske_2030, "Monat"]))
+            prognose.loc[maske_2045, f"Installierte {key}"] = zieldaten["Ziele 2030"]["Ausbau EE"][key] + (zuwachsraten["zuwachs_2045"][key] * ((prognose.loc[maske_2045, "Jahr"] - 2031) * 12 + prognose.loc[maske_2045, "Monat"]))
 
-        prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"] / virtelstunden_pro_jahr
+            prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[f"Installierte {key}"] / virtelstunden_pro_jahr
+        else:
+            # Für andere Erzeugerarten: Nutze bereits berechnete installierte Leistungen aus erzeugung_df
+            if key in spalten_mapping:
+                spaltenname = spalten_mapping[key]
+                prognose = erzeugung_df[['Datum von', spaltenname]].copy()
+                prognose['Jahr'] = prognose['Datum von'].dt.year
+                prognose[f"Opex {key} [€]"] = 1e6 * kostendaten[key]["opex"] * prognose[spaltenname] / virtelstunden_pro_jahr
+            else:
+                continue
         
         prognose[f"Opex {key} [€]"] = prognose[f"Opex {key} [€]"] * (virtelstunden_opex[key] ** (prognose['Jahr'] - 2026))
         prognose[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"] * (virtelstunden_capex[key] ** (prognose['Jahr'] - 2026))
@@ -120,12 +129,13 @@ def Kosten_EE(zieldaten: json)-> pd.DataFrame:
    
     return kosten_df
 
-def kosten_speicher(szenario: json) -> pd.DataFrame:
+def kosten_speicher(szenario: json, speicher_df: pd.DataFrame) -> pd.DataFrame:
     """
     Berechnet die Kosten für Speicher basierend auf dem Szenario.
     
     Args:
         szenario (json): Das Szenario mit den Speicherzielen und Veränderungsfaktoren.
+        speicher_df (pd.DataFrame): DataFrame mit bereits berechneten Speicherkapazitäten und Viertelstundenleistungen.
         
     Returns:
         pd.DataFrame: DataFrame mit den jährlichen Speicherkosten.
@@ -168,13 +178,16 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
         kosten_df[f"Capex {key} [€]"] = kosten_df[f"Capex {key} [€]"].round(2)
 
     #=== OpEx Berechnung ===
-    installierte_speicher = Prognose_Gesamt_Ausbau_(kostendaten["batteriespeicher"]["bestand"], kostendaten["wasserstoff"]["bestand"],kostendaten["pumpspeicher"]["bestand"], ausbau_2030_GWh["batteriespeicher"], ausbau_2045_GWh["batteriespeicher"], ausbau_2030_GWh["wasserstoff"], ausbau_2045_GWh["wasserstoff"], ausbau_2030_GWh["pumpspeicher"], ausbau_2045_GWh["pumpspeicher"])
-    kosten_df = pd.merge(kosten_df, installierte_speicher, on="Datum von", how="left")
+    relevante_spalten = ['Datum von', 'Speicherkapazität batteriespeicher [MWh]', 'Speicherkapazität wasserstoff [MWh]', 
+                        'Speicherkapazität pumpspeicher [MWh]', 'Viertelstundenleistung batteriespeicher [MW]',
+                        'Viertelstundenleistung wasserstoff [MW]', 'Viertelstundenleistung pumpspeicher [MW]']
+    kosten_df = pd.merge(kosten_df, speicher_df[relevante_spalten], on="Datum von", how="left")
 
     for key in kostendaten.keys():      # (MWh/1e3) * (GW/GWh) * (Mio. €/(GW*a)) *1e6 / virtelstunden_pro_jahr  = € / virtelstunde
-        kosten_df[f"Opex {key} [€]"] = (1e3 * kostendaten[key]["opex"] * kosten_df[f"Speicherkapazität {key} [MWh]"] * kostendaten[key]["leistung"]) / virtelstunden_pro_jahr
+        #kosten_df[f"Opex {key} [€]"] = (1e3 * kostendaten[key]["opex"] * kosten_df[f"Speicherkapazität {key} [MWh]"] * kostendaten[key]["leistung"]) / virtelstunden_pro_jahr
+        kosten_df[f"Opex {key} [€]"] = 4 * kosten_df[f"Viertelstundenleistung {key} [MW]"]  * 1e3 * kostendaten[key]["opex"] / virtelstunden_pro_jahr
         kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"] * (virtelstunden_opex[key] ** (kosten_df['Jahr'] - 2025))
-        kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"].round(2)
+        kosten_df[f"Opex {key} [€]"] = kosten_df[f"Opex {key} [€]"].round(2)    
         
         kosten_df[f"Gesamtkosten {key} [€]"] = kosten_df[f"Capex {key} [€]"] + kosten_df[f"Opex {key} [€]"]
         spalten_kosten = [f"Capex {key} [€]", f"Opex {key} [€]", f"Gesamtkosten {key} [€]"]
@@ -188,18 +201,20 @@ def kosten_speicher(szenario: json) -> pd.DataFrame:
     kosten_df["Gesamtkosten_Speicher [€]"] = kosten_df[["Gesamtkosten batteriespeicher [€]", "Gesamtkosten wasserstoff [€]", "Gesamtkosten pumpspeicher [€]"]].sum(axis=1).round(2)
     return kosten_df
     
-def kostenrechnung(szenario: json) -> pd.DataFrame:
+def kostenrechnung(szenario: json, erzeugung_df: pd.DataFrame, speicher_df: pd.DataFrame) -> pd.DataFrame:
     """
     Berechnet die Gesamtkosten für Erneuerbare Energien und Speicher basierend auf dem Szenario.
     
     Args:
         szenario (json): Das Szenario mit den Zielwerten und Veränderungsfaktoren.
+        erzeugung_df (pd.DataFrame): DataFrame mit bereits berechneten installierten Leistungen.
+        speicher_df (pd.DataFrame): DataFrame mit bereits berechneten Speicherkapazitäten.
         
     Returns:
         pd.DataFrame: DataFrame mit den jährlichen Gesamtkosten.
     """
-    kosten_ee_df = Kosten_EE(szenario)
-    kosten_speicher_df = kosten_speicher(szenario)
+    kosten_ee_df = Kosten_EE(szenario, erzeugung_df)
+    kosten_speicher_df = kosten_speicher(szenario, speicher_df)
 
     gesamt_kosten_df = pd.merge(kosten_ee_df, kosten_speicher_df, on="Datum von", how="inner")
 
