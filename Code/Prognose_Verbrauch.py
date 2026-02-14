@@ -55,7 +55,8 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
     verbrauch_df["Wochentag"] = verbrauch_df["Datum von"].dt.dayofweek
     verbrauch_df["Uhrzeit"] = verbrauch_df["Datum von"].dt.hour
     verbrauch_df["Minute"] = verbrauch_df["Datum von"].dt.minute
-
+    verbrauch_df = verbrauch_df[verbrauch_df["Datum von"].dt.year == 2024]
+    
     gesamtverbrauch_2024 = verbrauch_df["Netzlast [MWh] origin"].sum().round(2)    
 
     #=== Wachstumsrate bis 2030 berechnen ===
