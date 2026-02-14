@@ -2,8 +2,8 @@
     "batteriespeicher": {
         "bestand": 22,
         "wirkungsgrad": 0.9,
-        "capex": 900,
-        "opex": 16,
+        "capex": 260,
+        "opex": 4,
         "verluste": 0.0055556,
         "leistung": 0.66,
         "obergrenze": 1.0,
@@ -12,8 +12,8 @@
     "wasserstoff": {
         "bestand": 1,
         "wirkungsgrad": 0.3,
-        "capex": 1200,
-        "opex": 100,
+        "capex": 2.2,
+        "opex": 23,
         "verluste": 0.0006944,
         "leistung": 0.00214,
         "obergrenze": 1.0,
@@ -22,8 +22,8 @@
     "pumpspeicher": {
         "bestand": 40,
         "wirkungsgrad": 0.75,
-        "capex": 200,
-        "opex": 20,
+        "capex": 50,
+        "opex": 4,
         "verluste": 0.0001389,
         "leistung": 0.25,
         "obergrenze": 1.0,
