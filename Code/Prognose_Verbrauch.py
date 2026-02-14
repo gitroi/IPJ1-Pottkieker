@@ -56,13 +56,6 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
     verbrauch_df["Uhrzeit"] = verbrauch_df["Datum von"].dt.hour
     verbrauch_df["Minute"] = verbrauch_df["Datum von"].dt.minute
     verbrauch_df = verbrauch_df[verbrauch_df["Datum von"].dt.year == 2024]
-    
-    gesamtverbrauch_2024 = verbrauch_df["Netzlast [MWh] origin"].sum().round(2)    
-
-    #=== Wachstumsrate bis 2030 berechnen ===
-
-    #ziel = wachstumsrate * jahr + startwert -> wachstumsrate = (ziel - startwert) / jahr
-    wachstumsrate_2030 = (verbrauch_2030_MWh - gesamtverbrauch_2024) / 6
 
     #=== profil für 2024 erstellen ===
 
@@ -81,6 +74,14 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
         ], how='left'
     )
 
+    #=== Wachstumsrate bis 2030 berechnen ===
+    
+    # Berechne die Summe des Basisprofils über ein Normaljahr (365 Tage) als Startwert
+    gesamtverbrauch_basisprofil = df_gesamt[df_gesamt["Jahr"] == 2026]["Netzlast [MWh] origin"].sum()
+    
+    # Interpoliere von der Basisprofil-Summe zum Zielwert 2030
+    wachstumsrate_2030 = (verbrauch_2030_MWh - gesamtverbrauch_basisprofil) / (2030 - 2026)
+
     #=== Verbrauchsprognose berechnen ===
     
     # Berechne Anzahl Viertelstunden pro Jahr (Schaltjahre berücksichtigen)
@@ -92,7 +93,7 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
 
     df_gesamt["Netzlast_Prognose [MWh]"] = (
         df_gesamt["Netzlast [MWh] origin"] + 
-        (wachstumsrate_2030 * (df_gesamt["Jahr"] - 2024)) / df_gesamt["Viertelstunden_im_Jahr"]
+        (wachstumsrate_2030 * (df_gesamt["Jahr"] - 2026)) / df_gesamt["Viertelstunden_im_Jahr"]
     )
 
     df_gesamt["Netzlast_Prognose [MWh]"] = df_gesamt["Netzlast_Prognose [MWh]"].round(2)
@@ -110,9 +111,10 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
 
     #===  wachstumsfaktor für 2031 bis 2045 berechnen ===
 
-    gesamtverbrauch_2030_berechnet = df_gesamt[df_gesamt["Jahr"] == 2030]["Netzlast_Prognose [MWh]"].sum()
+    # Berechne die Summe des 2030-Profils (Mittelwerte) als Startwert für die nächste Phase
+    gesamtverbrauch_2030_basisprofil = df_gesamt[df_gesamt["Jahr"] == 2030]["Netzlast_Prognose [MWh]"].sum()
 
-    wachstumsrate_2045 = (verbrauch_2045_MWh - gesamtverbrauch_2030_berechnet ) / 15
+    wachstumsrate_2045 = (verbrauch_2045_MWh - gesamtverbrauch_2030_basisprofil) / 15
 
     basisprofil_2030 = df_gesamt[df_gesamt["Jahr"] == 2030][["Jahr","Monat","Wochentag","Uhrzeit","Minute" ,"Netzlast_Prognose [MWh]"]].copy()
 
