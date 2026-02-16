@@ -47,16 +47,30 @@ def Prognose_Verbrauch_2025(verbrauch_2025: float ) -> pd.DataFrame:
     verbrauch_df["Uhrzeit"] = verbrauch_df["Datum von"].dt.hour
     verbrauch_df["Minute"] = verbrauch_df["Datum von"].dt.minute
 
-    gesamtverbrauch_2024 = verbrauch_df["Netzlast [MWh] origin"].sum().round(2)    
+    #=== profil für 2024 erstellen ===
+
+    basisprofil_2024 = verbrauch_df.groupby(["Monat", "Wochentag", "Uhrzeit", "Minute"])[["Netzlast [MWh] origin"]].mean().reset_index()
+
+    # Erstelle DataFrame für 2024 um Gesamtverbrauch aus Basisprofil zu berechnen
+    date_range_2024 = pd.date_range(start='01-01-2024 00:00', end='31-12-2024 23:45', freq='15min',tz='UTC')
+    df_2024 = pd.DataFrame({"Datum von": date_range_2024})
+    
+    df_2024["Monat"]= df_2024["Datum von"].dt.month
+    df_2024["Wochentag"] = df_2024["Datum von"].dt.dayofweek
+    df_2024["Uhrzeit"] = df_2024["Datum von"].dt.hour
+    df_2024["Minute"] = df_2024["Datum von"].dt.minute
+    
+    df_2024 = df_2024.merge(basisprofil_2024, on=["Monat", "Wochentag", "Uhrzeit", "Minute"], how='left')
+    
+    # Berechne Gesamtverbrauch aus Basisprofil (wie in Prognose_Verbrauch)
+    gesamtverbrauch_2024 = df_2024["Netzlast [MWh] origin"].sum().round(2)
 
     #=== Wachstumsrate bis 2025 berechnen ===
 
     #ziel = wachstumsrate * jahr + startwert -> wachstumsrate = (ziel - startwert) / jahr
     wachstumsrate_2025 = (verbrauch_2025_MWh - gesamtverbrauch_2024) 
 
-    #=== profil für 2024 erstellen ===
-
-    basisprofil_2024 = verbrauch_df.groupby(["Monat", "Wochentag", "Uhrzeit", "Minute"])[["Netzlast [MWh] origin"]].mean().reset_index()
+    #=== DataFrame für 2025 erstellen ===
 
     date_range = pd.date_range(start='01-01-2025 00:00', end='31-12-2025 23:45', freq='15min',tz='UTC')
     df_gesamt = pd.DataFrame({"Datum von": date_range})

@@ -1,7 +1,8 @@
 """
 Streamlit Web-App für die EE-Ausbau Simulation
 Team Pottkieker - IPJ1
-Programmiert von Joris Bürger, Robin Matzke 
+Programmiert von Joris Bürger, Robin Matzke
+Unterstützt durch Claude Sonnet 4.5 und Inlinesuggestions 
 """
 
 import streamlit as st
@@ -42,7 +43,7 @@ try:
     from Auswertung import formatiere_spaltennamen
 
 except ImportError as e:
-    st.error(f"❌ Import-Fehler: {str(e)}")
+    st.error(f"Import-Fehler: {str(e)}")
     st.error(f"PROJECT_ROOT: {PROJECT_ROOT}")
     st.error(f"CODE_DIR: {CODE_DIR}")
     st.error(f"Current dir: {os.getcwd()}")
@@ -56,7 +57,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("⚡ Simulation der Stromversorgung mit Erneuerbaren Energien in Deutschland")
+st.title("Simulation der Stromversorgung mit Erneuerbaren Energien in Deutschland")
 st.markdown("**Simulation des Erneuerbare-Energien-Ausbaus bis 2030/2045**")
 st.markdown("---")
 
@@ -123,22 +124,22 @@ szenarien = lade_szenarien(get_file_mtime(szenarien_pfad))
 verbrauchsprofile = lade_verbrauchsprofile(get_file_mtime(verbrauchsprofile_pfad))
 
 with st.sidebar:
-    st.header("📊 Navigation")
+    st.header("Navigation")
     modus = st.radio(
         "Simulationsmodus wählen:",
-        ["🎯 Einzelnes Szenario", "📈 Szenarien vergleichen", "➕ Szenario hinzufügen/Verändern","ℹ️ Über das Projekt"],
+        ["Einzelnes Szenario", "Szenarien vergleichen", "Szenario hinzufügen/Verändern","Über das Projekt"],
         index=0
     )
     
     st.markdown("---")
-    st.markdown("### 👥 Team Pottkieker")
+    st.markdown("### Team Pottkieker")
     st.markdown("IPJ1 - HAW Hamburg")
 
 # ============================================================================
 # MODUS 1: EINZELNES SZENARIO
 # ============================================================================
-if modus == "🎯 Einzelnes Szenario":
-    st.header("🎯 Einzelnes Szenario simulieren")
+if modus == "Einzelnes Szenario":
+    st.header("Einzelnes Szenario simulieren")
     
     col1, col2 = st.columns(2)
     
@@ -153,7 +154,7 @@ if modus == "🎯 Einzelnes Szenario":
         
         gewaehltes_szenario = get_scenario_by_name(szenarien, ausgewähltes_szenario_name)
         if gewaehltes_szenario:
-            st.info(f"📝 {gewaehltes_szenario['Beschreibung']}")
+            st.info(f" {gewaehltes_szenario['Beschreibung']}")
     
     with col2:
         st.subheader("Verbrauchsprofil wählen")
@@ -166,9 +167,9 @@ if modus == "🎯 Einzelnes Szenario":
         
         gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, ausgewähltes_profil_name)
         if gewaehltes_profil:
-            st.info(f"📝 {gewaehltes_profil.get('Beschreibung', 'Verbrauchsprofil für die Simulation')}")
+            st.info(f"{gewaehltes_profil.get('Beschreibung', 'Verbrauchsprofil für die Simulation')}")
     
-    st.subheader("⚙️ Simulationsparameter")
+    st.subheader("Simulationsparameter")
     
     col1, col2, col3 = st.columns(3)
     
@@ -198,7 +199,7 @@ if modus == "🎯 Einzelnes Szenario":
     )
     
 
-    st.markdown("### ⚡ Konventionelle Anteile")
+    st.markdown("### Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
     
     with st.expander("Anteile 2038 konfigurieren", expanded=False):
@@ -216,7 +217,7 @@ if modus == "🎯 Einzelnes Szenario":
         
         summe_2038 = braun_2038 + erdgas_2038 + stein_2038 + sonstige_konv_2038 + importe_2038
         if abs(summe_2038 - 1.0) > 0.01:
-            st.warning(f"⚠️ Summe 2038: {summe_2038:.2f} (sollte 1.0 sein)")
+            st.warning(f"Summe 2038: {summe_2038:.2f} (sollte 1.0 sein)")
         else:
             st.success(f"✓ Summe 2038: {summe_2038:.2f}")
     
@@ -235,11 +236,11 @@ if modus == "🎯 Einzelnes Szenario":
         
         summe_2045 = braun_2045 + erdgas_2045 + stein_2045 + sonstige_konv_2045 + importe_2045
         if abs(summe_2045 - 1.0) > 0.01:
-            st.warning(f"⚠️ Summe 2045: {summe_2045:.2f} (sollte 1.0 sein)")
+            st.warning(f"Summe 2045: {summe_2045:.2f} (sollte 1.0 sein)")
         else:
             st.success(f"✓ Summe 2045: {summe_2045:.2f}")
     
-    st.markdown("### 📊 Lastprofile")
+    st.markdown("### Lastprofile")
     
     lastprofile_einzel = st.checkbox(
         "Lastprofile berücksichtigen",
@@ -249,7 +250,7 @@ if modus == "🎯 Einzelnes Szenario":
     )
     
     st.markdown("---")
-    if st.button("🚀 Simulation starten", type="primary", width='stretch'):
+    if st.button("Simulation starten", type="primary", width='stretch'):
         if gewaehltes_szenario and gewaehltes_profil:
             with st.spinner(f"Berechne Prognosen für '{ausgewähltes_szenario_name}'..."):
                 try:
@@ -292,22 +293,22 @@ if modus == "🎯 Einzelnes Szenario":
                         st.session_state['letztes_szenario'] = szenario_ergebnis
                         st.session_state['szenario_key'] = szenario_key
                         st.session_state['jahr'] = 2045
-                        st.success(f"✅ Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
+                        st.success(f"Simulation für '{ausgewähltes_szenario_name}' abgeschlossen!")
                     else:
-                        st.info("ℹ️ Verwende gecachte Simulation (keine Parameter geändert)")
+                        st.info("ℹVerwende gecachte Simulation (keine Parameter geändert)")
                     
                 except Exception as e:
-                    st.error(f"❌ Fehler bei der Simulation: {str(e)}")
+                    st.error(f"Fehler bei der Simulation: {str(e)}")
                     st.exception(e)
     
     if 'letztes_szenario' in st.session_state:
         st.markdown("---")
-        st.header("📊 Ergebnisse")
+        st.header("Ergebnisse")
         
         szenario = st.session_state['letztes_szenario']
         jahr = st.session_state.get('jahr')
         
-        tab1, tab2, tab3 = st.tabs(["ℹ️ Übersicht", "📊 Visualisierungen","📈 Verlaufsdarstellung"])
+        tab1, tab2, tab3 = st.tabs(["Übersicht", "Visualisierungen","Verlaufsdarstellung"])
         
         with tab1:
             st.subheader("Zusammenfassung")
@@ -346,13 +347,13 @@ if modus == "🎯 Einzelnes Szenario":
     
         
         with tab2:
-            st.subheader("📊 Visualisierungen")
+            st.subheader("Visualisierungen")
             
             if hasattr(szenario, 'gebe_plots'):
                 try:
                     figures = szenario.gebe_plots(jahr)
                     
-                    st.markdown("### 🔋 EE-Anteil mit/ohne Speicher")
+                    st.markdown("### EE-Anteil mit/ohne Speicher")
                     st.pyplot(figures['fig5'])
                     buf5 = BytesIO()
                     figures['fig5'].savefig(buf5, format='png', dpi=300, bbox_inches='tight')
@@ -366,7 +367,7 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_fig5"
                     )
 
-                    st.markdown("### 🔋 Nutzung des EE-Überschusses")
+                    st.markdown("### Nutzung des EE-Überschusses")
                     st.pyplot(figures['fig6'])
                     buf6 = BytesIO()
                     figures['fig6'].savefig(buf6, format='png', dpi=300, bbox_inches='tight')
@@ -381,7 +382,7 @@ if modus == "🎯 Einzelnes Szenario":
                     )
 
                     st.markdown("---")
-                    st.markdown("### 📊 EE-Anteil & Konventionelle Energie")
+                    st.markdown("### EE-Anteil & Konventionelle Energie")
                     st.pyplot(figures['fig1'])
                     buf1 = BytesIO()
                     figures['fig1'].savefig(buf1, format='png', dpi=300, bbox_inches='tight')
@@ -396,7 +397,7 @@ if modus == "🎯 Einzelnes Szenario":
                     )
                     
                     st.markdown("---")
-                    st.markdown("### 💰 Kosten-Analyse")
+                    st.markdown("### Kosten-Analyse")
                     st.pyplot(figures['fig2'])
                     buf2 = BytesIO()
                     figures['fig2'].savefig(buf2, format='png', dpi=300, bbox_inches='tight')
@@ -411,7 +412,7 @@ if modus == "🎯 Einzelnes Szenario":
                     )
                     
                     st.markdown("---")
-                    st.markdown("### 📈 Ausbauraten Übersicht")
+                    st.markdown("### Ausbauraten Übersicht")
                     st.pyplot(figures['fig3'])
                     buf3 = BytesIO()
                     figures['fig3'].savefig(buf3, format='png', dpi=300, bbox_inches='tight')
@@ -426,7 +427,7 @@ if modus == "🎯 Einzelnes Szenario":
                     )
                     
                     st.markdown("---")
-                    st.markdown("### 📊 Installierte Leistungen/Kapazitäten")
+                    st.markdown("### Installierte Leistungen/Kapazitäten")
                     st.pyplot(figures['fig4'])
                     buf4 = BytesIO()
                     figures['fig4'].savefig(buf4, format='png', dpi=300, bbox_inches='tight')
@@ -441,7 +442,7 @@ if modus == "🎯 Einzelnes Szenario":
                     )
                     
                     st.markdown("---")
-                    st.markdown("### 📊 EE-Anteil nach Saison")
+                    st.markdown("### EE-Anteil nach Saison")
                     
                     @st.fragment
                     def render_ee_anteil_jahr_tab2():
@@ -465,18 +466,18 @@ if modus == "🎯 Einzelnes Szenario":
                                 key="download_ee_anteil_jahr_tab2"
                             )
                         except Exception as e:
-                            st.error(f"❌ Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
+                            st.error(f"Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
                             st.exception(e)
                     
                     render_ee_anteil_jahr_tab2()
                     
                 except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen der Plots: {str(e)}")
+                    st.error(f"Fehler beim Erstellen der Plots: {str(e)}")
                     st.exception(e)
             
         with tab3:
 
-            st.subheader("📈 Verlaufsdarstellung")
+            st.subheader("Verlaufsdarstellung")
             st.markdown("### Verbrauch & Erzeugung im Jahr")
             
             @st.fragment
@@ -501,13 +502,13 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_verbrauch_jahr"
                     )
                 except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen der Auswertungskurven: {str(e)}")
+                    st.error(f"Fehler beim Erstellen der Auswertungskurven: {str(e)}")
                     st.exception(e)
             
             render_verbrauch_jahr()  
 
             st.markdown("---")
-            st.markdown("### 📊 EE-Anteil nach Monat")
+            st.markdown("### EE-Anteil nach Monat")
             
             @st.fragment
             def render_ee_anteil_jahr_monat():
@@ -531,7 +532,7 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_ee_anteil_jahr_monat"         
                     )
                 except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
+                    st.error(f"Fehler beim Erstellen des EE-Anteil Diagramms: {str(e)}")
                     st.exception(e)
             
             render_ee_anteil_jahr_monat()    
@@ -562,7 +563,7 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_zweiwochen"
                     )
                 except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
+                    st.error(f"Fehler beim Erstellen des Zwei-Wochen-Diagramms: {str(e)}")
                     st.exception(e)
             
             render_zweiwochen_diagramm()
@@ -591,7 +592,7 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_ladestand"
                     )
                 except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des Ladestand-Diagramms: {str(e)}")
+                    st.error(f"Fehler beim Erstellen des Ladestand-Diagramms: {str(e)}")
                     st.exception(e)
             
             render_ladestand_diagramm()
@@ -613,7 +614,7 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_dunkel2030"
                     )
             except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-2030-Diagramms: {str(e)}")
+                    st.error(f"Fehler beim Erstellen des Dunkelflaute-2030-Diagramms: {str(e)}")
                     st.exception(e)
 
             try:
@@ -633,7 +634,7 @@ if modus == "🎯 Einzelnes Szenario":
                         key="download_dunkel2045"
                     )
             except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen des Dunkelflaute-2045-Diagramms: {str(e)}")
+                    st.error(f"Fehler beim Erstellen des Dunkelflaute-2045-Diagramms: {str(e)}")
                     st.exception(e)
 
 
@@ -659,7 +660,7 @@ if modus == "🎯 Einzelnes Szenario":
                 key="download_simulation_csv"
             )
         except Exception as e:
-            st.error(f"❌ Fehler beim Erstellen der Simulationsdaten-Excel: {str(e)}")
+            st.error(f"Fehler beim Erstellen der Simulationsdaten-Excel: {str(e)}")
             st.exception(e)
 
         st.markdown("---")
@@ -679,8 +680,8 @@ if modus == "🎯 Einzelnes Szenario":
 # ============================================================================
 # MODUS 2: ALLE SZENARIEN
 # ============================================================================
-elif modus == "📈 Szenarien vergleichen":
-    st.header("📈 Szenarien vergleichen")
+elif modus == "Szenarien vergleichen":
+    st.header("Szenarien vergleichen")
     
     st.info("Dieser Modus berechnet alle verfügbaren Szenarien und vergleicht die Ergebnisse.")
     
@@ -726,7 +727,7 @@ elif modus == "📈 Szenarien vergleichen":
         help="Aktivieren, um, wenn möglich, die Batteriespeicher auf Leistungsniveau durch Laden aus Wasserstoffspeicher zu bringen"
     )
     
-    st.markdown("### ⚡ Konventionelle Anteile")
+    st.markdown("### Konventionelle Anteile")
     st.info("Verteilung der konventionellen Stromerzeugung auf verschiedene Technologien (Summe sollte 1.0 ergeben)")
     
     with st.expander("Anteile bis 2038 konfigurieren", expanded=False):
@@ -744,7 +745,7 @@ elif modus == "📈 Szenarien vergleichen":
         
         summe_2038_vgl = braun_2038_vgl + erdgas_2038_vgl + stein_2038_vgl + sonstige_konv_2038_vgl + importe_2038_vgl
         if abs(summe_2038_vgl - 1.0) > 0.01:
-            st.warning(f"⚠️ Summe 2038: {summe_2038_vgl:.2f} (sollte 1.0 sein)")
+            st.warning(f"Summe 2038: {summe_2038_vgl:.2f} (sollte 1.0 sein)")
         else:
             st.success(f"✓ Summe 2038: {summe_2038_vgl:.2f}")
     
@@ -763,11 +764,11 @@ elif modus == "📈 Szenarien vergleichen":
         
         summe_2045_vgl = braun_2045_vgl + erdgas_2045_vgl + stein_2045_vgl + sonstige_konv_2045_vgl + importe_2045_vgl
         if abs(summe_2045_vgl - 1.0) > 0.01:
-            st.warning(f"⚠️ Summe 2045: {summe_2045_vgl:.2f} (sollte 1.0 sein)")
+            st.warning(f"Summe 2045: {summe_2045_vgl:.2f} (sollte 1.0 sein)")
         else:
             st.success(f"✓ Summe 2045: {summe_2045_vgl:.2f}")
     
-    st.markdown("### 📊 Lastprofile")
+    st.markdown("### Lastprofile")
     lastprofile_vergleich = st.checkbox(
         "Lastprofile berücksichtigen",
         value=True,
@@ -779,7 +780,7 @@ elif modus == "📈 Szenarien vergleichen":
     for key in ausgewählte_szenarien:
         ausgewählte.append(szenarien_dict[key])
     
-    if st.button("🚀 Ausgewählte Szenarien simulieren", type="primary", width='stretch'):
+    if st.button("Ausgewählte Szenarien simulieren", type="primary", width='stretch'):
         gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, ausgewähltes_profil_name)
         
         if gewaehltes_profil:
@@ -844,7 +845,7 @@ elif modus == "📈 Szenarien vergleichen":
                     plot_histogram_gesamtauswertung(alle_ergebnisse, ax1[0], ax1[1], ax2[0], ax2[1])
                     plt.tight_layout()
                     
-                    st.success("✅ Alle Szenarien erfolgreich berechnet!")
+                    st.success("Alle Szenarien erfolgreich berechnet!")
                     
                     st.pyplot(fig1)
                     buf1 = BytesIO()
@@ -870,13 +871,13 @@ elif modus == "📈 Szenarien vergleichen":
                     )
                     
                 except Exception as e:
-                    st.error(f"❌ Fehler beim Erstellen der Vergleichsvisualisierungen: {str(e)}")
+                    st.error(f"Fehler beim Erstellen der Vergleichsvisualisierungen: {str(e)}")
                     
             else:
-                st.warning("⚠️ Keine Ergebnisse zum Visualisieren vorhanden. Bitte überprüfen Sie, ob die Szenarien korrekt berechnet wurden.")
+                st.warning("Keine Ergebnisse zum Visualisieren vorhanden. Bitte überprüfen Sie, ob die Szenarien korrekt berechnet wurden.")
             
             if not alle_ergebnisse.empty:
-                st.subheader("📊 Vergleichstabelle")
+                st.subheader("Vergleichstabelle")
                 # Spaltennamen sauber formatieren
                 alle_ergebnisse_formatiert = formatiere_spaltennamen(alle_ergebnisse)
                 st.dataframe(alle_ergebnisse_formatiert, width='stretch')
@@ -900,17 +901,17 @@ elif modus == "📈 Szenarien vergleichen":
 # Modus 3: Szenario hinzufügen
 # ============================================================================
 
-elif modus == "➕ Szenario hinzufügen/Verändern":
-    st.header("➕ Szenario hinzufügen/Verändern")
+elif modus == "Szenario hinzufügen/Verändern":
+    st.header("Szenario hinzufügen/Verändern")
     st.info("Hier können Sie neue Szenarien und Verbrauchsprofile zur Simulation hinzufügen oder verändern. Wird Online nur Lokal gespeichert.")
     
-    tab1, tab2, tab3 = st.tabs(["🎯 Neues Szenario", "📊 Neues Verbrauchsprofil", "✏️ Szenario verändern"])
+    tab1, tab2, tab3 = st.tabs(["Neues Szenario", "Neues Verbrauchsprofil", "Szenario verändern"])
     
     # ========================================================================
     # TAB 1: NEUES SZENARIO HINZUFÜGEN
     # ========================================================================
     with tab1:
-        st.subheader("🎯 Neues Szenario erstellen")
+        st.subheader("Neues Szenario erstellen")
         
         with st.form("neues_szenario_form"):
             st.markdown("### Grunddaten")
@@ -922,7 +923,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                 beschreibung = st.text_area("Beschreibung*", placeholder="Kurze Beschreibung des Szenarios")
             
             st.markdown("---")
-            st.markdown("### 🎯 Ziele 2030")
+            st.markdown("### Ziele 2030")
             st.markdown("#### Ausbau Erneuerbare Energien (in GW)")
             
             col1, col2, col3, col4 = st.columns(4)
@@ -948,7 +949,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                 pumpspeicher_2030 = st.number_input("Pumpspeicher", min_value=0.0, value=50.0, step=1.0, key="pump_2030")
             
             st.markdown("---")
-            st.markdown("### 🎯 Ziele 2045")
+            st.markdown("### Ziele 2045")
             st.markdown("#### Ausbau Erneuerbare Energien (in GW)")
             
             col1, col2, col3, col4 = st.columns(4)
@@ -974,7 +975,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                 pumpspeicher_2045 = st.number_input("Pumpspeicher", min_value=0.0, value=300.0, step=10.0, key="pump_2045")
             
             st.markdown("---")
-            st.markdown("### 🔧 Veränderungsfaktoren")
+            st.markdown("### Veränderungsfaktoren")
             st.markdown("#### Erzeugung")
             col1, col2, col3, col4 = st.columns(4)
             with col1:
@@ -1040,7 +1041,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
             
             if submitted:
                 if not name or not beschreibung:
-                    st.error("❌ Bitte füllen Sie Name und Beschreibung aus!")
+                    st.error("Bitte füllen Sie Name und Beschreibung aus!")
                 else:
                     # Neues Szenario erstellen
                     neues_szenario = {
@@ -1126,7 +1127,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                         
                         # Prüfen ob Name bereits existiert
                         if any(s["Name"] == name for s in alle_szenarien):
-                            st.error(f"❌ Ein Szenario mit dem Namen '{name}' existiert bereits!")
+                            st.error(f"Ein Szenario mit dem Namen '{name}' existiert bereits!")
                         else:
                             # Neues Szenario hinzufügen
                             alle_szenarien.append(neues_szenario)
@@ -1138,32 +1139,32 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                             # Cache invalidieren
                             st.cache_data.clear()
                             
-                            st.success(f"✅ Szenario '{name}' erfolgreich gespeichert!")
+                            st.success(f"Szenario '{name}' erfolgreich gespeichert!")
                             
                             # Git-Automatisierung
-                            with st.spinner("📤 Speichere ins Repository..."):
+                            with st.spinner("Speichere ins Repository..."):
                                 success, message = git_commit_and_push(
                                     szenarien_pfad.relative_to(PROJECT_ROOT),
                                     f"Neues Szenario hinzugefügt: {name}"
                                 )
                                 if success:
-                                    st.success(f"✅ {message}")
+                                    st.success(f"{message}")
                                 else:
-                                    st.warning(f"⚠️ Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
+                                    st.warning(f"Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
                             
                             st.balloons()
-                            st.info("🔄 Seite wird neu geladen, um das neue Szenario anzuzeigen...")
+                            st.info("Seite wird neu geladen, um das neue Szenario anzuzeigen...")
                             st.rerun()
                             
                     except Exception as e:
-                        st.error(f"❌ Fehler beim Speichern: {str(e)}")
+                        st.error(f"Fehler beim Speichern: {str(e)}")
                         st.exception(e)
     
     # ========================================================================
     # TAB 2: NEUES VERBRAUCHSPROFIL HINZUFÜGEN
     # ========================================================================
     with tab2:
-        st.subheader("📊 Neues Verbrauchsprofil erstellen")
+        st.subheader("Neues Verbrauchsprofil erstellen")
         
         with st.form("neues_profil_form"):
             st.markdown("### Grunddaten")
@@ -1227,11 +1228,11 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                 )
             
             st.markdown("---")
-            profil_submitted = st.form_submit_button("💾 Verbrauchsprofil speichern", type="primary", width='stretch')
+            profil_submitted = st.form_submit_button("Verbrauchsprofil speichern", type="primary", width='stretch')
             
             if profil_submitted:
                 if not profil_name:
-                    st.error("❌ Bitte geben Sie einen Namen ein!")
+                    st.error("Bitte geben Sie einen Namen ein!")
                 else:
                     # Neues Verbrauchsprofil erstellen
                     neues_profil = {
@@ -1249,7 +1250,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                             alle_profile = json.load(f)
                         
                         if any(p["Name"] == profil_name for p in alle_profile):
-                            st.error(f"❌ Ein Verbrauchsprofil mit dem Namen '{profil_name}' existiert bereits!")
+                            st.error(f"Ein Verbrauchsprofil mit dem Namen '{profil_name}' existiert bereits!")
                         else:
                             alle_profile.append(neues_profil)
                             
@@ -1258,30 +1259,30 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                             
                             st.cache_data.clear()
                             
-                            st.success(f"✅ Verbrauchsprofil '{profil_name}' erfolgreich gespeichert!")
+                            st.success(f"Verbrauchsprofil '{profil_name}' erfolgreich gespeichert!")
                             
-                            with st.spinner("📤 Speichere ins Repository..."):
+                            with st.spinner("Speichere ins Repository..."):
                                 success, message = git_commit_and_push(
                                     verbrauchsprofile_pfad.relative_to(PROJECT_ROOT),
                                     f"Neues Verbrauchsprofil hinzugefügt: {profil_name}"
                                 )
                                 if success:
-                                    st.success(f"✅ {message}")
+                                    st.success(f"{message}")
                                 else:
-                                    st.warning(f"⚠️ Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
+                                    st.warning(f"Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
                             
                             st.balloons()
-                            st.info("🔄 Seite wird neu geladen, um das neue Profil anzuzeigen...")
+                            st.info("Seite wird neu geladen, um das neue Profil anzuzeigen...")
                             st.rerun()
                             
                     except Exception as e:
-                        st.error(f"❌ Fehler beim Speichern: {str(e)}")
+                        st.error(f"Fehler beim Speichern: {str(e)}")
                         st.exception(e)
     # ========================================================================
     # TAB 3: SZENARIO VERÄNDERN
     # ========================================================================
     with tab3:
-        st.subheader("✏️ Szenario verändern")
+        st.subheader("Szenario verändern")
         st.info("Wählen Sie ein Szenario aus, um dessen Daten zu bearbeiten.")
         
         szenario_namen = [szen["Name"] for szen in szenarien]
@@ -1303,7 +1304,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                 )
 
                 st.markdown("---")
-                st.markdown("### 🎯 Ziele 2030")
+                st.markdown("### Ziele 2030")
                 st.markdown("#### Ausbaustand Erneuerbare Energien (in GW)")
                 
                 col1, col2, col3, col4 = st.columns(4)
@@ -1329,7 +1330,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                     pumpspeicher_2030 = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2030"]["Ausbau Speicher"]["pumpspeicher"]), 2), step=1.0, key="pump_2030_edit")
                 
                 st.markdown("---")
-                st.markdown("### 🎯 Ziele 2045")
+                st.markdown("### Ziele 2045")
                 st.markdown("#### Ausbaustand Erneuerbare Energien (in GW)")
                 
                 col1, col2, col3, col4 = st.columns(4)
@@ -1355,7 +1356,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                     pumpspeicher_2045 = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Ziele 2045"]["Ausbau Speicher"]["pumpspeicher"]), 2), step=10.0, key="pump_2045_edit")
                 
                 st.markdown("---")
-                st.markdown("### 🔧 Veränderungsfaktoren")
+                st.markdown("### Veränderungsfaktoren")
                 st.markdown("#### Erzeugung")
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
@@ -1416,7 +1417,7 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                 with col3:
                     os_pump = st.number_input("Pumpspeicher", min_value=0.0, value=round(float(szenario_to_edit["Veränderungsfaktoren"]["Opex_Speicher"]["pumpspeicher"]), 2), step=0.1, key="os_pump_edit")
                 
-                if st.button("💾 Änderungen speichern", type="primary", width='stretch'):
+                if st.button("Änderungen speichern", type="primary", width='stretch'):
                     try:
                         with open(szenarien_pfad, 'r', encoding='utf-8') as f:
                             alle_szenarien = json.load(f)
@@ -1494,51 +1495,51 @@ elif modus == "➕ Szenario hinzufügen/Verändern":
                         
                         st.cache_data.clear()
                         
-                        st.success(f"✅ Szenario '{ausgewähltes_szenario_name}' erfolgreich aktualisiert!")
+                        st.success(f"Szenario '{ausgewähltes_szenario_name}' erfolgreich aktualisiert!")
                         
-                        with st.spinner("📤 Speichere ins Repository..."):
+                        with st.spinner("Speichere ins Repository..."):
                             success, message = git_commit_and_push(
                                 szenarien_pfad.relative_to(PROJECT_ROOT),
                                 f"Szenario verändert: {ausgewähltes_szenario_name}"
                             )
                             if success:
-                                st.success(f"✅ {message}")
+                                st.success(f"{message}")
                             else:
-                                st.warning(f"⚠️ Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
+                                st.warning(f"Lokal gespeichert, aber Git-Operation fehlgeschlagen: {message}")
                         
                         st.balloons()
-                        st.info("🔄 Seite wird neu geladen, um die Änderungen zu speichern")
+                        st.info("Seite wird neu geladen, um die Änderungen zu speichern")
                         st.rerun()
                     except Exception as e:
-                        st.error(f"❌ Fehler beim Speichern: {str(e)}")
+                        st.error(f"Fehler beim Speichern: {str(e)}")
                         st.exception(e)
 
 
 # ============================================================================
 # MODUS 4: ÜBER DAS PROJEKT
 # ============================================================================
-elif modus == "ℹ️ Über das Projekt":
-    st.header("ℹ️ Über das Projekt")
+elif modus == "ℹÜber das Projekt":
+    st.header("ℹÜber das Projekt")
     
     st.markdown("""
     ## IPJ1 - Team Pottkieker
     
-    ### 🎯 Projektbeschreibung
+    ### Projektbeschreibung
     Diese Simulationssoftware analysiert den Ausbau erneuerbarer Energien in Deutschland 
     bis zu den Zieljahren 2030 und 2045.
     
-    ### 🔧 Funktionen
+    ### Funktionen
     - **Szenario-Simulation:** Berechnung verschiedener Ausbauszenarien
     - **Erzeugungsprognose:** Vorhersage der EE-Erzeugung nach Technologien
     - **Speicheranalyse:** Bewertung des Speicherbedarfs
     - **Kostenrechnung:** Investitions- und Betriebskosten
     - **Dunkelflaute-Szenarien:** Analyse kritischer Situationen
     
-    ### 📊 Verfügbare Szenarien
+    ### Verfügbare Szenarien
     """)
     
     for szenario in szenarien:
-        with st.expander(f"📁 {szenario['Name']}"):
+        with st.expander(f"{szenario['Name']}"):
             st.write(f"**Beschreibung:** {szenario['Beschreibung']}")
             
             col1, col2, col3 = st.columns(3)
@@ -1553,11 +1554,20 @@ elif modus == "ℹ️ Über das Projekt":
                 st.json(szenario['Veränderungsfaktoren'])
     
     st.markdown("""
-    ### 👥 Softwareteam
+    
+    ### Projektleitung
+    - Tom Niklas Schmitt
+                
+    ### Softwareteam
     - Joris Bürger
     - Robin Matzke
     
-    ### 🏫 Institution
+    ### Rechercheteam
+    - Tobias Grüllmeier
+    - Soeren Scheele
+    - Cedrik Wilke
+                
+    ### Institution
     HAW Hamburg - Integrationsprojekt 1
     """)
     
