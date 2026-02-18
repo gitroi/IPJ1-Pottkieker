@@ -172,14 +172,12 @@ def berechne_speicher_aufteilung(
     platz_wasserstoff: float,
     leistung_batterie: float,
     leistung_pumpspeicher: float,
-    leistung_wasserstoff: float,
-    gewicht_kapazitaet: float = 0.5,
-    gewicht_leistung: float = 0.5
+    leistung_wasserstoff: float
 ) -> tuple[float, float, float]:
     """
     Berechnet die Aufteilung der Lademenge auf drei Speichertypen basierend auf
     verfügbarer Kapazität und Leistung mit gewichteter Kombination.
-    Erstellt von KI Claude Sonnet 4.5.
+    Erstellt mit Hilfe von KI Claude Sonnet 4.5.
     
     Args:
         lademenge: Verfügbare Energie zum Laden in MWh
@@ -189,8 +187,8 @@ def berechne_speicher_aufteilung(
         leistung_batterie: Viertelstundenleistung Batterie in MW
         leistung_pumpspeicher: Viertelstundenleistung Pumpspeicher in MW
         leistung_wasserstoff: Viertelstundenleistung Wasserstoff in MW
-        gewicht_kapazitaet: Gewichtungsfaktor für verfügbare Kapazität (0-1)
-        gewicht_leistung: Gewichtungsfaktor für Leistung (0-1)
+        gewicht_kapazitaet: Gewichtungsfaktor für verfügbare Kapazität (0-1) ENTFERNT
+        gewicht_leistung: Gewichtungsfaktor für Leistung (0-1) ENTFERNT
     
     Returns:
         (anteil_batterie, anteil_pumpspeicher, anteil_wasserstoff)
@@ -235,7 +233,9 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     (Optimierte Version mit Hilfsfunktionen und NumPy-Arrays)
     
     Args:
+        entladegrenze:
         untergrenze_h2_prozent: Winterladestand für Wasserstoffspeicher in Prozent (0-100)
+        langzeit_kurzzeit: Werden Kurzzeitspeicher aus Langzeitspeichern geladen? y/n
     """
 
     bestandBatterie = FIXPARAMETER_BATTERIE.bestand
@@ -348,9 +348,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
                 platz_h2,
                 leistung_batterie[idx],
                 leistung_pumpspeicher[idx],
-                leistung_wasserstoff[idx],
-                0.5,  # Optional: Standard ist 0.5
-                0.5   # Optional: Standard ist 0.5
+                leistung_wasserstoff[idx]
                 )
 
                 # Batterie laden
@@ -473,7 +471,7 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
 
                 anteil_batterie, anteil_pump, anteil_h2 = berechne_speicher_aufteilung(
                     lademenge, platz_batterie, platz_pump, platz_h2,
-                    leistung_batterie[idx], leistung_pumpspeicher[idx], leistung_wasserstoff[idx], 0.5, 0.5
+                    leistung_batterie[idx], leistung_pumpspeicher[idx], leistung_wasserstoff[idx]
                 )
 
                 aktuell_batterie, rest = speicher_laden(
