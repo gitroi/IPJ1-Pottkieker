@@ -86,10 +86,9 @@ def prognose_eines_Szenarios():
     gewaehltes_profil = get_verbrauchsprofil_by_name(verbrauchsprofile, verbrauch)
     
     if gewaehltes_szenario:
-        # Konventionelle Anteile aus Szenario laden oder Standardwerte verwenden
         konven_anteile = gewaehltes_szenario.get("Konventionelle Anteile", {
-            "2038": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige": 0.1, "importe": 0.1},
-            "2045": {"braun": 0.0, "erdgas": 0.6, "stein": 0.0, "sonstige": 0.2, "importe": 0.2}
+            "2038": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige_konventionelle": 0.1, "importe": 0.1},
+            "2045": {"braun": 0.0, "erdgas": 0.6, "stein": 0.0, "sonstige_konventionelle": 0.2, "importe": 0.2}
         }) 
         
         szenario_ergebnis = Szenario(
@@ -157,8 +156,8 @@ def prognose_alle_Szenarien():
     for szenario in szenarien:
         # Konventionelle Anteile aus Szenario laden oder Standardwerte verwenden
         konven_anteile = szenario.get("Konventionelle Anteile", {
-            "2030": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige": 0.1, "importe": 0.1},
-            "2045": {"braun": 0.0, "erdgas": 0.6, "stein": 0.0, "sonstige": 0.2, "importe": 0.2}
+            "2030": {"braun": 0.25, "erdgas": 0.4, "stein": 0.15, "sonstige_konventionelle": 0.1, "importe": 0.1},
+            "2045": {"braun": 0.0, "erdgas": 0.6, "stein": 0.0, "sonstige_konventionelle": 0.2, "importe": 0.2}
         })
         
         szenario_ergebnis = Szenario(

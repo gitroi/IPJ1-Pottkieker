@@ -260,14 +260,14 @@ if modus == "Einzelnes Szenario":
                             "braun": braun_2038,
                             "erdgas": erdgas_2038,
                             "stein": stein_2038,
-                            "sonstige": sonstige_konv_2038,
+                            "sonstige_konventionelle": sonstige_konv_2038,
                             "importe": importe_2038
                         },
                         "2045": {
                             "braun": braun_2045,
                             "erdgas": erdgas_2045,
                             "stein": stein_2045,
-                            "sonstige": sonstige_konv_2045,
+                            "sonstige_konventionelle": sonstige_konv_2045,
                             "importe": importe_2045
                         }
                     }
@@ -799,14 +799,14 @@ elif modus == "Szenarien vergleichen":
                             "braun": braun_2038_vgl,
                             "erdgas": erdgas_2038_vgl,
                             "stein": stein_2038_vgl,
-                            "sonstige": sonstige_konv_2038_vgl,
+                            "sonstige_konventionelle": sonstige_konv_2038_vgl,
                             "importe": importe_2038_vgl
                         },
                         "2045": {
                             "braun": braun_2045_vgl,
                             "erdgas": erdgas_2045_vgl,
                             "stein": stein_2045_vgl,
-                            "sonstige": sonstige_konv_2045_vgl,
+                            "sonstige_konventionelle": sonstige_konv_2045_vgl,
                             "importe": importe_2045_vgl
                         }
                     }

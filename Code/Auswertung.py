@@ -76,22 +76,20 @@ def ausgabe(kosten_df: pd.DataFrame, ee_df: pd.DataFrame,szenario: json, konvent
     mask1 = end_df["Jahr"] <= 2030
     mask2 = end_df["Jahr"] > 2030
     
-    konventionelle_typen = ["braun", "erdgas", "stein", "sonstige", "importe"]
+    konventionelle_typen = ["braun", "erdgas", "stein", "sonstige_konventionelle", "importe"]
     for konv_typ in konventionelle_typen:
         if f"{konv_typ} [GW]" in gesamt.columns:
-            # Kraftwerke mit installierter Leistung (braun, erdgas, stein, sonstige)
             end_df[f"Installierte Leistung {konv_typ} [GW]"] = grouped[f"{konv_typ} [GW]"].first().values
             
             kosten_capex = grouped[f"{konv_typ}_capex [€]"].sum() if f"{konv_typ}_capex [€]" in gesamt.columns else 0
             kosten_opex = grouped[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in gesamt.columns else 0
             end_df[f"Gesamtkosten {konv_typ} [Mrd. €]"] = ((kosten_capex + kosten_opex) / 1e9).round(2).values
         elif konv_typ == "importe":
-            # Importe: nur OPEX, keine installierte Leistung
             kosten_opex = grouped[f"{konv_typ}_opex [€]"].sum() if f"{konv_typ}_opex [€]" in gesamt.columns else 0
             end_df[f"Gesamtkosten {konv_typ} [Mrd. €]"] = (kosten_opex / 1e9).round(2).values
 
     gesamtkosten_konventionelle_spalten = ["Gesamtkosten braun [Mrd. €]", "Gesamtkosten erdgas [Mrd. €]",
-                                            "Gesamtkosten stein [Mrd. €]", "Gesamtkosten sonstige [Mrd. €]", "Gesamtkosten importe [Mrd. €]"]
+                                            "Gesamtkosten stein [Mrd. €]", "Gesamtkosten sonstige_konventionelle [Mrd. €]", "Gesamtkosten importe [Mrd. €]"]
 
     if gesamtkosten_konventionelle_spalten:
         end_df["Gesamtkosten Konventionelle [Mrd. €]"] = end_df[gesamtkosten_konventionelle_spalten].sum(axis=1).round(2)

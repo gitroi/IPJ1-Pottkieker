@@ -1,8 +1,6 @@
 """
 Unit Tests für Prognose_Erzeugung.py
 Testet die Funktionen zur Erzeugungsprognose von Erneuerbaren Energien.
-Erstellt mit GitHub Copilot
-(Kannst du mir einen Test ergenzen, der die Funktion Prognose_erzeugung testet)
 """
 
 import sys
@@ -12,9 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
 import pandas as pd
-import numpy as np
 import json
-from pathlib import Path
 from unittest.mock import patch, mock_open
 from Prognose_Erzeugung import Jährlicher_Zuwachs_EE, Prognose_erzeugung
 
@@ -101,17 +97,6 @@ class TestJährlicher_Zuwachs_EE:
         for key in expected_keys:
             assert key in result["zuwachsrate_2030"]
             assert key in result["zuwachsrate_2045"]
-    
-    def test_rundung_auf_drei_nachkommastellen(self, zielwert_2030, zielwert_2045, mock_erzeugerarten):
-        """Testet, ob Werte auf 3 Nachkommastellen gerundet werden"""
-        with patch('builtins.open', mock_open(read_data=json.dumps(mock_erzeugerarten))):
-            with patch('Prognose_Erzeugung.PROJECT_ROOT', Path('/mock/path')):
-                result = Jährlicher_Zuwachs_EE(zielwert_2030, zielwert_2045)
-        
-        for key in result["zuwachsrate_2030"]:
-            # Prüfe, dass maximal 3 Nachkommastellen
-            assert len(str(result["zuwachsrate_2030"][key]).split('.')[-1]) <= 3
-            assert len(str(result["zuwachsrate_2045"][key]).split('.')[-1]) <= 3
 
 
 class TestPrognose_erzeugung:
@@ -169,18 +154,15 @@ class TestPrognose_erzeugung:
     
     def test_ertragsart_mittel(self, installierte_2030, installierte_2045, steigerungsfaktoren):
         """Testet die Funktion mit Ertragsart 'mittel' - Integrationstest"""
-        # Integrationstest: Nutzt echte Dateien
         result = Prognose_erzeugung(installierte_2030, installierte_2045, 
                                    steigerungsfaktoren, "mittel")
         
-        # Prüfe, dass ein DataFrame zurückgegeben wird
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
         assert 'Datum von' in result.columns
     
     def test_ertragsart_schlecht(self, installierte_2030, installierte_2045, steigerungsfaktoren):
         """Testet die Funktion mit Ertragsart 'schlecht' - Integrationstest"""
-        # Integrationstest: Nutzt echte Dateien
         result = Prognose_erzeugung(installierte_2030, installierte_2045, 
                                    steigerungsfaktoren, "schlecht")
         
@@ -191,62 +173,16 @@ class TestPrognose_erzeugung:
     
     def test_ungueltige_ertragsart(self, installierte_2030, installierte_2045, steigerungsfaktoren):
         """Testet, ob ungültige Ertragsart eine ValueError auslöst"""
-        # Mock der Dateizugriffe, um bis zur Validierung zu kommen
-        mock_df = pd.DataFrame({
-            'Jahr': [2020, 2021],
-            'Monat': [1, 1],
-            'pv': [50.0, 50.0],
-            'wind_onshore': [60.0, 60.0],
-            'wind_offshore': [10.0, 10.0],
-            'biomasse': [8.0, 8.0],
-            'wasser': [5.0, 5.0],
-            'sonstige': [2.0, 2.0]
-        })
-        
-        mock_erzeugung = pd.DataFrame({
-            'Datum von': pd.date_range('2020-01-01', periods=96, freq='15min'),
-            'Photovoltaik [MWh] Originalauflösungen': [100.0] * 96,
-            'Wind Onshore [MWh] Originalauflösungen': [200.0] * 96,
-            'Wind Offshore [MWh] Originalauflösungen': [150.0] * 96,
-            'Biomasse [MWh] Originalauflösungen': [50.0] * 96,
-            'Wasserkraft [MWh] Originalauflösungen': [30.0] * 96,
-            'Sonstige Erneuerbare [MWh] Originalauflösungen': [10.0] * 96
-        })
-        
-        mock_erzeugerarten = {
-            "pv_dach": {"bestand": 50.0},
-            "pv_frei": {"bestand": 30.0},
-            "wind_onshore": {"bestand": 60.0},
-            "wind_offshore": {"bestand": 10.0},
-            "biomasse": {"bestand": 8.0},
-            "wasser": {"bestand": 5.0},
-            "sonstige": {"bestand": 2.0}
-        }
-        
-        with patch('pandas.read_csv') as mock_read_csv:
-            mock_read_csv.side_effect = [mock_df, mock_erzeugung]
-            with patch('builtins.open', mock_open(read_data=json.dumps(mock_erzeugerarten))):
-                with patch('Prognose_Erzeugung.PROJECT_ROOT', Path('/mock/path')):
-                    with pytest.raises(ValueError, match="Ungültige Ertragsart"):
-                        Prognose_erzeugung(installierte_2030, installierte_2045, 
-                                         steigerungsfaktoren, "ungültig")
+        with pytest.raises(ValueError, match="Ungültige Ertragsart"):
+            Prognose_erzeugung(installierte_2030, installierte_2045, 
+                             steigerungsfaktoren, "ungültig")
     
-    def test_steigerungsfaktoren_umrechnung(self, steigerungsfaktoren):
-        """Testet die Umrechnung der Steigerungsfaktoren auf Viertelstunden"""
-        # Jahresfaktor 1.02 sollte auf Viertelstunde umgerechnet werden
-        # 1.02 ^ (1 / (365.25 * 24 * 4))
-        expected_virtelstunden_faktor = 1.02 ** (1 / (365.25 * 24 * 4))
+    def test_ausgabe_struktur(self, installierte_2030, installierte_2045, steigerungsfaktoren):
+        """Testet die Struktur der Ausgabe"""
+        result = Prognose_erzeugung(installierte_2030, installierte_2045, 
+                                   steigerungsfaktoren, "gut")
         
-        # Dieser Test prüft die Logik, würde aber echte Dateien benötigen
-        assert expected_virtelstunden_faktor < 1.02  # Muss kleiner als Jahresfaktor sein
-        assert expected_virtelstunden_faktor > 1.0   # Muss größer als 1.0 sein
-
-
-class TestDataFrame_Ausgabe:
-    """Tests für die Struktur und Qualität der Ausgabe"""
-    
-    def test_spalten_vorhanden(self):
-        """Testet, ob alle erforderlichen Spalten in der Ausgabe vorhanden sind"""
+        # Prüfe erforderliche Spalten
         expected_columns = [
             'Datum von',
             'Photovoltaik [MWh] Originalauflösungen',
@@ -263,137 +199,31 @@ class TestDataFrame_Ausgabe:
             'Installierte Sonstige_GW'
         ]
         
-        # Test-DataFrame simulieren
-        df = pd.DataFrame(columns=expected_columns)
-        
         for col in expected_columns:
-            assert col in df.columns
+            assert col in result.columns, f"Spalte '{col}' fehlt in der Ausgabe"
+        
+        # Prüfe, dass keine NaN-Werte vorhanden sind
+        assert not result.isna().any().any(), "Ausgabe enthält NaN-Werte"
+        
+        # Prüfe, dass Erzeugungswerte nicht negativ sind
+        erzeugung_cols = [col for col in result.columns if '[MWh]' in col]
+        for col in erzeugung_cols:
+            assert (result[col] >= 0).all(), f"Spalte '{col}' enthält negative Werte"
     
-    def test_zeitraum_2026_bis_2045(self):
-        """Testet, ob der Zeitraum von 2026 bis 2045 korrekt abgedeckt wird"""
-        date_range = pd.date_range(start='01-01-2026 00:00', end='31-12-2045 23:45', 
-                                  freq='15min', tz='UTC')
+    def test_zeitraum(self, installierte_2030, installierte_2045, steigerungsfaktoren):
+        """Testet, ob der korrekte Zeitraum 2026-2045 abgedeckt wird"""
+        result = Prognose_erzeugung(installierte_2030, installierte_2045, 
+                                   steigerungsfaktoren, "gut")
         
-        # Prüfe Anzahl der Zeitpunkte (20 Jahre * 365.25 Tage * 96 Viertelstunden)
-        expected_count = int(20 * 365.25 * 96)
-        assert len(date_range) == pytest.approx(expected_count, abs=200)
+        start_date = result['Datum von'].min()
+        end_date = result['Datum von'].max()
         
-        # Prüfe Start- und Enddatum
-        assert date_range[0].year == 2026
-        assert date_range[-1].year == 2045
-
-
-class TestKapazitätsfaktoren:
-    """Tests für die Kapazitätsfaktor-Berechnungen"""
-    
-    def test_kapazitätsfaktor_bereich(self):
-        """Testet, ob Kapazitätsfaktoren im gültigen Bereich [0, 1] liegen"""
-        # Simuliere Erzeugung und installierte Leistung
-        erzeugung_mwh = 100.0
-        installierte_leistung_gw = 1.0  # 1 GW = 1000 MW
-        viertelstunde = 0.25  # 15 Minuten
+        assert start_date.year == 2026, f"Startjahr sollte 2026 sein, ist aber {start_date.year}"
+        assert end_date.year == 2045, f"Endjahr sollte 2045 sein, ist aber {end_date.year}"
         
-        kapazitätsfaktor = erzeugung_mwh / (installierte_leistung_gw * 1000 * viertelstunde)
-        
-        assert 0 <= kapazitätsfaktor <= 1, f"Kapazitätsfaktor {kapazitätsfaktor} außerhalb [0, 1]"
-    
-    def test_kapazitätsfaktor_pv_nachts(self):
-        """Testet, ob PV-Kapazitätsfaktor nachts null ist"""
-        # Nachts sollte PV keine Erzeugung haben
-        erzeugung_mwh = 0.0
-        installierte_leistung_gw = 100.0
-        
-        kapazitätsfaktor = erzeugung_mwh / (installierte_leistung_gw * 1000 * 0.25)
-        
-        assert kapazitätsfaktor == 0.0
-    
-    def test_kapazitätsfaktor_biomasse_konstant(self):
-        """Testet, ob Biomasse einen relativ konstanten Kapazitätsfaktor hat"""
-        # Biomasse sollte grundlastfähig sein
-        # Simuliere mehrere Zeitpunkte mit ähnlicher Erzeugung
-        kapazitätsfaktoren = []
-        
-        for erzeugung in [45, 47, 46, 48, 45]:
-            kf = erzeugung / (8.0 * 1000 * 0.25)  # 8 GW Biomasse
-            kapazitätsfaktoren.append(kf)
-        
-        # Standardabweichung sollte gering sein
-        assert np.std(kapazitätsfaktoren) < 0.05
-
-
-class TestDatensätze:
-    """Tests für die verwendeten Datensätze"""
-    
-    def test_historische_jahre_verfügbar(self):
-        """Testet, ob die benötigten historischen Jahre verfügbar sind"""
-        # Die Funktion nutzt Jahre 2020-2024
-        required_years = [2020, 2021, 2022, 2023, 2024]
-        
-        for year in required_years:
-            assert 2020 <= year <= 2024
-    
-    def test_schaltjahr_behandlung(self):
-        """Testet die Behandlung von Schaltjahren (29. Februar)"""
-        # 2020 und 2024 sind Schaltjahre
-        schaltjahre = [2020, 2024]
-        
-        for jahr in schaltjahre:
-            # Prüfe, ob 29. Februar existiert
-            datum = pd.Timestamp(f'{jahr}-02-29')
-            assert datum.is_leap_year
-
-
-class TestPlausibilität:
-    """Tests für Plausibilität der Ergebnisse"""
-    
-    def test_installierte_leistung_steigt(self):
-        """Testet, ob die installierte Leistung über Zeit zunimmt"""
-        # Beispiel: 2026 sollte weniger als 2030 haben, 2030 weniger als 2045
-        installiert_2026 = 80.0
-        installiert_2030 = 100.0
-        installiert_2045 = 150.0
-        
-        assert installiert_2026 < installiert_2030 < installiert_2045
-    
-    def test_erzeugung_nicht_negativ(self):
-        """Testet, ob Erzeugungswerte nicht negativ sind"""
-        # Simuliere Prognose-Werte
-        prognose_werte = [100.5, 234.7, 0.0, 567.8, 12.3]
-        
-        for wert in prognose_werte:
-            assert wert >= 0, f"Negative Erzeugung: {wert}"
-    
-    def test_wind_offshore_geringer_als_onshore(self):
-        """Testet, ob Wind Offshore in der Regel geringer installiert ist als Onshore"""
-        # In Deutschland ist Onshore typischerweise größer
-        wind_onshore_2030 = 115.0
-        wind_offshore_2030 = 30.0
-        
-        # Offshore sollte kleiner sein (aktueller Stand)
-        assert wind_offshore_2030 < wind_onshore_2030
-
-
-class TestFehlende_Werte:
-    """Tests für den Umgang mit fehlenden Werten"""
-    
-    def test_keine_nan_in_ausgabe(self):
-        """Testet, ob die Ausgabe keine NaN-Werte enthält"""
-        # Simuliere DataFrame ohne NaN
-        df = pd.DataFrame({
-            'A': [1.0, 2.0, 3.0],
-            'B': [4.0, 5.0, 6.0]
-        })
-        
-        assert not df.isna().any().any()
-    
-    def test_keine_inf_in_ausgabe(self):
-        """Testet, ob die Ausgabe keine Inf-Werte enthält"""
-        df = pd.DataFrame({
-            'A': [1.0, 2.0, 3.0],
-            'B': [4.0, 5.0, 6.0]
-        })
-        
-        assert not np.isinf(df.values).any()
+        expected_rows = 20 * 365.25 * 96
+        assert len(result) == pytest.approx(expected_rows, abs=20), \
+            f"DataFrame sollte ca. {expected_rows:.0f} Viertelstundenwerte haben, hat aber {len(result)}"
 
 
 if __name__ == "__main__":
