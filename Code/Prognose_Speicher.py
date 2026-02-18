@@ -233,7 +233,8 @@ def Verlauf_Speicher(df_anteilEE: pd.DataFrame, entladegrenze: float, ladegrenze
     (Optimierte Version mit Hilfsfunktionen und NumPy-Arrays)
     
     Args:
-        entladegrenze:
+        entladegrenze: EE-Prozentwert der unterschritten werden muss, damit Speicher entladen werden in Prozent (0-100)
+        ladegrenze: EE-Prozentwert der überschritten werden muss, damit Speicher geladen werden in Prozent (0-100)
         untergrenze_h2_prozent: Winterladestand für Wasserstoffspeicher in Prozent (0-100)
         langzeit_kurzzeit: Werden Kurzzeitspeicher aus Langzeitspeichern geladen? y/n
     """
