@@ -1,0 +1,55 @@
+@startuml Prognose_Speicher
+/'
+Grundstruktur mit Hilfe von KI anhand Python-Code erstellt. (Claude Sonnet 4.5)
+'/
+
+<style>
+activity {
+    HorizontalAlignment center
+}
+</style>
+
+start
+
+partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
+    
+    :Momentanleistungen und verfügbare Ladung berechnen;
+    
+    :Summe EE-Erzeuger berechnen;
+    
+    if (Anteil EE > Ladegrenze?) then (ja)
+        :Überschüssige Energie berechnen;
+        
+        :Speicher nach Priorität laden\n(Kapazität und Leistung);
+        
+        note right
+            Pro Speicher:
+            - Prüfe Ladestand
+            - Lade max. Leistung/4 (15min)
+            - Lade max. bis Obergrenze
+            - Output-Wirkungsgrad berücksichtigen
+            - Restenergie → "Export"
+        end note
+        
+    elseif (Anteil EE ≤ Entladegrenze?) then (ja)
+        :Fehlende Energie berechnen;
+        
+        :Speicher nacheinander entladen\n(Batterie → Pumpspeicher → Wasserstoff);
+        
+        note right
+            Pro Speicher:
+            - Prüfe Ladestand
+            - Entlade max. Leistung/4 (15min)
+            - Entlade max. bis Untergrenze
+            - Output-Wirkungsgrad berücksichtigen
+            - Restbedarf → "Import"/Konventionelle
+        end note
+        
+    endif
+    
+    :Speicherstände und "extra" Energien in Listen speichern;
+    
+}
+
+stop
+@enduml
