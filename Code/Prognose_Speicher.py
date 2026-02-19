@@ -184,9 +184,9 @@ def berechne_speicher_aufteilung(
         platz_batterie: Verfügbarer Platz im Batteriespeicher in MWh
         platz_pumpspeicher: Verfügbarer Platz im Pumpspeicher in MWh
         platz_wasserstoff: Verfügbarer Platz im Wasserstoffspeicher in MWh
-        leistung_batterie: Viertelstundenleistung Batterie in MW
-        leistung_pumpspeicher: Viertelstundenleistung Pumpspeicher in MW
-        leistung_wasserstoff: Viertelstundenleistung Wasserstoff in MW
+        leistung_batterie: Viertelstundenleistung Batterie in MWh
+        leistung_pumpspeicher: Viertelstundenleistung Pumpspeicher in MWh
+        leistung_wasserstoff: Viertelstundenleistung Wasserstoff in MWh
         gewicht_kapazitaet: Gewichtungsfaktor für verfügbare Kapazität (0-1) ENTFERNT
         gewicht_leistung: Gewichtungsfaktor für Leistung (0-1) ENTFERNT
     
