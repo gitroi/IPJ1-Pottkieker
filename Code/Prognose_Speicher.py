@@ -206,7 +206,7 @@ def berechne_speicher_aufteilung(
     anteil_leistung_pump = leistung_pumpspeicher / gesamt_leistung if gesamt_leistung > 0 else 0
     anteil_leistung_h2 = leistung_wasserstoff / gesamt_leistung if gesamt_leistung > 0 else 0
     
-    # Gewichtete Kombination TODO: Gewichtung war in Formel irrelevant, nach MS5 anpassen?
+    # Kombination
     gewicht_batterie = anteil_platz_batterie * anteil_leistung_batterie
     gewicht_pump = anteil_platz_pump * anteil_leistung_pump
     gewicht_h2 = anteil_platz_h2 * anteil_leistung_h2
