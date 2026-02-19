@@ -18,7 +18,8 @@ partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
     :Summe EE-Erzeuger berechnen;
     
     if (Anteil EE > Ladegrenze?) then (ja)
-        :Überschüssige Energie berechnen;
+        :Überschüssige Energie 
+         berechnen;
         
         :Speicher nach Priorität laden\n(Kapazität und Leistung);
         
@@ -27,12 +28,13 @@ partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
             - Prüfe Ladestand
             - Lade max. Leistung/4 (15min)
             - Lade max. bis Obergrenze
-            - Output-Wirkungsgrad berücksichtigen
+            - Output-Wirkungsgrad
             - Restenergie → "Export"
         end note
         
     elseif (Anteil EE ≤ Entladegrenze?) then (ja)
-        :Fehlende Energie berechnen;
+        :Fehlende Energie 
+         berechnen;
         
         :Speicher nacheinander entladen\n(Batterie → Pumpspeicher → Wasserstoff);
         
@@ -41,8 +43,9 @@ partition "Schleife über alle Zeitpunkte (15 min Auflösung)" {
             - Prüfe Ladestand
             - Entlade max. Leistung/4 (15min)
             - Entlade max. bis Untergrenze
-            - Output-Wirkungsgrad berücksichtigen
-            - Restbedarf → "Import"/Konventionelle
+            - Output-Wirkungsgrad
+            - Restbedarf 
+              → "Import"/Konventionelle
         end note
         
     endif
