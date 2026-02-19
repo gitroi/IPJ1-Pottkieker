@@ -81,31 +81,41 @@ def speicher_laden(
         wirkungsgrad: Wirkungsgrad beim Laden
     
     Returns:
-        (neuer_bestand, verbleibende_lademenge)
+        (aktueller_bestand, verbleibende_lademenge)
     """
     max_bestand = kapazitaet * obergrenze
     
+    # Berechne wie viel geladen werden kann
+    energie_mit_wirkungsgrad = lademenge * wirkungsgrad
+
     # Prüfen ob Speicher noch Platz hat
-    if aktueller_bestand > (max_bestand - leistung): 
-        lademenge = lademenge - ((max_bestand - aktueller_bestand) / wirkungsgrad)
-        aktueller_bestand = max_bestand
-        return aktueller_bestand, lademenge  
+    if (aktueller_bestand > (max_bestand - leistung)): 
+        if ((energie_mit_wirkungsgrad) >= leistung):
+            lademenge = lademenge - ((max_bestand - aktueller_bestand) / wirkungsgrad)
+            aktueller_bestand = max_bestand
+            return aktueller_bestand, lademenge  
+        else if ((energie_mit_wirkungsgrad) < leistung):
+            if ((energie_mit_wirkungsgrad) < (max_bestand - aktueller_bestand)):
+                lademenge = 0
+                aktueller_bestand = aktueller_bestand + energie_mit_wirkungsgrad
+                return aktueller_bestand, lademenge
+            else if ((energie_mit_wirkungsgrad) >= (max_bestand - aktueller_bestand)):
+                lademenge = lademenge - ((max_bestand - aktueller_bestand) / wirkungsgrad)
+                aktueller_bestand = max_bestand
+                return aktueller_bestand, lademenge
     
     if lademenge <= 0:
         return aktueller_bestand, lademenge
     
-    # Berechne wie viel geladen werden kann
-    energie_mit_wirkungsgrad = lademenge * wirkungsgrad
-    
     if leistung > energie_mit_wirkungsgrad:
         # Gesamte Lademenge passt in einen Zeitschritt
-        neuer_bestand = aktueller_bestand + energie_mit_wirkungsgrad
-        return neuer_bestand, 0.0
+        aktueller_bestand = aktueller_bestand + energie_mit_wirkungsgrad
+        return aktueller_bestand, 0.0
     else:
         # Leistung begrenzt die Lademenge
-        neuer_bestand = aktueller_bestand + leistung
+        aktueller_bestand = aktueller_bestand + leistung
         verbraucht = leistung / wirkungsgrad
-        return neuer_bestand, lademenge - verbraucht
+        return aktueller_bestand, lademenge - verbraucht
 
 # Hilfsfunktion zum Entladen eines Speichers
 def speicher_entladen(
@@ -129,7 +139,7 @@ def speicher_entladen(
         wirkungsgrad: Wirkungsgrad beim Entladen
     
     Returns:
-        (neuer_bestand, gelieferte_energie, verbleibende_fehlmenge)
+        (aktueller_bestand, gelieferte_energie, verbleibende_fehlmenge)
     """
     min_bestand = kapazitaet * untergrenze
     verfuegbar = aktueller_bestand - min_bestand
@@ -144,25 +154,25 @@ def speicher_entladen(
     
     # Fall 1: Leistung reicht, Kapazität reicht → vollständig decken
     if leistung > fehlmenge and verfuegbar >= benoetigt_fuer_fehlmenge:
-        neuer_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
-        return neuer_bestand, fehlmenge, 0.0
+        aktueller_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
+        return aktueller_bestand, fehlmenge, 0.0
     
     # Fall 2: Leistung begrenzt, aber genug Kapazität
     if leistung <= fehlmenge and verfuegbar >= max_entnahme_leistung:
-        neuer_bestand = aktueller_bestand - max_entnahme_leistung
+        aktueller_bestand = aktueller_bestand - max_entnahme_leistung
         geliefert = leistung
-        return neuer_bestand, geliefert, fehlmenge - geliefert
+        return aktueller_bestand, geliefert, fehlmenge - geliefert
     
     # Fall 3: Kapazität begrenzt (nicht genug im Speicher)
     lieferbar = verfuegbar * wirkungsgrad
     if fehlmenge < lieferbar:
         # Fehlmenge ist kleiner als verfügbar
-        neuer_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
-        return neuer_bestand, fehlmenge, 0.0
+        aktueller_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
+        return aktueller_bestand, fehlmenge, 0.0
     else:
         # Alles Verfügbare liefern
-        neuer_bestand = min_bestand
-        return neuer_bestand, lieferbar, fehlmenge - lieferbar
+        aktueller_bestand = min_bestand
+        return aktueller_bestand, lieferbar, fehlmenge - lieferbar
 
 # Hilfsfunktion zur Aufteilung der Lademenge
 def berechne_speicher_aufteilung(
