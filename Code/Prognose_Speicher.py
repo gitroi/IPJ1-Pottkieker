@@ -149,27 +149,28 @@ def speicher_entladen(
     benoetigt_fuer_fehlmenge = fehlmenge / wirkungsgrad
     max_entnahme_leistung = leistung / wirkungsgrad
     
-    # Fall 1: Leistung reicht, Kapazität reicht → vollständig decken
-    if leistung > fehlmenge and verfuegbar >= benoetigt_fuer_fehlmenge:
-        aktueller_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
-        return aktueller_bestand, fehlmenge, 0.0
     
-    # Fall 2: Leistung begrenzt, aber genug Kapazität
-    if leistung <= fehlmenge and verfuegbar >= max_entnahme_leistung:
-        aktueller_bestand = aktueller_bestand - max_entnahme_leistung
-        geliefert = leistung
-        return aktueller_bestand, geliefert, fehlmenge - geliefert
+    if leistung >= fehlmenge:
+    # Fall 1: Leistung reicht, Speicher reicht → vollständig decken
+        if verfuegbar >= benoetigt_fuer_fehlmenge:
+            aktueller_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
+            return aktueller_bestand, fehlmenge, 0.0
+    # Fall 2: Leistung reicht, Speicher reicht nicht → teilweise decken
+        else:
+            aktueller_bestand = aktueller_bestand - verfuegbar
+            return aktueller_bestand, verfuegbar * wirkungsgrad, fehlmenge - (verfuegbar * wirkungsgrad)
     
-    # Fall 3: Kapazität begrenzt (nicht genug im Speicher)
-    lieferbar = verfuegbar * wirkungsgrad
-    if fehlmenge < lieferbar:
-        # Fehlmenge ist kleiner als verfügbar
-        aktueller_bestand = aktueller_bestand - benoetigt_fuer_fehlmenge
-        return aktueller_bestand, fehlmenge, 0.0
     else:
-        # Alles Verfügbare liefern
-        aktueller_bestand = min_bestand
-        return aktueller_bestand, lieferbar, fehlmenge - lieferbar
+    # Fall 3 Leistung reicht nicht, Speicher reicht → gelieferte Energie durch Leistung begrenzt
+        if verfuegbar >= max_entnahme_leistung:
+            aktueller_bestand = aktueller_bestand - max_entnahme_leistung
+            geliefert = leistung
+            return aktueller_bestand, geliefert, fehlmenge - geliefert
+    # Fall 4 Leistung reicht nicht, Speicher noch weniger → gelieferte Energie durch Speicher begrenzt
+        else:
+            aktueller_bestand = min_bestand
+            geliefert = verfuegbar * wirkungsgrad
+            return aktueller_bestand, geliefert, fehlmenge - geliefert
 
 # Hilfsfunktion zur Aufteilung der Lademenge
 def berechne_speicher_aufteilung(
