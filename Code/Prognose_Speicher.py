@@ -94,25 +94,20 @@ def speicher_laden(
 
     # Prüfen ob Speicher noch Platz hat
     if (aktueller_bestand > (max_bestand - leistung)): 
-        if ((energie_mit_wirkungsgrad) >= leistung):
+        if (energie_mit_wirkungsgrad >= (max_bestand - aktueller_bestand)):
             lademenge = lademenge - ((max_bestand - aktueller_bestand) / wirkungsgrad)
             aktueller_bestand = max_bestand
             return aktueller_bestand, lademenge  
-        elif ((energie_mit_wirkungsgrad) < leistung):
-            if ((energie_mit_wirkungsgrad) < (max_bestand - aktueller_bestand)):
-                lademenge = 0
-                aktueller_bestand = aktueller_bestand + energie_mit_wirkungsgrad
-                return aktueller_bestand, lademenge
-            elif ((energie_mit_wirkungsgrad) >= (max_bestand - aktueller_bestand)):
-                lademenge = lademenge - ((max_bestand - aktueller_bestand) / wirkungsgrad)
-                aktueller_bestand = max_bestand
-                return aktueller_bestand, lademenge
-    
-    
-    if leistung > energie_mit_wirkungsgrad:
+        else:
+            lademenge = 0
+            aktueller_bestand = aktueller_bestand + energie_mit_wirkungsgrad
+            return aktueller_bestand, lademenge
+
+    elif leistung > energie_mit_wirkungsgrad:
         # Gesamte Lademenge passt in einen Zeitschritt
+        lademenge = 0
         aktueller_bestand = aktueller_bestand + energie_mit_wirkungsgrad
-        return aktueller_bestand, 0.0
+        return aktueller_bestand, lademenge
     else:
         # Leistung begrenzt die Lademenge
         aktueller_bestand = aktueller_bestand + leistung
