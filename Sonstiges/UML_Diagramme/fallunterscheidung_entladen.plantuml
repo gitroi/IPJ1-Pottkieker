@@ -15,9 +15,13 @@ if (Fehlmenge <= 0 oder verfügbare Energie <= 0 ?) then (ja)
 else (nein)
 endif
     
-:Lademenge <latex>\cdot</latex> Wirkungsgrad;
+:Fehlmenge / Wirkungsgrad;
     
-:Maximal lieferbare Energie;
+:Benötigte Energie;
+
+:Leistung / Wirkungsgrad;
+    
+:Maximal abzugebende Energie;
     
 if (    Ladestand > (Obere Ladegrenze - Leistung) ?
 Speicher fast voll, Leistung ausreichend um zu füllen) then (ja)

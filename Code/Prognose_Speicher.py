@@ -141,8 +141,8 @@ def speicher_entladen(
     min_bestand = kapazitaet * untergrenze
     verfuegbar = aktueller_bestand - min_bestand
     
-    # Prüfen ob Speicher über Minimum und Fehlmenge vorhanden
-    if aktueller_bestand <= min_bestand or fehlmenge <= 0:
+    # Prüfen ob Speicher unter Minimum und Fehlmenge vorhanden
+    if verfuegbar <= 0 or fehlmenge <= 0:
         return aktueller_bestand, 0.0, fehlmenge
     
     # Berechne benötigte Entnahme (mit Wirkungsgrad-Verlust)
