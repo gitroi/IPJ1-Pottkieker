@@ -1,0 +1,29 @@
+@startuml Fallunterscheidung
+/'
+Grundstruktur mit Hilfe von KI anhand Python-Code erstellt. (Claude Sonnet 4.5)
+'/
+
+<style>
+activity {
+    HorizontalAlignment center
+}
+</style>
+!pragma useVerticalIf on
+start
+
+    :Lademenge <latex>\cdot</latex> Wirkungsgrad;
+    
+    :Maximal lieferbare Energie;
+    
+    if (Ladestand > (Ladegrenze - Leistung)) then (ja)
+        :Überschüssige Energie berechnen;
+        
+    (nein) elseif (Lademenge <= 0) then (ja)
+        :Return Ladestand, Lademenge;
+        
+    endif
+    
+    :Speicherstände und "extra" Energien in Listen speichern;
+    
+stop
+@enduml

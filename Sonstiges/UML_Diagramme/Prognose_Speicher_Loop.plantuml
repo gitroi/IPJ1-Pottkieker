@@ -1,4 +1,4 @@
-@startuml Prognose_Speicher
+@startuml Prognose_Speicher_Loop
 /'
 Grundstruktur mit Hilfe von KI anhand Python-Code erstellt. (Claude Sonnet 4.5)
 '/
