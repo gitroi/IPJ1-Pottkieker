@@ -655,7 +655,7 @@ def zweiwochendiagramm_stunden(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
                  woche_df["braun [MWh]"]/1e3,
                  woche_df["erdgas [MWh]"]/1e3,
                  woche_df["stein [MWh]"]/1e3,
-                 woche_df["sonstige [MWh]"]/1e3,
+                 woche_df["sonstige_konventionelle [MWh]"]/1e3,
                  woche_df["importe [MWh]"]/1e3,
                  labels=["Sonstige", "Biomasse", "Wasserkraft", "Wind Onshore", "Wind Offshore", "PV", "Speicher", "Braunkohle","Erdgas","Steinkohle","Sonstige Konv.","Importe"],
                  colors=['#FF8C00', '#228B22', '#00CED1', '#87CEEB', '#4169E1', '#F9BF02', '#00FF00', '#8B4513',"#DCAE76",'#708090','#D3D3D3','#000000'],
