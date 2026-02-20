@@ -83,6 +83,10 @@ def speicher_laden(
     Returns:
         (aktueller_bestand, verbleibende_lademenge)
     """
+
+    if lademenge <= 0:
+        return aktueller_bestand, lademenge
+    
     max_bestand = kapazitaet * obergrenze
     
     # Berechne wie viel geladen werden kann
@@ -104,8 +108,6 @@ def speicher_laden(
                 aktueller_bestand = max_bestand
                 return aktueller_bestand, lademenge
     
-    if lademenge <= 0:
-        return aktueller_bestand, lademenge
     
     if leistung > energie_mit_wirkungsgrad:
         # Gesamte Lademenge passt in einen Zeitschritt
