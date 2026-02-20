@@ -1,29 +1,44 @@
 @startuml Fallunterscheidung
-/'
-Grundstruktur mit Hilfe von KI anhand Python-Code erstellt. (Claude Sonnet 4.5)
-'/
 
 <style>
 activity {
     HorizontalAlignment center
 }
+
 </style>
 !pragma useVerticalIf on
 start
-
-    :Lademenge <latex>\cdot</latex> Wirkungsgrad;
     
-    :Maximal lieferbare Energie;
+if (Lademenge <= 0 ?) then (ja)
+    :Fehlerhafte Lademenge;
+    stop
+else (nein)
+endif
     
-    if (Ladestand > (Ladegrenze - Leistung)) then (ja)
-        :Überschüssige Energie berechnen;
-        
-    (nein) elseif (Lademenge <= 0) then (ja)
-        :Return Ladestand, Lademenge;
+:Lademenge <latex>\cdot</latex> Wirkungsgrad;
+    
+:Maximal lieferbare Energie;
+    
+if (    Ladestand > (Obere Ladegrenze - Leistung) ?
+Speicher fast voll, Leistung ausreichend um zu füllen) then (ja)
+    if (Maximal lieferbare Energie >= Speicherplatz ?) then (ja)
+        :Speicher wird voll geladen
+        Ladungs-Energie durch Platz begrenzt;
+        stop
+    else (nein) 
+        :Lademenge wird komplett eingespiesen;
+        stop
         
     endif
-    
-    :Speicherstände und "extra" Energien in Listen speichern;
-    
-stop
+
+(nein) elseif (Leistung > Maximal lieferbare Energie ?) then (ja)
+    :Lademenge wird komplett eingespiesen;
+        stop
+else (nein)
+    :Lademenge wird nur zum Teil eingespiesen
+    Ladungs-Energie durch Leistung begrenzt;
+    stop
+
+endif
+
 @enduml
