@@ -23,24 +23,24 @@ endif
     
 :Maximal abzugebende Energie;
     
-if (    Ladestand > (Obere Ladegrenze - Leistung) ?
-Speicher fast voll, Leistung ausreichend um zu füllen) then (ja)
-    if (Maximal lieferbare Energie >= Speicherplatz ?) then (ja)
-        :Speicher wird voll geladen
-        Ladungs-Energie durch Platz begrenzt;
+if (Leistung >= Fehlmenge ?) then (ja)
+    if (Verfügbare Energie >= Benötigte Energie ?) then (ja)
+        :Bedarf wird komplett gedeckt
+        Speicher um Benötigte Energie entladen;
         stop
     else (nein) 
-        :Lademenge wird komplett eingespiesen;
+        :Verfügbare Energie wird komplett abgegeben;
         stop
         
     endif
 
-(nein) elseif (Leistung > Maximal lieferbare Energie ?) then (ja)
-    :Lademenge wird komplett eingespiesen;
+(nein) elseif (Verfügbare Energie >= Leistung ?) then (ja)
+    :Verfügbare Energie durch Leistung begrenzt
+    Maximal abzugebende Energie wird entladen;
         stop
 else (nein)
-    :Lademenge wird nur zum Teil eingespiesen
-    Ladungs-Energie durch Leistung begrenzt;
+    :Verfügbare Energie durch Speicher begrenzt
+    Speicher wird komplett entladen;
     stop
 
 endif
