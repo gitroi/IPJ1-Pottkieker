@@ -1,4 +1,4 @@
-@startuml Fallunterscheidung laden
+@startuml Fallunterscheidung Entladung
 
 <style>
 activity {
@@ -9,8 +9,8 @@ activity {
 !pragma useVerticalIf on
 start
     
-if (Lademenge <= 0 ?) then (ja)
-    :Fehlerhafte Lademenge;
+if (Fehlmenge <= 0 oder verfügbare Energie <= 0 ?) then (ja)
+    :Fehlerhafte Werte;
     stop
 else (nein)
 endif
