@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Optional
 from config import DATA_DIR, PROJECT_ROOT
-from Analyse import analyse_erneuerbare_anteil
 from Prognose_Erzeugung import Prognose_erzeugung, Jährlicher_Zuwachs_EE
 from Prognose_Verbrauch import Prognose_Verbrauch
 from Prognose_Konventionelle import konventionelle_prognose
@@ -28,7 +27,11 @@ from Auswertung import ausgabe, konventionelle_Leistung_Energie, top10_fehlenerg
 
 @dataclass
 class Szenario:
-    """Speichert alle Daten und Ergebnisse für ein Szenario"""
+    """
+    Speichert alle Daten und Ergebnisse für ein Szenario
+    Erställt die Formatierung der Ergebnisse und Plots für die Auswertung
+    Gibt die Auswertung für mehrere Szenarien zurück
+    """
     name: str
     beschreibung: str
     szenario: json

@@ -111,7 +111,6 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
 
     #===  wachstumsfaktor für 2031 bis 2045 berechnen ===
 
-    # Berechne die Summe des 2030-Profils (Mittelwerte) als Startwert für die nächste Phase
     gesamtverbrauch_2030_basisprofil = df_gesamt[df_gesamt["Jahr"] == 2030]["Netzlast_Prognose [MWh]"].sum()
 
     wachstumsrate_2045 = (verbrauch_2045_MWh - gesamtverbrauch_2030_basisprofil) / 15
@@ -165,7 +164,6 @@ def Prognose_Verbrauch(verbrauchsprofil: json , lastprofil: bool ) -> pd.DataFra
     df_gesamt_2045 = df_gesamt_2045[["Datum von", "Netzlast [MWh]"]]
     df_gesamt_2045 = df_gesamt_2045.sort_values(by="Datum von").reset_index(drop=True)
 
-    #=== Rückgabe des DataFrames nur mit den relevanten Spalten ===
     if(df_gesamt_2045.isna().any().any()):
         raise ValueError("Fehlende Werte in der Verbrauchsprognose entdeckt.")
 

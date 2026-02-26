@@ -793,7 +793,6 @@ elif modus == "Szenarien vergleichen":
                 status_text.text(f"Berechne {szenario_data['Name']}... ({idx+1}/{len(ausgewählte)})")
                 
                 try:
-                    # Konventionelle Anteile aus den UI-Inputs verwenden
                     konven_anteile = {
                         "2038": {
                             "braun": braun_2038_vgl,
@@ -826,7 +825,6 @@ elif modus == "Szenarien vergleichen":
                         langzeit_kurzzeit=langzeit_kurzzeit
                     )
                     
-                    #szenario_ergebnis.berechne_alle_prognosen()
                     ergebnisse_df = szenario_ergebnis.getErgebnisse()
                     alle_ergebnisse = pd.concat([alle_ergebnisse, ergebnisse_df], ignore_index=True)
                     

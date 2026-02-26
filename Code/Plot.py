@@ -1,4 +1,5 @@
 """
+Gibt die Verbrauchsdaten von SMARD für vergangende Jahre grafisch aus.
 Programmiert von Joris Bürger
 """
 

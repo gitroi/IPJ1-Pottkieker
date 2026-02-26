@@ -1,5 +1,6 @@
 """
-Diese Datei enthält die Funktion zur Prognose konventioneller Methoden basierend auf Eingabedaten und festen Parametern.
+Diese Datei enthält die Funktion zur Prognose konventioneller Methoden basierend auf 
+Eingabedaten und festen Parametern.
 Programmiert von Joris Bürger 
 """
 
@@ -80,7 +81,6 @@ def konventionelle_prognose(gesamt:pd.DataFrame,konventionelle:dict,anteile:dict
                 # CAPEX: €/kW × kW = € (einmalig im Baujahr)
                 capex_gesamt = zubau_gw * 1e6 * feste_parameter_konventionelle[key]['capex']
                 
-                # CAPEX wird gleichmäßig über alle Viertelstunden des Baujahres verteilt
                 anzahl_viertelstunden = jahr_mask.sum()
                 capex_pro_viertelstunde = capex_gesamt / anzahl_viertelstunden
                 prognose_konventionelle.loc[jahr_mask, f'{key}_capex [€]'] = capex_pro_viertelstunde
