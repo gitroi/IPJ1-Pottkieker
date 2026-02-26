@@ -1517,8 +1517,8 @@ elif modus == "Szenario hinzufügen/Verändern":
 # ============================================================================
 # MODUS 4: ÜBER DAS PROJEKT
 # ============================================================================
-elif modus == "ℹÜber das Projekt":
-    st.header("ℹÜber das Projekt")
+elif modus == "Über das Projekt":
+    st.header("Über das Projekt")
     
     st.markdown("""
     ## IPJ1 - Team Pottkieker
