@@ -476,6 +476,7 @@ def plot_histogram_gesamtauswertung(gesamt_df: pd.DataFrame,ax1,ax2,ax3,ax4):
 def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes):
     """
     Erstellt ein Liniendiagramm des Ladestands der Speicher über die Zeit.
+    Das Design wurde größtenteils von dem Team "Green+" übernommen.
     
     Args:
         gesamt_df (pd.DataFrame): DataFrame mit den Gesamtdaten.
@@ -530,7 +531,8 @@ def plot_liniendiagramm_ladestand(gesamt: pd.DataFrame, start_datum,ax: plt.Axes
 def plot_liniendiagramm_ladestand_dunkelflaute(dunkelflaute_df: pd.DataFrame, ax: plt.Axes):
     """
     Erstellt ein Liniendiagramm des Ladestands der Speicher über die Zeit der Dunkelflaute.
-    
+    Das Design wurde größtenteils von dem Team "Green+" übernommen.
+
     Args:
         dunkelflaute_df (pd.DataFrame): DataFrame mit den Daten der Dunkelflaute.
         ax (matplotlib.axes.Axes): Achsenobjekt für das Diagramm.

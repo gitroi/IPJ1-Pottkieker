@@ -2,6 +2,7 @@
 Streamlit Web-App für die EE-Ausbau Simulation
 Team Pottkieker - IPJ1
 Programmiert von Joris Bürger, Robin Matzke
+Idee Streamlit zu nutzen übernommen vom Team "Eco Vision Labs"
 Unterstützt durch Claude Sonnet 4.5 und Inlinesuggestions 
 """
 
