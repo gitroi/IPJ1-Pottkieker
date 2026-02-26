@@ -6,7 +6,7 @@ Github Repository für eine Simulationssoftware zur Analyse des EE-Ausbaus in De
 
 # Software Starten
 
-Um die Software zu starten in der Komandozeile streamlit run Code\streamlit_app.py eingeben.
+Um die Software zu starten in der Kommandozeile streamlit run Code\streamlit_app.py eingeben.
 Streamlit startet lokal und läuft sicher.
 
 Andernfalls kann die Onlineapp genutz werden: https://pottkieker.streamlit.app 
@@ -15,11 +15,11 @@ Andernfalls kann die Onlineapp genutz werden: https://pottkieker.streamlit.app
 
 #### Code
 
-Hier liegen alle Python-/Jupyter-Quelldateien.
+Hier liegen alle Python-Quelldateien.
 
 #### Daten
 
-Hier liegen alle Daten die zur Auswertung eingelesen werden wie CSV-Dateien.
+Hier liegen alle Daten die zur Auswertung eingelesen werden wie CSV- oder JSON-Dateien.
 
 #### Quellen
 
